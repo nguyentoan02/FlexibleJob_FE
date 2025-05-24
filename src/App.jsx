@@ -12,6 +12,7 @@ import UserPage from "./pages/UserPage";
 import NotFound from "./pages/NotFound";
 import PrivateRoute from "./components/PrivateRoute";
 import { useAuth } from "./hooks/useAuth";
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
     const { user } = useAuth();
@@ -66,6 +67,10 @@ function App() {
                 </Route>
 
                 <Route path="/404" element={<NotFound />} />
+                <Route
+                    path="/resetPassword/:token"
+                    element={<ResetPassword />}
+                />
                 {/* <Route path="*" element={<NotFound />} /> */}
             </Routes>
         </Router>
