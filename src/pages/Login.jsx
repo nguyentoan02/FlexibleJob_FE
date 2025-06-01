@@ -61,20 +61,34 @@ export default function LoginEm() {
         }
     };
 
+    const validateEmail = (email) => {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    };
+
     return (
         <>
             <div className="h-screen flex bg-[url(/public/background.jpg)]">
                 <div className="mx-auto space-y-4 my-auto w-1/4 p-20 bg-white/20 rounded-3xl backdrop-blur-lg isolate shadow-lg ring-1 ring-black/5">
                     <Label className="text-3xl text-center">Login</Label>
-                    <Label className="text-xl">Email</Label>
+                    <div className="flex items-baseline gap-2">
+                        <Label className="text-xl">Email</Label>
+                        {!validateEmail(form.email) && form.email && (
+                            <span className="text-red-500 text-sm">
+                                Invalidate Email
+                            </span>
+                        )}
+                    </div>
                     <Input
                         value={form.email}
                         onChange={(e) =>
                             setForm({ ...form, email: e.target.value })
                         }
                         required
-                        className="border-white/20"
+                        className={
+                            validateEmail ? "border-red-500" : "border-white/20"
+                        }
                     />
+
                     <Label className="text-xl">Password</Label>
                     <Input
                         type="password"
@@ -89,6 +103,11 @@ export default function LoginEm() {
                         type="submit"
                         className="w-full"
                         onClick={(e) => {
+                            if (!validateEmail(form.email)) {
+                                setMessage("invalidate Email");
+                                setShowModal(true);
+                                return;
+                            }
                             handleLogin(e);
                         }}
                     >
