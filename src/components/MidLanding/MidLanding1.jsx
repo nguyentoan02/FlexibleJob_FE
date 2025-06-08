@@ -37,7 +37,7 @@ export default function MidLanding1() {
                         {/* Updated green blur effect for a softer, fainter glow */}
                         <div className="absolute inset-0 bg-green-200 opacity-50 blur-[100px] transform scale-110 -translate-x-8 translate-y-8 md:-translate-x-12 md:translate-y-12"></div>
                         <img
-                            src="/public/image.png" // Replace with your actual image path
+                            src="/image.png" // Replace with your actual image path
                             alt="Person using laptop"
                             className="rounded-lg shadow-2xl max-w-md w-full z-10"
                         />
@@ -111,7 +111,7 @@ export default function MidLanding1() {
                         {/* Image Section for About Us */}
                         <div className="lg:w-1/2 flex justify-center">
                             <img
-                                src="/public/image1.png" // Replace with your actual image path for this section
+                                src="/image1.png" // Replace with your actual image path for this section
                                 alt="Woman on phone"
                                 className="rounded-lg shadow-xl max-w-lg w-full object-cover h-[500px]" // Adjust height as needed
                             />
