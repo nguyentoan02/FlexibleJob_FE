@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import Toast from "@/components/Toast/Toast";
 import { AdminHeader } from '@/components/Header/AdminHeader'
-import { AdminSidebar } from '@/components/AdminSidebar'
+import { AdminSidebar } from '@/components/Sidebar/AdminSidebar'
 
 export default function AdminProfilePage() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
