@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const BASE_URL = 'http://localhost:5000/api'
+const BASE_URL = import.meta.env.VITE_API_URL 
 
 // Create axios instance with default config
 const api = axios.create({
@@ -26,17 +26,20 @@ api.interceptors.request.use(
 
 // Add response interceptor to handle errors
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    return response.data
+  },
   (error) => {
     if (error.response) {
       // Handle 401 Unauthorized
       if (error.response.status === 401) {
         localStorage.removeItem('token')
-        window.location.href = '/login' // Redirect to login page
+        window.location.href = '/login'
       }
-      // Handle 403 Forbidden (not admin)
+      // Handle 403 Forbidden
       if (error.response.status === 403) {
-        throw new Error('Access denied. Admin privileges required.')
+        localStorage.removeItem('token')
+        window.location.href = '/login'
       }
     }
     return Promise.reject(error)
@@ -46,52 +49,34 @@ api.interceptors.response.use(
 export const userApi = {
   // Get all users (admin only)
   getAllUsers: async () => {
-    try {
-      const response = await api.get('/users')
-      return response.data
-    } catch (error) {
-      throw error
-    }
+    const response = await api.get('/user')
+    return response
   },
 
   // Toggle user ban status (admin only)
-  toggleBanUser: async (userId, banned) => {
-    try {
-      const response = await api.patch(`/users/${userId}/toggle-ban`, {
-        banned
-      })
-      return response.data
-    } catch (error) {
-      throw error
-    }
+  toggleBanUser: async (userId, isBanned) => {
+    const endpoint = isBanned ? 
+      `/users/status/ban/${userId}` : 
+      `/users/status/unban/${userId}`
+    const response = await api.put(endpoint)
+    return response
   },
 
   // Get user by ID (admin only)
   getUserById: async (userId) => {
-    try {
-      const response = await api.get(`/users/${userId}`)
-      return response.data
-    } catch (error) {
-      throw error
-    }
+    const response = await api.get(`/user/${userId}`)
+    return response
   },
 
   // Update user (admin only)
   updateUser: async (userId, userData) => {
-    try {
-      const response = await api.put(`/users/${userId}`, userData)
-      return response.data
-    } catch (error) {
-      throw error
-    }
+    const response = await api.put(`/user/${userId}`, userData)
+    return response
   },
 
   // Delete user (admin only)
   deleteUser: async (userId) => {
-    try {
-      await api.delete(`/users/${userId}`)
-    } catch (error) {
-      throw error
-    }
+    const response = await api.delete(`/user/${userId}`)
+    return response
   }
 } 

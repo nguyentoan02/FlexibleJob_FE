@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { AdminHeader } from '@/components/Header/AdminHeader'
 import { AdminSidebar } from '@/components/AdminSidebar'
 import { AccountsTable } from '@/components/AccountsTable'
@@ -10,74 +11,72 @@ import { useAuth } from '@/hooks/useAuth'
 export default function BannedAccountsPage() {
   const navigate = useNavigate()
   const { user } = useAuth()
+  const queryClient = useQueryClient()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [accounts, setAccounts] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
   const [toastMessage, setToastMessage] = useState(null)
   const [toastType, setToastType] = useState('success')
 
-  // Check if user is admin
-  useEffect(() => {
-    if (user && user.role !== 'ADMIN') {
-      navigate('/')
-    }
-  }, [user, navigate])
-
-  // Fetch accounts
-  useEffect(() => {
-    fetchAccounts()
-  }, [])
-
-  const fetchAccounts = async () => {
-    try {
-      const data = await userApi.getAllUsers()
-      setAccounts(data)
-      setLoading(false)
-    } catch (err) {
-      const errorMessage = err.message || 'Failed to fetch accounts'
-      setError(errorMessage)
-      setLoading(false)
-      
-      // Show error toast
-      setToastMessage(errorMessage)
-      setToastType('error')
-      setTimeout(() => setToastMessage(null), 3000)
-
-      // If unauthorized or forbidden, redirect to login
-      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
-        navigate('/login')
-      }
-    }
+  // Verify admin access
+  if (!user) {
+    navigate('/login')
+    return null
+  }
+  
+  if (user.role !== 'ADMIN') {
+    navigate('/404')
+    return null
   }
 
-  const handleToggleBan = async (id) => {
-    try {
-      const account = accounts.find(acc => acc.id === id)
-      if (!account) return
+  // Fetch users data
+  const { data: accounts, isLoading, error } = useQuery({
+    queryKey: ['users'],
+    queryFn: userApi.getAllUsers,
+    refetchOnWindowFocus: false,
+    staleTime: 30000, // Consider data fresh for 30 seconds
+    retry: 1
+  })
 
-      await userApi.toggleBanUser(id, !account.banned)
-
-      // Update local state
-      setAccounts(accounts.map(acc =>
-        acc.id === id ? { ...acc, banned: !acc.banned } : acc
-      ))
+  // Toggle ban mutation
+  const toggleBanMutation = useMutation({
+    mutationFn: async ({ userId, isBanned }) => {
+      return userApi.toggleBanUser(userId, !isBanned)
+    },
+    onSuccess: (data, variables) => {
+      // Update local data
+      queryClient.setQueryData(['users'], (oldData) => {
+        return oldData.map(user => 
+          user._id === variables.userId 
+            ? { ...user, isBanned: !variables.isBanned }
+            : user
+        )
+      })
 
       // Show success message
-      setToastMessage(`Account successfully ${account.banned ? 'unbanned' : 'banned'}`)
+      setToastMessage(`Account successfully ${variables.isBanned ? 'unbanned' : 'banned'}`)
       setToastType('success')
       setTimeout(() => setToastMessage(null), 3000)
-    } catch (err) {
-      const errorMessage = err.message || 'Failed to update account status'
+    },
+    onError: (error) => {
+      const errorMessage = error.message || 'Failed to update account status'
       setToastMessage(errorMessage)
       setToastType('error')
       setTimeout(() => setToastMessage(null), 3000)
 
       // If unauthorized or forbidden, redirect to login
-      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+      if (error.response?.status === 401 || error.response?.status === 403) {
         navigate('/login')
       }
     }
+  })
+
+  const handleToggleBan = (userId) => {
+    const account = accounts?.find(acc => acc._id === userId)
+    if (!account) return
+
+    toggleBanMutation.mutate({ 
+      userId, 
+      isBanned: account.isBanned 
+    })
   }
 
   const toggleMobileMenu = () => {
@@ -85,7 +84,7 @@ export default function BannedAccountsPage() {
   }
 
   // Show loading state
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
@@ -94,12 +93,12 @@ export default function BannedAccountsPage() {
   }
 
   // Show error state
-  if (error && !toastMessage) {
+  if (error) {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="text-red-500 text-center">
           <h2 className="text-2xl font-bold mb-2">Error</h2>
-          <p>{error}</p>
+          <p>{error.message}</p>
         </div>
       </div>
     )
@@ -137,7 +136,7 @@ export default function BannedAccountsPage() {
                 )}
                 <div className="bg-white shadow rounded-lg">
                   <AccountsTable 
-                    accounts={accounts}
+                    accounts={accounts || []}
                     onToggleBan={handleToggleBan}
                   />
                 </div>

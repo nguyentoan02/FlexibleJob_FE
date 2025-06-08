@@ -1,5 +1,6 @@
 import React from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useAuth } from '@/hooks/useAuth'
 import {
   LayoutDashboard,
   FileText,
@@ -15,7 +16,26 @@ import {
   ShieldAlert,
 } from 'lucide-react'
 
-function NavItem({ icon, label, to, badge, active = false }) {
+function NavItem({ icon, label, to, badge, active = false, onClick }) {
+  if (onClick) {
+    return (
+      <button
+        onClick={onClick}
+        className={`w-full flex items-center px-3 py-2 rounded-md my-1 ${
+          active ? 'bg-green-50 text-green-500' : 'text-gray-700 hover:bg-gray-50'
+        }`}
+      >
+        <div className="mr-3 text-gray-400">{icon}</div>
+        <span>{label}</span>
+        {badge && (
+          <span className="bg-green-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+            {badge}
+          </span>
+        )}
+      </button>
+    )
+  }
+
   return (
     <Link
       to={to}
@@ -36,6 +56,13 @@ function NavItem({ icon, label, to, badge, active = false }) {
 
 export function AdminSidebar() {
   const location = useLocation()
+  const navigate = useNavigate()
+  const { logout } = useAuth()
+
+  const handleLogout = () => {
+    logout()
+    navigate('/')
+  }
 
   return (
     <aside className="w-64 bg-white border-r border-gray-200 flex-shrink-0 hidden md:block min-h-screen">
@@ -83,7 +110,7 @@ export function AdminSidebar() {
             <NavItem
               icon={<ShieldAlert size={20} />}
               label="Banned Accounts"
-              to="/admin/banned"
+              to="/admin/banned-accounts"
               badge={2}
             />
           </nav>
@@ -106,7 +133,7 @@ export function AdminSidebar() {
             <NavItem 
               icon={<LogOut size={20} />} 
               label="Log Out" 
-              to="/logout"
+              onClick={handleLogout}
             />
           </nav>
         </div>
