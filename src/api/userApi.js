@@ -41,6 +41,7 @@ api.interceptors.response.use(
         localStorage.removeItem('token')
         window.location.href = '/login'
       }
+      return Promise.reject(error.response.data)
     }
     return Promise.reject(error)
   }
@@ -55,9 +56,7 @@ export const userApi = {
 
   // Toggle user ban status (admin only)
   toggleBanUser: async (userId, isBanned) => {
-    const endpoint = isBanned ? 
-      `/users/status/ban/${userId}` : 
-      `/users/status/unban/${userId}`
+    const endpoint = `/users/status/${isBanned ? 'unban' : 'ban'}/${userId}`
     const response = await api.put(endpoint)
     return response
   },
