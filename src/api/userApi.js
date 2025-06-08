@@ -49,7 +49,7 @@ api.interceptors.response.use(
 export const userApi = {
   // Get all users (admin only)
   getAllUsers: async () => {
-    const response = await api.get('/user')
+    const response = await api.get('/users')
     return response
   },
 
@@ -64,19 +64,19 @@ export const userApi = {
 
   // Get user by ID (admin only)
   getUserById: async (userId) => {
-    const response = await api.get(`/user/${userId}`)
+    const response = await api.get(`/users/${userId}`)
     return response
   },
 
   // Update user (admin only)
   updateUser: async (userId, userData) => {
-    const response = await api.put(`/user/${userId}`, userData)
+    const response = await api.put(`/users/${userId}`, userData)
     return response
   },
 
   // Delete user (admin only)
   deleteUser: async (userId) => {
-    const response = await api.delete(`/user/${userId}`)
+    const response = await api.delete(`/users/${userId}`)
     return response
   }
 } 
