@@ -7,7 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Menu, X } from "lucide-react"; // Hamburger and close icons
 export default function HeaderJobseeker() {
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { user, logout } = useAuth();
     const navigate = useNavigate();
 
@@ -40,8 +43,22 @@ export default function HeaderJobseeker() {
                 {/* Logo */}
                 <div className="text-2xl font-bold text-blue-600">JobBox</div>
 
-                {/* Navigation */}
-                <nav className="flex items-center space-x-6">
+                {/* Hamburger for mobile */}
+                <div className="md:hidden">
+                    <button
+                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        className="text-gray-700 focus:outline-none"
+                    >
+                        {mobileMenuOpen ? (
+                            <X className="w-6 h-6" />
+                        ) : (
+                            <Menu className="w-6 h-6" />
+                        )}
+                    </button>
+                </div>
+
+                {/* Desktop Navigation */}
+                <nav className="hidden md:flex items-center space-x-6">
                     {menuItems.map((item, index) => (
                         <Popover key={index}>
                             <PopoverTrigger asChild>
@@ -76,10 +93,10 @@ export default function HeaderJobseeker() {
                     ))}
                 </nav>
 
-                {/* Actions */}
-                <div className="flex items-center space-x-4">
+                {/* Desktop Actions */}
+                <div className="hidden md:flex items-center space-x-4">
                     {user ? (
-                        <div className="flex items-center space-x-4">
+                        <>
                             <span className="text-gray-700">
                                 Welcome, <strong>{user.username}</strong>
                             </span>
@@ -90,7 +107,7 @@ export default function HeaderJobseeker() {
                             >
                                 Logout
                             </Button>
-                        </div>
+                        </>
                     ) : (
                         <>
                             <Link to="/login-em">
@@ -113,6 +130,65 @@ export default function HeaderJobseeker() {
                     )}
                 </div>
             </div>
+
+            {/* Mobile Menu Content */}
+            {mobileMenuOpen && (
+                <div className="md:hidden px-6 pb-4">
+                    <nav className="flex flex-col space-y-4">
+                        {menuItems.map((item, index) => (
+                            <div key={index}>
+                                <div className="text-gray-700 font-medium">
+                                    {item.label}
+                                </div>
+                                {item.subItems.length > 0 && (
+                                    <ul className="ml-4 mt-1 space-y-1">
+                                        {item.subItems.map(
+                                            (subItem, subIndex) => (
+                                                <li
+                                                    key={subIndex}
+                                                    className="text-gray-600 hover:text-blue-600"
+                                                >
+                                                    {subItem}
+                                                </li>
+                                            )
+                                        )}
+                                    </ul>
+                                )}
+                            </div>
+                        ))}
+                    </nav>
+
+                    <div className="mt-6 flex flex-col space-y-2">
+                        {user ? (
+                            <>
+                                <span className="text-gray-700">
+                                    Welcome, <strong>{user.username}</strong>
+                                </span>
+                                <Button
+                                    variant="default"
+                                    className="bg-red-600 text-white"
+                                    onClick={handleLogout}
+                                >
+                                    Logout
+                                </Button>
+                            </>
+                        ) : (
+                            <>
+                                <Link to="/login-em">
+                                    <Button className="bg-blue-600 text-white w-full">
+                                        Sign in for Employer
+                                    </Button>
+                                </Link>
+                                <Link to="/login">
+                                    <Button className="bg-blue-600 text-white w-full">
+                                        Sign in for Jobseeker
+                                    </Button>
+                                </Link>
+                            </>
+                        )}
+                    </div>
+                </div>
+            )}
         </header>
     );
 }

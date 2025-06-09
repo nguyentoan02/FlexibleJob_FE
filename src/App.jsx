@@ -5,6 +5,7 @@ import NotFound from "./pages/NotFound";
 import AuthRoutes from "./routes/AuthRoutes";
 import AdminRoutes from "./routes/AdminRoutes";
 import JobseekerRoutes from "./routes/JobseekerRoutes";
+import CompanyRoutes from "./routes/CompanyRoutes";
 
 function App() {
     return (
@@ -15,6 +16,7 @@ function App() {
                 {AuthRoutes()}
                 {AdminRoutes()}
                 {JobseekerRoutes()}
+                {CompanyRoutes()}
                 {/* Các route xử lý lỗi và catch-all */}
                 <Route path="/404" element={<NotFound />} />
                 <Route path="*" element={<NotFound />} />

@@ -6,6 +6,7 @@ import GuestPage from "../pages/LandingPage";
 import ForgotPasswordRequest from "../pages/ForgotPassword/ForgotPasswordRequest";
 import NewForgotPassword from "../pages/ForgotPassword/NewForgotPassword";
 import LoginEm from "../pages/Login";
+import CompanyProfile from "../pages/Employer/CompanyProfile";
 
 export default function AuthRoutes() {
     return (
@@ -25,6 +26,8 @@ export default function AuthRoutes() {
                 path="/new-forgot-password/:token"
                 element={<NewForgotPassword />}
             />
+            {/* Jobseeker view CompanyProfile */}
+            <Route path="/company/:companyId" element={<CompanyProfile />} />
         </>
     );
 }
