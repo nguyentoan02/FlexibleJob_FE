@@ -6,6 +6,7 @@ import GuestPage from "../pages/LandingPage";
 import ForgotPasswordRequest from "../pages/ForgotPassword/ForgotPasswordRequest";
 import NewForgotPassword from "../pages/ForgotPassword/NewForgotPassword";
 import LoginEm from "../pages/Login";
+import CompanyDetailPage from "../pages/CompanyUI/ComapnyDetail";
 
 export default function AuthRoutes() {
     return (
@@ -25,6 +26,7 @@ export default function AuthRoutes() {
                 path="/new-forgot-password/:token"
                 element={<NewForgotPassword />}
             />
+            <Route path="/company-detail" element={<CompanyDetailPage />} />
         </>
     );
 }
