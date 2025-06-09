@@ -2,6 +2,7 @@ import HeaderJobseeker from "../../components/Header/HeaderJobseeker";
 import { useParams } from "react-router-dom";
 import { useCompany } from "../../hooks/company";
 import {
+    CheckOutlined,
     FacebookOutlined,
     LinkedinOutlined,
     LoadingOutlined,
@@ -22,7 +23,7 @@ function CompanyProfile() {
         <>
             <HeaderJobseeker />
             <div className="bg-gray-200 w-full h-56 flex items-center">
-                <div className="flex flex-col gap-4 ms-52 ">
+                <div className="flex flex-col gap-4 px-4 md:ms-20 lg:ms-52">
                     <h1 className="text-3xl font-semibold">Employer Detail</h1>
                     <div className="flex gap-2 font-light">
                         <h1>Home / Employer / </h1>
@@ -39,37 +40,57 @@ function CompanyProfile() {
                     </div>
                 </div>
             </div>
-            <div className="grid grid-cols-5 mx-52 my-15 gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-5 px-4 md:px-20 lg:px-52 my-10 gap-10">
                 {CompanyProfile.isLoading ? (
                     <>
-                        <div className="border-1 rounded-2xl p-5 col-span-2 bg-white shadow-sm">
-                            <div className="items-center flex flex-col relative">
-                                <div className="w-full h-40 bg-gray-200 animate-pulse rounded-lg"></div>
-                                <div className="w-32 h-32 bg-gray-200 animate-pulse rounded-2xl mt-4 absolute"></div>
-                                <div className="h-6 w-48 bg-gray-200 animate-pulse rounded mt-2"></div>
-                                <div className="h-4 w-32 bg-gray-200 animate-pulse rounded mt-2"></div>
-                            </div>
-                            <div className="space-y-3">
-                                <div className="h-5 w-32 bg-gray-200 animate-pulse rounded"></div>
-                                <div className="flex justify-between">
-                                    <div className="h-4 w-40 bg-gray-200 animate-pulse rounded"></div>
-                                    <div className="h-4 w-40 bg-gray-200 animate-pulse rounded"></div>
+                        {/* Left Skeleton (col-span-2) */}
+                        <div className="md:col-span-2">
+                            <div className="border rounded-2xl p-5 space-y-4">
+                                <div className="h-40 bg-gray-300 rounded-xl w-full">
+                                    <div className="w-32 h-32 bg-gray-500 rounded-2xl mx-auto z-10"></div>
                                 </div>
-                                <div className="flex justify-between">
-                                    <div className="h-4 w-40 bg-gray-200 animate-pulse rounded"></div>
-                                    <div className="h-4 w-40 bg-gray-200 animate-pulse rounded"></div>
+                                <div className="h-2 bg-gray-500 rounded w-3/4 mx-auto"></div>
+                                <div className="h-2 bg-gray-500 rounded w-1/2 mx-auto"></div>
+                                <div className="space-y-2 mt-4">
+                                    <div className="h-2 bg-gray-300 rounded w-1/2"></div>
+                                    <div className="flex justify-between">
+                                        <div className="h-2 bg-gray-300 rounded w-1/2"></div>
+                                        <div className="h-2 bg-gray-300 rounded w-1/2"></div>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <div className="h-2 bg-gray-300 rounded w-1/2"></div>
+                                        <div className="h-2 bg-gray-300 rounded w-1/2"></div>
+                                    </div>
+                                    <div className="h-10 bg-gray-300 rounded w-full mt-3"></div>
                                 </div>
-                                <div className="h-10 w-full bg-gray-200 animate-pulse rounded-xl mt-4"></div>
                             </div>
                         </div>
-                        <div className="col-span-3 space-y-6">
+
+                        {/* Right Skeleton (col-span-3) */}
+                        <div className="md:col-span-3 space-y-6">
                             <div>
-                                <div className="h-6 w-48 bg-gray-200 animate-pulse rounded mb-4"></div>
-                                <div className="h-32 bg-gray-200 animate-pulse rounded"></div>
+                                <div className="h-4 bg-gray-300 rounded w-1/3 mb-2"></div>
+                                <div className="h-24 bg-gray-200 rounded"></div>
                             </div>
                             <div>
-                                <div className="h-6 w-36 bg-gray-200 animate-pulse rounded mb-4"></div>
-                                <div className="h-6 w-24 bg-gray-200 animate-pulse rounded"></div>
+                                <div className="h-4 bg-gray-300 rounded w-1/4 mb-2"></div>
+                                <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+                            </div>
+                            <div>
+                                <div className="h-4 bg-gray-300 rounded w-1/4 mb-2"></div>
+                                <div className="space-y-2">
+                                    <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                                    <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div className="h-4 bg-gray-300 rounded w-1/3 mb-2"></div>
+                                <div className="flex gap-2 overflow-x-auto">
+                                    <div className="w-1/3 h-48 bg-gray-300 rounded-xl"></div>
+                                    <div className="w-1/3 h-48 bg-gray-300 rounded-xl"></div>
+                                    <div className="w-1/3 h-48 bg-gray-300 rounded-xl"></div>
+                                </div>
                             </div>
                         </div>
                     </>
@@ -107,7 +128,7 @@ function CompanyProfile() {
                                     <h1 className="font-semibold">
                                         {CompanyProfile.data.payload.industry}
                                     </h1>
-                                    <div className="flex justify-between mt-2">
+                                    <div className="flex flex-col md:flex-row md:justify-between mt-2 gap-y-2">
                                         <h1 className="">
                                             <MailOutlined />{" "}
                                             {CompanyProfile.data.payload.email}
@@ -117,7 +138,7 @@ function CompanyProfile() {
                                             {CompanyProfile.data.payload.phone}
                                         </h1>
                                     </div>
-                                    <div className="flex justify-between mt-2">
+                                    <div className="flex flex-col md:flex-row md:justify-between mt-2 gap-y-2">
                                         <h1>
                                             <LinkedinOutlined />{" "}
                                             {
@@ -145,9 +166,9 @@ function CompanyProfile() {
                                     About{" "}
                                     {CompanyProfile.data.payload.companyName}
                                 </h1>
-                                <h1 className="text-justify">
+                                <div className="whitespace-pre-line text-gray-700 leading-relaxed text-justify">
                                     {CompanyProfile.data.payload.aboutUs}
-                                </h1>
+                                </div>
                             </div>
                             <div className="font-light mt-5">
                                 <h1 className="font-semibold">Company Size</h1>
@@ -156,14 +177,30 @@ function CompanyProfile() {
                                     Members
                                 </h1>
                             </div>
-                            <div>
-                                <div className="overflow-auto w-full">
-                                    <div className="flex ease">
+                            <div className="font-light mt-5">
+                                <h1 className="font-semibold">Benefit</h1>
+                                {CompanyProfile.data.payload.benefit.map(
+                                    (ben, index) => (
+                                        <div
+                                            key={index}
+                                            className="flex gap-2 my-2"
+                                        >
+                                            <div className="text-indigo-700">
+                                                <CheckOutlined className="bg-indigo-200 rounded-full p-1 text-xs" />{" "}
+                                            </div>
+                                            <div>{ben}</div>
+                                        </div>
+                                    )
+                                )}
+                            </div>
+                            <div className="relative w-full">
+                                <div className="overflow-x-auto scroll-smooth">
+                                    <div className="flex">
                                         {CompanyProfile.data.payload.albumImage.map(
                                             (img, index) => (
                                                 <div
                                                     key={index}
-                                                    className="w-1/3 p-2 flex-shrink-0"
+                                                    className="w-full sm:w-1/2 md:w-1/3 p-2 flex-shrink-0"
                                                 >
                                                     <img
                                                         src={img}
