@@ -9,3 +9,12 @@ export const fetchCompanyProfile = async (companyId) => {
         }, 2000); // 2 seconds delay
     });
 };
+
+export const fetchCompanyJobs = async (companyId) => {
+    return new Promise((resolve) => {
+        setTimeout(async () => {
+            const res = await axios.get(`${API_URL}/jobs/company/${companyId}`);
+            resolve(res.data);
+        }, 2000);
+    });
+};
