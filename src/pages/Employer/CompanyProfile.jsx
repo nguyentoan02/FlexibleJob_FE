@@ -79,15 +79,21 @@ function CompanyProfile() {
             </div>
             <div className="px-4 md:px-20 lg:px-52 text-center"></div>
             <div className="grid grid-cols-1 md:grid-cols-5 px-4 md:px-20 lg:px-52 my-10 gap-10">
-                {CompanyProfile.isLoading ||
-                    (CompanyJos.isLoading && (
-                        <>
-                            <div className="md:col-span-2">
-                                <div className="border rounded-2xl p-5 space-y-4 ">
-                                    <div className="w-32 h-32 bg-gray-500 rounded-2xl mx-auto"></div>
-                                    <div className="h-2 bg-gray-500 rounded w-3/4 mx-auto"></div>
-                                    <div className="h-2 bg-gray-500 rounded w-1/2 mx-auto"></div>
-                                    <div className="space-y-2 mt-4">
+                {CompanyProfile.isLoading && CompanyJos.isLoading && (
+                    <>
+                        <div className="md:col-span-2">
+                            <div className="border rounded-2xl p-5 space-y-4 ">
+                                <div className="w-32 h-32 bg-gray-500 rounded-2xl mx-auto"></div>
+                                <div className="h-2 bg-gray-500 rounded w-3/4 mx-auto"></div>
+                                <div className="h-2 bg-gray-500 rounded w-1/2 mx-auto"></div>
+                                <div className="space-y-2 mt-4">
+                                    <div className="h-2 bg-gray-300 rounded w-1/2"></div>
+                                    <div className="flex justify-between">
+                                        <div className="h-2 bg-gray-300 rounded w-1/2"></div>
+                                        <div className="h-2 bg-gray-300 rounded w-1/2"></div>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <div className="h-2 bg-gray-300 rounded w-1/2"></div>
                                         <div className="h-2 bg-gray-300 rounded w-1/2"></div>
                                         <div className="flex justify-between">
                                             <div className="h-2 bg-gray-300 rounded w-1/2"></div>
@@ -101,35 +107,34 @@ function CompanyProfile() {
                                     </div>
                                 </div>
                             </div>
-
-                            <div className="md:col-span-3 space-y-6">
-                                <div>
-                                    <div className="h-4 bg-gray-300 rounded w-1/3 mb-2"></div>
-                                    <div className="h-24 bg-gray-200 rounded"></div>
-                                </div>
-                                <div>
-                                    <div className="h-4 bg-gray-300 rounded w-1/4 mb-2"></div>
-                                    <div className="h-4 bg-gray-200 rounded w-1/3"></div>
-                                </div>
-                                <div>
-                                    <div className="h-4 bg-gray-300 rounded w-1/4 mb-2"></div>
-                                    <div className="space-y-2">
-                                        <div className="h-3 bg-gray-200 rounded w-2/3"></div>
-                                        <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                                        <div className="h-3 bg-gray-200 rounded w-3/4"></div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div className="h-4 bg-gray-300 rounded w-1/3 mb-2"></div>
-                                    <div className="flex gap-2 overflow-x-auto">
-                                        <div className="w-1/3 h-48 bg-gray-300 rounded-xl"></div>
-                                        <div className="w-1/3 h-48 bg-gray-300 rounded-xl"></div>
-                                        <div className="w-1/3 h-48 bg-gray-300 rounded-xl"></div>
-                                    </div>
+                        <div className="md:col-span-3 space-y-6">
+                            <div>
+                                <div className="h-4 bg-gray-300 rounded w-1/3 mb-2"></div>
+                                <div className="h-24 bg-gray-200 rounded"></div>
+                            </div>
+                            <div>
+                                <div className="h-4 bg-gray-300 rounded w-1/4 mb-2"></div>
+                                <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+                            </div>
+                            <div>
+                                <div className="h-4 bg-gray-300 rounded w-1/4 mb-2"></div>
+                                <div className="space-y-2">
+                                    <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                                    <div className="h-3 bg-gray-200 rounded w-3/4"></div>
                                 </div>
                             </div>
-                        </>
-                    ))}
+                            <div>
+                                <div className="h-4 bg-gray-300 rounded w-1/3 mb-2"></div>
+                                <div className="flex gap-2 overflow-x-auto">
+                                    <div className="w-1/3 h-48 bg-gray-300 rounded-xl"></div>
+                                    <div className="w-1/3 h-48 bg-gray-300 rounded-xl"></div>
+                                    <div className="w-1/3 h-48 bg-gray-300 rounded-xl"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </>
+                )}
                 {CompanyProfile.data && (
                     <div className="col-span-2">
                         <div className="border-1 rounded-2xl p-5 ">

@@ -18,3 +18,10 @@ export const fetchCompanyJobs = async (companyId) => {
         }, 2000);
     });
 };
+
+export const fetchMyCompanyProfile = async (token) => {
+    const res = await axios.get(`${API_URL}/company/myCompany`, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.data;
+};
