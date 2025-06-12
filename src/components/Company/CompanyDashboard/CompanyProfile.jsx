@@ -1,8 +1,15 @@
 import { useEffect, useState } from "react";
 import { useMyCompany } from "../../../hooks/myCompany";
+import { useAuth } from "../../../hooks/useAuth.js";
+import Toast from "../../../components/Toast/Toast";
+import { useMutation } from "@tanstack/react-query";
 
 const CompanyProfile = () => {
-    const { MyCompanyProfile } = useMyCompany();
+    const { token } = useAuth();
+    const [toastMessage, setToastMessage] = useState(null);
+    const [toastType, setToastType] = useState("success");
+    const [removedImages, setRemovedImages] = useState([]);
+    const { MyCompanyProfile, updateCompanyProfile } = useMyCompany();
     const [companyData, setCompanyData] = useState({
         companyName: "",
         industry: "",
@@ -38,11 +45,75 @@ const CompanyProfile = () => {
         }
     }, [MyCompanyProfile.isSuccess, MyCompanyProfile.data]);
 
-    if (MyCompanyProfile.isLoading) return <div>...loading</div>;
-    if (MyCompanyProfile.isError)
-        return <div>{MyCompanyProfile.error.message}</div>;
+    const updateMutation = useMutation({
+        mutationFn: (data) => {
+            // Logic xử lý FormData...
+            return updateCompanyProfile(formData, token);
+        },
+        onSuccess: () => {
+            setToastMessage("Success");
+            setToastType("success");
+            setRemovedImages([]);
+        },
+        onError: () => {
+            setToastMessage("Error");
+            setToastType("error");
+        },
+    });
 
-    console.log(MyCompanyProfile.data.payload);
+    const handleSaveChanges = () => {
+        updateCompanyProfile.mutate(
+            {
+                ...companyData,
+                removeImages: removedImages,
+            },
+            {
+                onSuccess: () => {
+                    setToastMessage("Profile updated successfully!");
+                    setToastType("success");
+                    setRemovedImages([]);
+                },
+                onError: (error) => {
+                    setToastMessage(
+                        error.message || "Failed to update profile"
+                    );
+                    setToastType("error");
+                },
+            }
+        );
+    };
+
+    // Update image handling functions
+    const handleImageUpload = async (e, field) => {
+        const files = Array.from(e.target.files);
+        const MAX_IMAGES = 10;
+
+        if (field === "albumImage") {
+            if (companyData.albumImage.length + files.length > MAX_IMAGES) {
+                setToastMessage(
+                    `You can only upload up to ${MAX_IMAGES} images`
+                );
+                setToastType("error");
+                return;
+            }
+
+            setCompanyData((prev) => ({
+                ...prev,
+                newAlbumImages: files,
+                albumImage: [
+                    ...prev.albumImage,
+                    ...files.map((file) => URL.createObjectURL(file)),
+                ],
+            }));
+        } else {
+            const file = files[0];
+            setCompanyData((prev) => ({
+                ...prev,
+                [`new${field.charAt(0).toUpperCase() + field.slice(1)}`]: file,
+                [field]: URL.createObjectURL(file),
+            }));
+        }
+    };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -52,19 +123,49 @@ const CompanyProfile = () => {
         }));
     };
 
-    const handleImageUpload = async (e, field) => {
-        // Add your image upload logic here
-        const file = e.target.files[0];
-        // Upload to server and get URL
-        // Then update state
+    const removeImage = (indexToRemove) => {
+        const removedImage = companyData.albumImage[indexToRemove];
+        if (!removedImage.startsWith("blob:")) {
+            // Only track removal of server images
+            setRemovedImages((prev) => [...prev, removedImage]);
+        }
+
         setCompanyData((prev) => ({
             ...prev,
-            [field]: URL.createObjectURL(file), // Temporary preview, replace with actual upload
+            albumImage: prev.albumImage.filter(
+                (_, index) => index !== indexToRemove
+            ),
         }));
     };
 
+    const ProfileSkeleton = () => (
+        <div className="animate-pulse">
+            <div className="h-32 bg-gray-200 rounded-lg mb-4" />
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div className="space-y-4">
+                    <div className="h-32 w-32 bg-gray-200 rounded-lg mx-auto" />
+                    <div className="h-10 bg-gray-200 rounded w-full" />
+                    <div className="h-10 bg-gray-200 rounded w-full" />
+                </div>
+                <div className="md:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {[...Array(6)].map((_, i) => (
+                        <div key={i} className="space-y-2">
+                            <div className="h-4 bg-gray-200 rounded w-1/4" />
+                            <div className="h-10 bg-gray-200 rounded w-full" />
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+
+    if (MyCompanyProfile.isLoading) return <ProfileSkeleton />;
+    if (MyCompanyProfile.isError)
+        return <div>{MyCompanyProfile.error.message}</div>;
+
     return (
         <div className="px-4 py-6 md:px-10 md:py-10 bg-gray-100/20">
+            {toastMessage && <Toast message={toastMessage} type={toastType} />}
             <div className="mb-4 text-sm text-gray-600">
                 <span className="text-gray-400">Home</span> /{" "}
                 <span className="text-gray-400">Dashboard</span> /{" "}
@@ -101,32 +202,7 @@ const CompanyProfile = () => {
                                 value={userData.email}
                                 readOnly={!!userData.googleId}
                                 // onChange={handleChange}
-                                className="w-full mt-1 p-2 border rounded-md"
-                            />
-                        </div>
-
-                        <div className="w-full">
-                            <label className="block font-medium">
-                                Password
-                            </label>
-                            <input
-                                type="password"
-                                name="password"
-                                // onChange={handleChange}
-                                placeholder="Leave blank to keep unchanged"
-                                className="w-full mt-1 p-2 border rounded-md"
-                            />
-                        </div>
-                        <div className="w-full">
-                            <label className="block font-medium">
-                                Confirm Password
-                            </label>
-                            <input
-                                type="password"
-                                name="confirm password"
-                                // onChange={handleChange}
-                                placeholder="Leave blank to keep unchanged"
-                                className="w-full mt-1 p-2 border rounded-md"
+                                className="w-full border-gray-300 mt-1 p-2 border rounded-md bg-gray-100"
                             />
                         </div>
 
@@ -293,33 +369,65 @@ const CompanyProfile = () => {
                         {/* Album Images */}
                         <div className="sm:col-span-2">
                             <label className="block text-sm font-medium text-gray-700">
-                                Album Images
+                                Album Images ({companyData.albumImage.length}
+                                /10)
                             </label>
                             <div className="flex gap-2 mt-2 overflow-x-auto scroll-smooth w-full">
                                 {companyData.albumImage.map((img, index) => (
-                                    <img
-                                        key={index}
-                                        src={img}
-                                        alt={`Album ${index + 1}`}
-                                        className="w-64 h-64 object-cover rounded"
-                                    />
+                                    <div key={index} className="relative">
+                                        <img
+                                            src={img}
+                                            alt={`Album ${index + 1}`}
+                                            className="w-64 h-64 object-cover rounded"
+                                        />
+                                        <button
+                                            onClick={() => removeImage(index)}
+                                            className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                className="h-5 w-5"
+                                                viewBox="0 0 20 20"
+                                                fill="currentColor"
+                                            >
+                                                <path
+                                                    fillRule="evenodd"
+                                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                                    clipRule="evenodd"
+                                                />
+                                            </svg>
+                                        </button>
+                                    </div>
                                 ))}
                             </div>
                             <input
                                 type="file"
                                 multiple
+                                accept="image/*"
                                 onChange={(e) =>
                                     handleImageUpload(e, "albumImage")
                                 }
                                 className="mt-2 text-sm"
+                                disabled={companyData.albumImage.length >= 10}
                             />
+                            {companyData.albumImage.length >= 10 && (
+                                <p className="text-red-500 text-sm mt-1">
+                                    Maximum number of images reached (10)
+                                </p>
+                            )}
                         </div>
                     </div>
                 </div>
 
                 <div className="mt-6 flex justify-end">
-                    <button className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition text-sm">
-                        Save Changes
+                    <button
+                        className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition text-sm disabled:opacity-50"
+                        onClick={handleSaveChanges}
+                        disabled={updateMutation.isPending}
+                    >
+                        {updateMutation.isPending
+                            ? "Saving..."
+                            : "Save Changes"}
                     </button>
                 </div>
             </div>
