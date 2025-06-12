@@ -1,13 +1,16 @@
 import { FileAddOutlined } from "@ant-design/icons";
 import { useMutation } from "@tanstack/react-query";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { createNewJob } from "../../../api/job";
 import { useAuth } from "../../../hooks/useAuth";
+import { useCategory } from "../../../hooks/category";
+import Toast from "../../Toast/Toast";
 
 const AddNewJob = () => {
     const [toastMessage, setToastMessage] = useState(null); // State for toast message
     const [toastType, setToastType] = useState("success"); // State for toast type
     const { token } = useAuth();
+    const { AllCategory } = useCategory();
 
     const [formData, setFormData] = useState({
         title: "",
@@ -26,7 +29,17 @@ const AddNewJob = () => {
         },
         deadline: "",
         expiredAt: "",
+        category: [],
     });
+
+    useEffect(() => {
+        if (AllCategory.isSuccess && AllCategory.data?.payload) {
+            setFormData((prevFormData) => ({
+                ...prevFormData,
+                category: AllCategory.data.payload,
+            }));
+        }
+    }, [AllCategory.data, AllCategory.isSuccess]);
 
     const jobMutation = useMutation({
         mutationFn: () => createNewJob(formData, token),
@@ -76,8 +89,11 @@ const AddNewJob = () => {
         console.log("Form data:", formData);
         jobMutation.mutate(formData, token);
     };
+    if (AllCategory.isLoading) return <div>...loading</div>;
+    if (AllCategory.isError) return <div>{AllCategory.error.message}</div>;
     return (
         <div className="px-4 py-6 md:px-10 md:py-10 bg-gray-100/20">
+            {toastMessage && <Toast message={toastMessage} type={toastType} />}
             <h2 className="text-4xl font-semibold mb-4 flex items-center">
                 Post a new Job
             </h2>
@@ -198,6 +214,23 @@ const AddNewJob = () => {
                         ].map((lvl) => (
                             <option key={lvl} value={lvl}>
                                 {lvl}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <div>
+                    <label className="block font-medium mb-1">Category</label>
+
+                    <select
+                        name="category"
+                        value={formData.category} // Should be a string like "1"
+                        onChange={handleChange}
+                        className="w-full border p-2 rounded"
+                    >
+                        <option value="">Select a category</option>
+                        {AllCategory?.data?.payload?.map((cate) => (
+                            <option key={cate._id} value={cate._id}>
+                                {cate.categoryName}
                             </option>
                         ))}
                     </select>
