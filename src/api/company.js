@@ -25,3 +25,13 @@ export const fetchMyCompanyProfile = async (token) => {
     });
     return res.data;
 };
+
+export const updateCompanyProfile = async (formData, token) => {
+    const response = await axios.put(`${API_URL}/company`, formData, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+        },
+    });
+    return response.data;
+};
