@@ -87,7 +87,11 @@ const SideBar = () => {
                     <SideBarItem
                         icon={<FileDoneOutlined />}
                         label="Manage Jobs"
-                        onClick={() => {}}
+                        active={action === "MANAGEJOBS"}
+                        onClick={() => {
+                            navigate("manageJob");
+                            setActions("MANAGEJOBS");
+                        }}
                     />
                     <SideBarItem
                         icon={<UsergroupAddOutlined />}
