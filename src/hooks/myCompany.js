@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchMyCompanyProfile, updateCompanyProfile } from "../api/company";
+import { getJobsByUserId } from "../api/job";
 
 export const useMyCompany = () => {
     const token = localStorage.getItem("token");
@@ -65,8 +66,13 @@ export const useMyCompany = () => {
         },
     });
 
+    const JobsOfMyCompany = useQuery({
+        queryKey: ["JobsMyCompany"],
+        queryFn: () => getJobsByUserId(token),
+    });
     return {
         MyCompanyProfile,
         updateCompanyProfile: updateCompanyProfileMutation,
+        JobsOfMyCompany,
     };
 };

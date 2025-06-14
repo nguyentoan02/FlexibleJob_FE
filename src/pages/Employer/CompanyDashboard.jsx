@@ -5,6 +5,7 @@ import Dashboard from "../../components/Company/CompanyDashboard/Dashboard";
 import HeaderJobseeker from "../../components/Header/HeaderJobseeker";
 import AddNewJob from "../../components/Company/CompanyDashboard/AddNewJob";
 import CompanyProfile from "../../components/Company/CompanyDashboard/CompanyProfile";
+import ManageJob from "../../components/Company/CompanyDashboard/ManageJob";
 
 const CompanyDashboard = () => {
     return (
@@ -17,6 +18,7 @@ const CompanyDashboard = () => {
                         <Route path="/" element={<Dashboard />} />
                         <Route path="addJob" element={<AddNewJob />} />
                         <Route path="profile" element={<CompanyProfile />} />
+                        <Route path="manageJob" element={<ManageJob />} />
                     </Routes>
                 </div>
             </div>
