@@ -1,10 +1,5 @@
 import {
     CheckOutlined,
-    FacebookOutlined,
-    LinkedinOutlined,
-    MailOutlined,
-    MehOutlined,
-    PhoneOutlined,
 } from "@ant-design/icons";
 
 function Detail({ companyData }) {
