@@ -2,7 +2,7 @@ import React from "react";
 import { Route, Routes } from "react-router-dom";
 import PrivateRoute from "../components/PrivateRoute";
 import CompanyProfile from "../pages/Employer/CompanyProfile";
-
+import CVProfileFollowID from "../pages/CVProfile/CVProfileFollowID";
 function CompanyRoutes() {
     return (
         <>
@@ -11,6 +11,7 @@ function CompanyRoutes() {
                     path="/company/companyProfile"
                     element={<CompanyProfile />}
                 />
+                <Route path="/cvprofile/:id" element={<CVProfileFollowID />} />
             </Route>
         </>
     );
