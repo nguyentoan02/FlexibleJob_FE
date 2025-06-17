@@ -18,7 +18,7 @@ export default function CVProfileFollowID() {
         const fetchCVProfile = async () => {
             try {
                 const response = await axios.get(
-                    `${import.meta.env.VITE_API_URL}/cv-profiles/${id}/details`,
+                    `${import.meta.env.VITE_API_URL}/company/${id}/details`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`, // Include the token in the request
