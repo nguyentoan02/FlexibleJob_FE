@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import HeaderJobseeker from "@/components/Header/HeaderJobseeker";
-// Thay đổi dòng import này
 import { ApplyJobModal } from "@/pages/Application/Applicant";
 import { useAuth } from "@/hooks/useAuth";
 import { useCVProfile } from "@/hooks/cvprofile";
@@ -22,9 +21,11 @@ import {
     BookmarkPlus,
 } from "lucide-react";
 
-const fetchJobDetail = async (jobId) => {
+const fetchJobDetail = async (jobId, token) => {
+    const headers = token ? { Authorization: `Bearer ${token}` } : undefined; // Include token only if available
     const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/jobs/${jobId}`
+        `${import.meta.env.VITE_API_URL}/jobs/${jobId}`,
+        { headers }
     );
     return res.data;
 };
@@ -32,15 +33,16 @@ const fetchJobDetail = async (jobId) => {
 export default function JobDetail() {
     const { jobId } = useParams();
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
     const { user, token } = useAuth();
     const { data: cvData } = useCVProfile();
     const [showApplyModal, setShowApplyModal] = useState(false);
     const [toast, setToast] = useState({ message: "", type: "" });
 
-    // Existing job detail query
+    // Fetch job details
     const { data, isLoading } = useQuery({
         queryKey: ["job", jobId],
-        queryFn: () => fetchJobDetail(jobId),
+        queryFn: () => fetchJobDetail(jobId, token),
     });
 
     // Apply mutation
@@ -64,6 +66,7 @@ export default function JobDetail() {
                 type: "success",
             });
             setShowApplyModal(false);
+            queryClient.invalidateQueries(["job", jobId]); // Refetch job details
         },
         onError: (error) => {
             setToast({
@@ -275,15 +278,26 @@ export default function JobDetail() {
                                     </div>
 
                                     <div className="space-y-3">
-                                        <Button
-                                            className="w-full bg-blue-600 hover:bg-blue-700"
-                                            onClick={handleApplyClick}
-                                            disabled={applyMutation.isLoading}
-                                        >
-                                            {applyMutation.isLoading
-                                                ? "Applying..."
-                                                : "Apply Now"}
-                                        </Button>
+                                        {job.hasApplied ? (
+                                            <Button
+                                                className="w-full bg-gray-400 cursor-not-allowed"
+                                                disabled
+                                            >
+                                                Already Applied
+                                            </Button>
+                                        ) : (
+                                            <Button
+                                                className="w-full bg-blue-600 hover:bg-blue-700"
+                                                onClick={handleApplyClick}
+                                                disabled={
+                                                    applyMutation.isLoading
+                                                }
+                                            >
+                                                {applyMutation.isLoading
+                                                    ? "Applying..."
+                                                    : "Apply Now"}
+                                            </Button>
+                                        )}
                                         <div className="flex gap-2">
                                             <Button
                                                 variant="outline"
