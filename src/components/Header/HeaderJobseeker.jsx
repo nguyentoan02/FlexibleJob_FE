@@ -9,12 +9,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Menu, X } from "lucide-react"; // Hamburger and close icons
-import { useCVProfile } from "@/hooks/cvprofile";
 export default function HeaderJobseeker() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { user, logout } = useAuth();
     const navigate = useNavigate();
-    const { data: cvData } = useCVProfile();
 
     const handleLogout = () => {
         logout();
@@ -22,11 +20,7 @@ export default function HeaderJobseeker() {
     };
     const menuItems = [
         { label: "Home", subItems: [] },
-        {
-            label: "Jobs",
-            to: "/jobs", // Thêm đường dẫn trực tiếp
-            subItems: [],
-        },
+        { label: "Find a Job", subItems: ["Job List", "Job Details"] },
         {
             label: "Recruiters",
             subItems: ["Recruiter List", "Recruiter Details"],
@@ -68,23 +62,12 @@ export default function HeaderJobseeker() {
                     {menuItems.map((item, index) => (
                         <Popover key={index}>
                             <PopoverTrigger asChild>
-                                {item.to ? (
-                                    <Link to={item.to}>
-                                        <Button
-                                            variant="ghost"
-                                            className="text-gray-700 hover:text-blue-600"
-                                        >
-                                            {item.label}
-                                        </Button>
-                                    </Link>
-                                ) : (
-                                    <Button
-                                        variant="ghost"
-                                        className="text-gray-700 hover:text-blue-600"
-                                    >
-                                        {item.label}
-                                    </Button>
-                                )}
+                                <Button
+                                    variant="ghost"
+                                    className="text-gray-700 hover:text-blue-600"
+                                >
+                                    {item.label}
+                                </Button>
                             </PopoverTrigger>
                             {item.subItems.length > 0 && (
                                 <PopoverContent
@@ -117,35 +100,6 @@ export default function HeaderJobseeker() {
                             <span className="text-gray-700">
                                 Welcome, <strong>{user.username}</strong>
                             </span>
-                            {cvData?.payload ? (
-                                <Link
-                                    to={`/cvprofile/update/${cvData.payload._id}`}
-                                >
-                                    <Button
-                                        variant="default"
-                                        className="bg-green-600 hover:bg-green-700 text-white"
-                                    >
-                                        Update CV
-                                    </Button>
-                                </Link>
-                            ) : (
-                                <Link to="/cvprofile/create">
-                                    <Button
-                                        variant="default"
-                                        className="bg-green-600 hover:bg-green-700 text-white"
-                                    >
-                                        Create CV
-                                    </Button>
-                                </Link>
-                            )}
-                            <Link to="/cvprofile">
-                                <Button
-                                    variant="default"
-                                    className="bg-green-600 hover:bg-green-700 text-white"
-                                >
-                                    View CV Profile
-                                </Button>
-                            </Link>
                             <Button
                                 variant="default"
                                 className="bg-red-600 text-white"

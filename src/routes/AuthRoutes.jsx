@@ -7,9 +7,6 @@ import ForgotPasswordRequest from "../pages/ForgotPassword/ForgotPasswordRequest
 import NewForgotPassword from "../pages/ForgotPassword/NewForgotPassword";
 import LoginEm from "../pages/Login";
 import CompanyProfile from "../pages/Employer/CompanyProfile";
-// import ViewCVProfile from "../pages/CVProfile/ViewCVProfile";
-import JobList from "../pages/Job/JobList";
-import JobDetail from "../pages/Job/JobDetail";
 
 export default function AuthRoutes() {
     return (
@@ -31,10 +28,6 @@ export default function AuthRoutes() {
             />
             {/* Jobseeker view CompanyProfile */}
             <Route path="/company/:companyId" element={<CompanyProfile />} />
-            {/* Jobseeker view CompanyProfile */}
-            {/* <Route path="/cvprofile/:id" element={<ViewCVProfile />} /> */}
-            <Route path="/jobs" element={<JobList />} />
-            <Route path="/jobs/:jobId" element={<JobDetail />} />
         </>
     );
 }
