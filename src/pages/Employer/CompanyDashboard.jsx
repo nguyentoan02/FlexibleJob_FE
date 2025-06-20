@@ -10,7 +10,7 @@ import ManageJob from "../../components/Company/CompanyDashboard/ManageJob";
 const CompanyDashboard = () => {
     return (
         <div className="h-full">
-            <HeaderJobseeker />
+            {/* <HeaderJobseeker /> */}
             <div className="flex h-full">
                 <SideBar />
                 <div className="flex-1 p-6">

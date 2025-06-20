@@ -14,9 +14,15 @@ export const createNewJob = async (formdata, token) => {
     return response.data;
 };
 
-export const getJobsByUserId = async (token) => {
+export const getJobsByUserId = async (
+    token,
+    page = 1,
+    limit = 10,
+    search = ""
+) => {
     const response = await axios.get(`${API_URL}/jobs/getJobs/ByCompany`, {
         headers: { Authorization: `Bearer ${token}` },
+        params: { page, limit, search },
     });
     return response.data;
 };
@@ -40,5 +46,14 @@ export const updateJobById = async (updateData, jId, token) => {
             },
         }
     );
+    return response.data;
+};
+
+export const fetchApplicantsByJobId = async (jId, token) => {
+    const response = await axios.get(`${API_URL}/jobs/${jId}`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
     return response.data;
 };
