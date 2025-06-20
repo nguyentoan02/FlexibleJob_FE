@@ -57,6 +57,17 @@ const JobForm = ({ handleSubmit, title, initialData }) => {
         }));
     };
 
+    const formatDateForInput = (dateString) => {
+        if (!dateString) return "";
+        const date = new Date(dateString);
+        const year = date.getFullYear();
+        const month = `${date.getMonth() + 1}`.padStart(2, "0");
+        const day = `${date.getDate()}`.padStart(2, "0");
+        return `${year}-${month}-${day}`;
+    };
+
+    console.log("form data", formData.category);
+
     useEffect(() => {
         if (AllCategory.isSuccess && AllCategory.data?.payload) {
             setFormData((prevFormData) => ({
@@ -204,8 +215,8 @@ const JobForm = ({ handleSubmit, title, initialData }) => {
 
                     <select
                         name="category"
-                        value={formData.category} // Should be a string like "1"
                         onChange={handleChange}
+                        value={formData.category}
                         className="w-full border p-2 rounded"
                     >
                         <option value="">Select a category</option>
@@ -289,29 +300,31 @@ const JobForm = ({ handleSubmit, title, initialData }) => {
                     <input
                         type="date"
                         name="deadline"
-                        value={formData.deadline}
+                        value={formatDateForInput(formData.deadline)}
                         onChange={handleChange}
                         className="w-full border p-2 rounded"
                     />
                 </div>
-                <div>
-                    <label className="block font-medium mb-1">
-                        expired date
-                    </label>
-                    <input
-                        type="date"
-                        name="expiredAt"
-                        value={formData.expiredAt}
-                        onChange={handleChange}
-                        className="w-full border p-2 rounded"
-                    />
-                </div>
+                {!initialData && (
+                    <div>
+                        <label className="block font-medium mb-1">
+                            expired date
+                        </label>
+                        <input
+                            type="date"
+                            name="expiredAt"
+                            value={formData.expiredAt}
+                            onChange={handleChange}
+                            className="w-full border p-2 rounded"
+                        />
+                    </div>
+                )}
 
                 <button
                     type="submit"
                     className="px-6 py-2 bg-indigo-400 text-white rounded duration-300 hover:bg-indigo-700"
                 >
-                    Submit Job
+                    {initialData ? "update this job" : "submit job"}
                 </button>
             </form>
         </>
