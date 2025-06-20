@@ -5,7 +5,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 export const createNewJob = async (formdata, token) => {
     console.log("token khi goi api", token);
     const response = await axios.post(
-        `${API_URL}/jobs/createJob`,
+        `${API_URL}/manageJob/createJob`,
         {
             ...formdata,
         },
@@ -20,15 +20,18 @@ export const getJobsByUserId = async (
     limit = 10,
     search = ""
 ) => {
-    const response = await axios.get(`${API_URL}/jobs/getJobs/ByCompany`, {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { page, limit, search },
-    });
+    const response = await axios.get(
+        `${API_URL}/manageJobs/getJobs/ByCompany`,
+        {
+            headers: { Authorization: `Bearer ${token}` },
+            params: { page, limit, search },
+        }
+    );
     return response.data;
 };
 
 export const getJobByJobId = async (jId) => {
-    const response = await axios.get(`${API_URL}/jobs/getJob/${jId}`);
+    const response = await axios.get(`${API_URL}/manageJobs/getJob/${jId}`);
     return response.data;
 };
 
@@ -36,7 +39,7 @@ export const updateJobById = async (updateData, jId, token) => {
     console.log(updateData);
     console.log(jId);
     const response = await axios.put(
-        `${API_URL}/jobs/${jId}`,
+        `${API_URL}/manageJobs/${jId}`,
         { ...updateData },
         {
             headers: {
@@ -50,7 +53,7 @@ export const updateJobById = async (updateData, jId, token) => {
 };
 
 export const fetchApplicantsByJobId = async (jId, token) => {
-    const response = await axios.get(`${API_URL}/jobs/${jId}`, {
+    const response = await axios.get(`${API_URL}/manageJobs/${jId}`, {
         headers: {
             Authorization: `Bearer ${token}`,
         },
