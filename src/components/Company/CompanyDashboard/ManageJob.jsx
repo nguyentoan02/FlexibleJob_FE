@@ -134,12 +134,12 @@ const ManageJob = () => {
                 </div>
             )}
             {applicantsModal && (
-                <div
-                    className="absolute inset-0 z-50"
-                    onClick={() => setApplicantsModal(false)}
-                >
-                    <div className="fixed inset-0 bg-black/50 transition-opacity"></div>
-                    <div className="relative min-h-screen items-center justify-start border-2 border-white p-5 bg-white">
+                <div className="absolute inset-0 z-50">
+                    <div
+                        className="fixed inset-0 bg-black/50 transition-opacity"
+                        onClick={() => setApplicantsModal(false)}
+                    ></div>
+                    <div className="relative min-h-screen items-center justify-start p-5 bg-white rounded-3xl">
                         <ApplicantList ApplicantList={applicantsData} />
                     </div>
                 </div>
