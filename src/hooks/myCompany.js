@@ -38,7 +38,7 @@ export const useMyCompany = () => {
             }
 
             // Handle new album images
-            if (data.newAlbumImages) {
+            if (data.newAlbumImages && data.newAlbumImages.length > 0) {
                 data.newAlbumImages.forEach((file) => {
                     formData.append("albumImage", file);
                 });
