@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -19,7 +19,9 @@ import {
     CheckCircle,
     Share2,
     BookmarkPlus,
+    Heart,
 } from "lucide-react";
+import { useFavoriteJobs } from "@/hooks/favoriteJob";
 
 const fetchJobDetail = async (jobId, token) => {
     const headers = token ? { Authorization: `Bearer ${token}` } : undefined; // Include token only if available
@@ -36,8 +38,11 @@ export default function JobDetail() {
     const queryClient = useQueryClient();
     const { user, token } = useAuth();
     const { data: cvData } = useCVProfile();
+    const { checkFavoriteStatus, addToFavorites, removeFromFavorites } =
+        useFavoriteJobs();
     const [showApplyModal, setShowApplyModal] = useState(false);
     const [toast, setToast] = useState({ message: "", type: "" });
+    const [isFavorited, setIsFavorited] = useState(false);
 
     // Fetch job details
     const { data, isLoading } = useQuery({
@@ -77,6 +82,45 @@ export default function JobDetail() {
             });
         },
     });
+
+    useEffect(() => {
+        const checkFavorite = async () => {
+            if (user) {
+                const status = await checkFavoriteStatus(jobId);
+                setIsFavorited(status);
+            }
+        };
+        checkFavorite();
+    }, [jobId, user]);
+
+    const handleFavoriteClick = async () => {
+        if (!user) {
+            navigate("/login");
+            return;
+        }
+
+        try {
+            if (isFavorited) {
+                await removeFromFavorites.mutateAsync(jobId);
+                setToast({
+                    message: "Removed from favorites",
+                    type: "success",
+                });
+            } else {
+                await addToFavorites.mutateAsync(jobId);
+                setToast({
+                    message: "Added to favorites",
+                    type: "success",
+                });
+            }
+            setIsFavorited(!isFavorited);
+        } catch (error) {
+            setToast({
+                message: "Failed to update favorites",
+                type: "error",
+            });
+        }
+    };
 
     const handleApplyClick = () => {
         if (!user) {
@@ -304,7 +348,7 @@ export default function JobDetail() {
                                                 className="flex-1"
                                             >
                                                 <BookmarkPlus className="h-4 w-4 mr-2" />
-                                                Save
+                                                Share
                                             </Button>
                                             <Button
                                                 variant="outline"
@@ -312,6 +356,24 @@ export default function JobDetail() {
                                             >
                                                 <Share2 className="h-4 w-4 mr-2" />
                                                 Share
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                className="flex-1"
+                                                onClick={handleFavoriteClick}
+                                                disabled={
+                                                    addToFavorites.isLoading ||
+                                                    removeFromFavorites.isLoading
+                                                }
+                                            >
+                                                <Heart
+                                                    className={`h-4 w-4 mr-2 ${
+                                                        isFavorited
+                                                            ? "fill-red-500 text-red-500"
+                                                            : ""
+                                                    }`}
+                                                />
+                                                {isFavorited ? "Saved" : "Save"}
                                             </Button>
                                         </div>
                                     </div>
