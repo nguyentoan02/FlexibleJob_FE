@@ -17,7 +17,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import SideBarItem from "./SideBarItem";
 
-const SideBar = ({ isApproved }) => {
+const SideBar = () => {
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
     const [action, setActions] = useState("DASHBOARD");
@@ -67,46 +67,84 @@ const SideBar = ({ isApproved }) => {
                 </h2>
                 <ul>
                     <SideBarItem
+                        icon={<DashboardOutlined />}
+                        label="Dashboard"
+                        active={action === "DASHBOARD"}
+                        onClick={() => {
+                            navigate("");
+                            setActions("DASHBOARD");
+                        }}
+                    />
+                    <SideBarItem
+                        icon={<PlusOutlined />}
+                        label="Post New Job"
+                        active={action === "ADDJOBS"}
+                        onClick={() => {
+                            navigate("addJob");
+                            setActions("ADDJOBS");
+                        }}
+                    />
+                    <SideBarItem
+                        icon={<FileDoneOutlined />}
+                        label="Manage Jobs"
+                        active={action === "MANAGEJOBS"}
+                        onClick={() => {
+                            navigate("manageJob");
+                            setActions("MANAGEJOBS");
+                        }}
+                    />
+                    <SideBarItem
+                        icon={<UsergroupAddOutlined />}
+                        label="Manage Applicants"
+                        onClick={() => {}}
+                    />
+                    <SideBarItem
+                        icon={<BookOutlined />}
+                        label="Bookmark Resumes"
+                        badge={4}
+                        onClick={() => {}}
+                    />
+                    <SideBarItem
+                        icon={<GiftOutlined />}
+                        label="Packages"
+                        onClick={() => {}}
+                    />
+                    <SideBarItem
+                        icon={<MessageOutlined />}
+                        label="Messages"
+                        badge={4}
+                        onClick={() => {}}
+                    />
+                </ul>
+
+                <h2 className="ps-6 text-sm font-semibold text-gray-800 uppercase mt-6 mb-4">
+                    My Accounts
+                </h2>
+                <ul className="space-y-2">
+                    <SideBarItem
                         icon={<UserOutlined />}
-                        label="Company Profile"
+                        label="My Profile"
                         onClick={() => {
                             navigate("profile");
                             setActions("PROFILE");
                         }}
                         active={action === "PROFILE"}
                     />
-
-                    {isApproved && (
-                        <>
-                            <SideBarItem
-                                icon={<DashboardOutlined />}
-                                label="Dashboard"
-                                onClick={() => {
-                                    navigate("");
-                                    setActions("DASHBOARD");
-                                }}
-                                active={action === "DASHBOARD"}
-                            />
-                            <SideBarItem
-                                icon={<PlusOutlined />}
-                                label="Post New Job"
-                                active={action === "ADDJOBS"}
-                                onClick={() => {
-                                    navigate("addJob");
-                                    setActions("ADDJOBS");
-                                }}
-                            />
-                            <SideBarItem
-                                icon={<FileDoneOutlined />}
-                                label="Manage Jobs"
-                                active={action === "MANAGEJOBS"}
-                                onClick={() => {
-                                    navigate("manageJob");
-                                    setActions("MANAGEJOBS");
-                                }}
-                            />
-                        </>
-                    )}
+                    <SideBarItem
+                        icon={<LockOutlined />}
+                        label="Change Password"
+                        onClick={() => {}}
+                    />
+                    <SideBarItem
+                        icon={<DeleteOutlined />}
+                        label="Delete Account"
+                        onClick={() => {}}
+                    />
+                    <SideBarItem
+                        icon={<PoweroffOutlined />}
+                        label="Log Out"
+                        onClick={() => {}}
+                    />
                 </ul>
             </div>
         </>
