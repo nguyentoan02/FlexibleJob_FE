@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Menu, X } from "lucide-react"; // Hamburger and close icons
 import { useCVProfile } from "@/hooks/cvprofile";
+import { Heart } from "lucide-react"; // Import Heart icon
 export default function HeaderJobseeker() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { user, logout } = useAuth();
@@ -144,6 +145,17 @@ export default function HeaderJobseeker() {
                                     className="bg-green-600 hover:bg-green-700 text-white"
                                 >
                                     View CV Profile
+                                </Button>
+                            </Link>
+                            <Link to="/my-applications">
+                                <Button variant="outline">
+                                    My Applications
+                                </Button>
+                            </Link>
+                            <Link to="/favorite-jobs">
+                                <Button variant="outline">
+                                    <Heart className="h-4 w-4 mr-2" />
+                                    Favorite Jobs
                                 </Button>
                             </Link>
                             <Button
