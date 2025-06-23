@@ -15,6 +15,8 @@ import {
     Building,
     Filter,
 } from "lucide-react";
+import { useAuth } from "../../hooks/useAuth";
+import HeaderCompany from "../../components/Header/HeaderCompany";
 
 const fetchJobs = async (page = 1) => {
     const res = await axios.get(
@@ -26,11 +28,13 @@ const fetchJobs = async (page = 1) => {
 export default function JobList() {
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState("");
+    const { user } = useAuth();
 
     const { data, isLoading, error } = useQuery({
         queryKey: ["jobs", page],
         queryFn: () => fetchJobs(page),
     });
+    console.log(user);
 
     const formatSalary = (salary) => {
         if (!salary) return "Negotiable";
@@ -47,7 +51,11 @@ export default function JobList() {
 
     return (
         <>
-            <HeaderJobseeker />
+            {user.role === "JOBSEEKER" ? (
+                <HeaderJobseeker />
+            ) : (
+                <HeaderCompany />
+            )}
             <div className="min-h-screen bg-gray-50 py-8">
                 <div className="container mx-auto px-4">
                     {/* Search Section */}

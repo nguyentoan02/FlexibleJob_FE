@@ -20,6 +20,7 @@ import {
     Share2,
     BookmarkPlus,
 } from "lucide-react";
+import HeaderCompany from "../../components/Header/HeaderCompany";
 
 const fetchJobDetail = async (jobId, token) => {
     const headers = token ? { Authorization: `Bearer ${token}` } : undefined; // Include token only if available
@@ -123,7 +124,11 @@ export default function JobDetail() {
 
     return (
         <>
-            <HeaderJobseeker />
+            {user.role === "JOBSEEKER" ? (
+                <HeaderJobseeker />
+            ) : (
+                <HeaderCompany />
+            )}
             {toast.message && (
                 <Toast message={toast.message} type={toast.type} />
             )}
