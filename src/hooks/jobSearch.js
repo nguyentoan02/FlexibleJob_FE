@@ -20,7 +20,7 @@ export const useJobSearch = (searchParams) => {
             const params = new URLSearchParams({
                 ...apiParams,
                 page: searchParams.page.toString(),
-                limit: "10",
+                limit: searchParams.limit.toString(), // Sử dụng limit từ searchParams
             });
 
             const response = await axios.get(
