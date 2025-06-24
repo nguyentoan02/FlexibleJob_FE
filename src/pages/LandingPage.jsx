@@ -12,7 +12,7 @@ export default function LandingPage() {
     const { user } = useAuth();
     return (
         <>
-            {user.role === "JOBSEEKER" ? (
+            {user?.role === "JOBSEEKER" ? (
                 <HeaderJobseeker />
             ) : (
                 <HeaderCompany />

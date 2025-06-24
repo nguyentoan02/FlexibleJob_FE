@@ -63,7 +63,6 @@ const ManageJob = () => {
             })
             .catch((err) => console.log(err));
         setApplicantsModal(true);
-        console.log(applicantsData);
     };
 
     return (
@@ -140,7 +139,10 @@ const ManageJob = () => {
                         onClick={() => setApplicantsModal(false)}
                     ></div>
                     <div className="relative min-h-screen items-center justify-start p-5 bg-white rounded-3xl">
-                        <ApplicantList ApplicantList={applicantsData} />
+                        <ApplicantList
+                            ApplicantList={applicantsData}
+                            jobId={jobData?._id}
+                        />
                     </div>
                 </div>
             )}
