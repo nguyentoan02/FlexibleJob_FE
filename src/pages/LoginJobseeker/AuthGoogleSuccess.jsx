@@ -25,7 +25,7 @@ export default function AuthGoogleSuccess() {
                 if (userRole === "ADMIN") {
                     navigate("/admin/dashboard", { replace: true });
                 } else {
-                    navigate("/user/dashboard", { replace: true });
+                    navigate("/jobs", { replace: true });
                 }
             } catch (decodeError) {
                 console.error("Error decoding token:", decodeError);

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useJobSearch } from "@/hooks/jobSearch";
+import { useJobList } from "@/hooks/jobList"; // Thêm dòng này
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -22,9 +23,25 @@ export default function JobList() {
         jobType: "all",
         experienceYears: "",
         page: 1,
+        limit: 2,
     });
 
-    const { data, isLoading, error } = useJobSearch(searchParams);
+    // Kiểm tra có đang filter/search không
+    const isFiltering =
+        searchParams.title ||
+        searchParams.location ||
+        (searchParams.level && searchParams.level !== "all") ||
+        (searchParams.jobType && searchParams.jobType !== "all") ||
+        searchParams.experienceYears;
+
+    // Nếu có filter thì dùng search, không thì dùng jobList
+    const {
+        data,
+        isLoading,
+        error,
+    } = isFiltering
+        ? useJobSearch(searchParams)
+        : useJobList(searchParams.page, searchParams.limit);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -63,77 +80,111 @@ export default function JobList() {
                 <div className="container mx-auto px-4">
                     {/* Search Form */}
                     <div className="bg-white rounded-xl shadow-md p-6 mb-8">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <Input
-                                name="title"
-                                placeholder="Job title, keywords..."
-                                value={searchParams.title}
-                                onChange={handleInputChange}
-                            />
-                            <Input
-                                name="location"
-                                placeholder="Location..."
-                                value={searchParams.location}
-                                onChange={handleInputChange}
-                            />
-                            <Input
-                                name="experienceYears"
-                                type="number"
-                                placeholder="Experience years..."
-                                value={searchParams.experienceYears}
-                                onChange={handleInputChange}
-                            />
-                            <Select
-                                value={searchParams.level}
-                                onValueChange={(value) =>
-                                    handleSelectChange("level", value)
-                                }
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Level" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">
-                                        All Levels
-                                    </SelectItem>
-                                    <SelectItem value="Intern">
-                                        Intern
-                                    </SelectItem>
-                                    <SelectItem value="Fresher">
-                                        Fresher
-                                    </SelectItem>
-                                    <SelectItem value="Junior">
-                                        Junior
-                                    </SelectItem>
-                                    <SelectItem value="Senior">
-                                        Senior
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <Select
-                                value={searchParams.jobType}
-                                onValueChange={(value) =>
-                                    handleSelectChange("jobType", value)
-                                }
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Job Type" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">
-                                        All Types
-                                    </SelectItem>
-                                    <SelectItem value="Full time">
-                                        Full time
-                                    </SelectItem>
-                                    <SelectItem value="Part time">
-                                        Part time
-                                    </SelectItem>
-                                    <SelectItem value="Remote">
-                                        Remote
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
+                        <div className="flex flex-col space-y-4">
+                            {/* Row 1: Search and Location */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="relative">
+                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                                    <Input
+                                        name="title"
+                                        placeholder="Job title, keywords..."
+                                        value={searchParams.title}
+                                        onChange={handleInputChange}
+                                        className="pl-10 bg-gray-50 border border-gray-200 focus:border-blue-500"
+                                    />
+                                </div>
+                                <div className="relative">
+                                    <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                                    <Input
+                                        name="location"
+                                        placeholder="Location..."
+                                        value={searchParams.location}
+                                        onChange={handleInputChange}
+                                        className="pl-10 bg-gray-50 border border-gray-200 focus:border-blue-500"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Row 2: Filters */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <Select
+                                    value={searchParams.level}
+                                    onValueChange={(value) =>
+                                        handleSelectChange("level", value)
+                                    }
+                                >
+                                    <SelectTrigger className="bg-gray-50 border border-gray-200 focus:border-blue-500">
+                                        <SelectValue placeholder="Select Level" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">
+                                            All Levels
+                                        </SelectItem>
+                                        <SelectItem value="Intern">
+                                            Intern
+                                        </SelectItem>
+                                        <SelectItem value="Fresher">
+                                            Fresher
+                                        </SelectItem>
+                                        <SelectItem value="Junior">
+                                            Junior
+                                        </SelectItem>
+                                        <SelectItem value="Senior">
+                                            Senior
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+
+                                <Select
+                                    value={searchParams.jobType}
+                                    onValueChange={(value) =>
+                                        handleSelectChange("jobType", value)
+                                    }
+                                >
+                                    <SelectTrigger className="bg-gray-50 border border-gray-200 focus:border-blue-500">
+                                        <SelectValue placeholder="Job Type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">
+                                            All Types
+                                        </SelectItem>
+                                        <SelectItem value="Full time">
+                                            Full time
+                                        </SelectItem>
+                                        <SelectItem value="Part time">
+                                            Part time
+                                        </SelectItem>
+                                        <SelectItem value="Remote">
+                                            Remote
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+
+                                <div className="relative">
+                                    <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                                    <Input
+                                        name="experienceYears"
+                                        type="number"
+                                        placeholder="Experience years..."
+                                        value={searchParams.experienceYears}
+                                        onChange={handleInputChange}
+                                        className="pl-10 bg-gray-50 border border-gray-200 focus:border-blue-500"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Search Button */}
+                            <div className="flex justify-end">
+                                <Button
+                                    className="bg-blue-600 hover:bg-blue-700 text-white px-8"
+                                    onClick={() =>
+                                        setSearchParams((prev) => ({ ...prev }))
+                                    }
+                                >
+                                    <Search className="h-4 w-4 mr-2" />
+                                    Search Jobs
+                                </Button>
+                            </div>
                         </div>
                     </div>
 
@@ -147,38 +198,6 @@ export default function JobList() {
                                           data?.payload?.totalJobs || 0
                                       } Jobs Found`}
                             </h2>
-                            <div className="flex gap-2">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    disabled={searchParams.page === 1}
-                                    onClick={() =>
-                                        setSearchParams((prev) => ({
-                                            ...prev,
-                                            page: prev.page - 1,
-                                        }))
-                                    }
-                                >
-                                    Previous
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    disabled={
-                                        !data?.payload?.totalPages ||
-                                        searchParams.page >=
-                                            data.payload.totalPages
-                                    }
-                                    onClick={() =>
-                                        setSearchParams((prev) => ({
-                                            ...prev,
-                                            page: prev.page + 1,
-                                        }))
-                                    }
-                                >
-                                    Next
-                                </Button>
-                            </div>
                         </div>
 
                         {isLoading && !data ? (
@@ -190,7 +209,9 @@ export default function JobList() {
                                 Error: {error.message}
                             </div>
                         ) : (
-                            <div className="space-y-4">
+                            <div className="space-y-4 min-h-[400px]">
+                                {" "}
+                                {/* Thêm min-height */}
                                 {data?.payload?.jobs.map((job) => (
                                     <Link key={job._id} to={`/jobs/${job._id}`}>
                                         <Card className="hover:shadow-lg transition-shadow duration-200">
@@ -244,6 +265,72 @@ export default function JobList() {
                                 ))}
                             </div>
                         )}
+
+                        {/* Pagination Section */}
+                        <div className="mt-6 flex justify-between items-center">
+                            <div className="text-sm text-gray-600">
+                                Page {searchParams.page} of{" "}
+                                {data?.payload?.totalPages || 1}
+                            </div>
+                            <div className="flex gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    disabled={searchParams.page === 1}
+                                    onClick={() =>
+                                        setSearchParams((prev) => ({
+                                            ...prev,
+                                            page: prev.page - 1,
+                                        }))
+                                    }
+                                >
+                                    Previous
+                                </Button>
+                                {/* Add page numbers */}
+                                <div className="flex gap-1">
+                                    {[
+                                        ...Array(
+                                            data?.payload?.totalPages || 1
+                                        ),
+                                    ].map((_, index) => (
+                                        <Button
+                                            key={index + 1}
+                                            variant={
+                                                searchParams.page === index + 1
+                                                    ? "default"
+                                                    : "outline"
+                                            }
+                                            size="sm"
+                                            onClick={() =>
+                                                setSearchParams((prev) => ({
+                                                    ...prev,
+                                                    page: index + 1,
+                                                }))
+                                            }
+                                        >
+                                            {index + 1}
+                                        </Button>
+                                    ))}
+                                </div>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    disabled={
+                                        !data?.payload?.totalPages ||
+                                        searchParams.page >=
+                                            data.payload.totalPages
+                                    }
+                                    onClick={() =>
+                                        setSearchParams((prev) => ({
+                                            ...prev,
+                                            page: prev.page + 1,
+                                        }))
+                                    }
+                                >
+                                    Next
+                                </Button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
