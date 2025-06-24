@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useMyApplications } from "@/hooks/manageapplicant";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,9 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import HeaderJobseeker from "@/components/Header/HeaderJobseeker";
 import { Building, MapPin, Clock, FileText, Briefcase } from "lucide-react";
+import CVProfileFollowID from "@/pages/CVProfile/CVProfileFollowID"; // Import component hiển thị CV
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 const MyApplicationsPage = () => {
     const { data, isLoading, isError, error } = useMyApplications();
+    const [openModal, setOpenModal] = useState(false);
+    const [selectedCv, setSelectedCv] = useState(null);
 
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString("en-US", {
@@ -112,18 +116,16 @@ const MyApplicationsPage = () => {
                                         Applied on:{" "}
                                         {formatDate(app.applicationDate)}
                                     </div>
-                                    <Button asChild variant="outline" size="sm">
-                                        <a
-                                            href={app.cv.linkUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                        >
-                                            <FileText
-                                                size={14}
-                                                className="mr-2"
-                                            />{" "}
-                                            View Submitted CV
-                                        </a>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => {
+                                            setSelectedCv(app.cvSnapshot);
+                                            setOpenModal(true);
+                                        }}
+                                    >
+                                        <FileText size={14} className="mr-2" />{" "}
+                                        View Submitted CV
                                     </Button>
                                 </CardContent>
                             </Card>
@@ -147,6 +149,15 @@ const MyApplicationsPage = () => {
                         </Button>
                     </div>
                 )}
+
+                {/* Modal hiển thị CV snapshot */}
+                <Dialog open={openModal} onOpenChange={setOpenModal}>
+                    <DialogContent className="max-w-2xl">
+                        {selectedCv && (
+                            <CVProfileFollowID profile={{ cv: selectedCv }} />
+                        )}
+                    </DialogContent>
+                </Dialog>
             </main>
         </div>
     );
