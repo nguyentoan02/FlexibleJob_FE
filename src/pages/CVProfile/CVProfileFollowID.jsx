@@ -1,55 +1,42 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import axios from "axios";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MapPin, Mail, Phone } from "lucide-react";
-import Toast from "@/components/Toast/Toast";
 import { useAuth } from "@/hooks/useAuth"; // Assuming you have a useAuth hook
 
-export default function CVProfileFollowID() {
-    const { id } = useParams();
+export default function CVProfileFollowID({ profile }) {
     const { token } = useAuth(); // Retrieve the token from your auth context
-    const [profile, setProfile] = useState(null);
-    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const fetchCVProfile = async () => {
-            try {
-                const response = await axios.get(
-                    `${import.meta.env.VITE_API_URL}/company/${id}/details`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`, // Include the token in the request
-                        },
-                    }
-                );
-                setProfile(response.data.payload);
-            } catch (err) {
-                setError(
-                    err.response?.data?.message || "Failed to fetch CV Profile"
-                );
-            } finally {
-                setLoading(false);
-            }
-        };
+    // useEffect(() => {
+    //     const fetchCVProfile = async () => {
+    //         try {
+    //             const response = await axios.get(
+    //                 `${import.meta.env.VITE_API_URL}/company/${id}/details`,
+    //                 {
+    //                     headers: {
+    //                         Authorization: `Bearer ${token}`, // Include the token in the request
+    //                     },
+    //                 }
+    //             );
+    //             setProfile(response.data.payload);
+    //         } catch (err) {
+    //             setError(
+    //                 err.response?.data?.message || "Failed to fetch CV Profile"
+    //             );
+    //         } finally {
+    //             setLoading(false);
+    //         }
+    //     };
 
-        if (token) {
-            fetchCVProfile();
-        } else {
-            setError("No token provided");
-            setLoading(false);
-        }
-    }, [id, token]);
-
-    if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
-            </div>
-        );
-    }
+    //     if (token) {
+    //         fetchCVProfile();
+    //     } else {
+    //         setError("No token provided");
+    //         setLoading(false);
+    //     }
+    // }, [id, token]);
 
     if (error) {
         return (
@@ -80,7 +67,7 @@ export default function CVProfileFollowID() {
                                     {`${profile.user?.firstName} ${profile.user?.lastName}`}
                                 </h1>
                                 <p className="text-gray-600">
-                                    {profile.description}
+                                    {profile.cv.description}
                                 </p>
                             </div>
                         </div>
@@ -90,16 +77,16 @@ export default function CVProfileFollowID() {
                             <div className="flex flex-wrap gap-4">
                                 <div className="flex items-center text-gray-600">
                                     <MapPin className="w-5 h-5 mr-2" />
-                                    {profile.experience?.[0]?.location ||
+                                    {profile.cv.experience?.[0]?.location ||
                                         "Not specified"}
                                 </div>
                                 <div className="flex items-center text-gray-600">
                                     <Mail className="w-5 h-5 mr-2" />
-                                    {profile.user?.email}
+                                    {profile.cv.user?.email}
                                 </div>
                                 <div className="flex items-center text-gray-600">
                                     <Phone className="w-5 h-5 mr-2" />
-                                    {profile.number}
+                                    {profile.cv.number}
                                 </div>
                             </div>
 
@@ -108,7 +95,7 @@ export default function CVProfileFollowID() {
                                     Skills
                                 </h3>
                                 <div className="flex flex-wrap gap-2">
-                                    {profile.skills?.map((skill, index) => (
+                                    {profile.cv.skills?.map((skill, index) => (
                                         <span
                                             key={index}
                                             className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium"
@@ -123,7 +110,7 @@ export default function CVProfileFollowID() {
                                 <h3 className="text-lg font-semibold">
                                     Education
                                 </h3>
-                                {profile.education?.map((edu) => (
+                                {profile.cv.education?.map((edu) => (
                                     <div
                                         key={edu._id}
                                         className="border-b pb-4 mb-4"
@@ -144,7 +131,7 @@ export default function CVProfileFollowID() {
                                 <h3 className="text-lg font-semibold">
                                     Experience
                                 </h3>
-                                {profile.experience?.map((exp) => (
+                                {profile.cv.experience?.map((exp) => (
                                     <div
                                         key={exp._id}
                                         className="border-b pb-4 mb-4"
@@ -169,7 +156,7 @@ export default function CVProfileFollowID() {
                                     Certifications
                                 </h3>
                                 <p>
-                                    {profile.certifications ||
+                                    {profile.cv.certifications ||
                                         "No certifications listed."}
                                 </p>
                             </div>
@@ -177,7 +164,7 @@ export default function CVProfileFollowID() {
                             <Button
                                 className="bg-green-500 hover:bg-green-600 text-white"
                                 onClick={() =>
-                                    window.open(profile.linkUrl, "_blank")
+                                    window.open(profile.cv.linkUrl, "_blank")
                                 }
                             >
                                 Download Resume

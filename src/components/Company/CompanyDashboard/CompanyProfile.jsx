@@ -99,7 +99,7 @@ const CompanyProfile = () => {
 
             setCompanyData((prev) => ({
                 ...prev,
-                newAlbumImages: files,
+                newAlbumImages: [...(prev.newAlbumImages || []), ...files],
                 albumImage: [
                     ...prev.albumImage,
                     ...files.map((file) => URL.createObjectURL(file)),

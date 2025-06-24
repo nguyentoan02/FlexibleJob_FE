@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { getJobByJobId } from "../api/job";
+import { fetchApplicantsByJobId, getJobByJobId } from "../api/job";
 
 export const useCompanyJobId = (jobId) => {
     const token = localStorage.getItem("token");
@@ -7,5 +7,10 @@ export const useCompanyJobId = (jobId) => {
         queryKey: ["SingleJob"],
         queryFn: () => getJobByJobId(jobId),
     });
-    return { JobData };
+
+    const JobApplicants = useQuery({
+        queryKey: ["JobApplicants"],
+        queryFn: () => fetchApplicantsByJobId(jobId, token),
+    });
+    return { JobData, JobApplicants };
 };

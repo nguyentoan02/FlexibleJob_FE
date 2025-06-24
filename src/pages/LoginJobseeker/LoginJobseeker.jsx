@@ -26,9 +26,7 @@ export default function LoginJobseeker() {
             setToastType("success");
             setTimeout(() => {
                 navigate(
-                    payload.role === "ADMIN"
-                        ? "/admin/dashboard"
-                        : "/user/dashboard"
+                    payload.role === "ADMIN" ? "/admin/dashboard" : "/jobs"
                 );
             }, 1000); // Navigate after showing toast
         },
