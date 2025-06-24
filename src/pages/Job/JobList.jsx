@@ -35,11 +35,7 @@ export default function JobList() {
         searchParams.experienceYears;
 
     // Nếu có filter thì dùng search, không thì dùng jobList
-    const {
-        data,
-        isLoading,
-        error,
-    } = isFiltering
+    const { data, isLoading, error } = isFiltering
         ? useJobSearch(searchParams)
         : useJobList(searchParams.page, searchParams.limit);
 
