@@ -79,15 +79,22 @@ export default function ViewCVProfile() {
                                         <div className="absolute -bottom-2 -right-2 bg-green-500 w-6 h-6 rounded-full border-4 border-white"></div>
                                     </div>
                                     <Button
-                                        className="bg-green-500 hover:bg-green-600 text-white w-full"
-                                        onClick={() =>
-                                            window.open(
-                                                profile.linkUrl,
-                                                "_blank"
-                                            )
-                                        }
+                                        className="bg-green-500 hover:bg-green-600 text-white w-full flex items-center justify-center px-4 py-2 rounded-md transition-colors"
+                                        onClick={() => {
+                                            const a =
+                                                document.createElement("a");
+                                            a.href = profile.linkUrl;
+                                            a.setAttribute(
+                                                "download",
+                                                "resume.pdf"
+                                            );
+                                            a.style.display = "none";
+                                            document.body.appendChild(a);
+                                            a.click();
+                                            document.body.removeChild(a);
+                                        }}
                                     >
-                                        <Download className="w-4 h-4 mr-2" />{" "}
+                                        <Download className="w-4 h-4 mr-2" />
                                         Download Resume
                                     </Button>
                                 </div>
