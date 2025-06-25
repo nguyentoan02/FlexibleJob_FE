@@ -113,7 +113,12 @@ const SideBar = ({ isCreate }) => {
                             <SideBarItem
                                 icon={<GiftOutlined />}
                                 label="Packages"
-                                onClick={() => {}}
+                                active={action === "PACKAGES"}
+                                onClick={() => {
+                                    console.log("asdfas");
+                                    navigate("viewCompanyPackage");
+                                    setActions("PACKAGES");
+                                }}
                             />
                             <SideBarItem
                                 icon={<MessageOutlined />}

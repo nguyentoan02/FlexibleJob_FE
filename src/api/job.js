@@ -74,3 +74,12 @@ export const changeApplicationStatus = async (appId, token, action) => {
     );
     return response.data;
 };
+
+export const getJobLimitation = async (token) => {
+    const response = await axios.get(`${API_URL}/manageJobs/limit`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+    return response.data;
+};

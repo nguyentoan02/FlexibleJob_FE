@@ -5,7 +5,7 @@ import {
     updateCompanyProfile,
     createCompanyProfile as createCompanyProfileApi,
 } from "../api/company";
-import { getJobsByUserId } from "../api/job";
+import { getJobLimitation, getJobsByUserId } from "../api/job";
 
 export const useMyCompany = () => {
     const token = localStorage.getItem("token");
@@ -118,11 +118,17 @@ export const useMyCompany = () => {
         },
     });
 
+    const jobLimitation = useQuery({
+        queryKey: ["JobLimitation"],
+        queryFn: () => getJobLimitation(token),
+    });
+
     return {
         MyCompanyProfile,
         updateCompanyProfile: updateCompanyProfileMutation,
         JobsOfMyCompany,
         isCompanyApproved,
         createCompany: createCompanyProfile,
+        jobLimitation,
     };
 };

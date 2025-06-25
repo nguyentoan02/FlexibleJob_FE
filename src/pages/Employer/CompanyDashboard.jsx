@@ -8,17 +8,20 @@ import CompanyProfile from "../../components/Company/CompanyDashboard/CompanyPro
 import ManageJob from "../../components/Company/CompanyDashboard/ManageJob";
 import HeaderCompany from "../../components/Header/HeaderCompany";
 import { useMyCompany } from "../../hooks/myCompany";
+import ViewPackage from "../../components/Company/CompanyDashboard/ViewPackage";
 
 const CompanyDashboard = () => {
     const { isCompanyApproved } = useMyCompany();
+    const { jobLimitation } = useMyCompany();
     const navigate = useNavigate();
-    console.log(isCompanyApproved.data);
-    if (isCompanyApproved.isLoading) return <div>loading</div>;
-    if (isCompanyApproved.isError)
+    if (isCompanyApproved.isLoading || jobLimitation.isLoading)
+        return <div>loading</div>;
+    if (isCompanyApproved.isError || jobLimitation.isError)
         return <div>{isCompanyApproved.error.message}</div>;
     if (!isCompanyApproved.data.payload.isApproved) {
         navigate("/createCompanyProfile");
     }
+    console.log(jobLimitation.data);
     return (
         <div className="h-full">
             {/* <HeaderJobseeker /> */}
@@ -28,9 +31,27 @@ const CompanyDashboard = () => {
                 <div className="flex-1 p-6">
                     <Routes>
                         <Route path="/" element={<Dashboard />} />
-                        <Route path="addJob" element={<AddNewJob />} />
+                        <Route
+                            path="addJob"
+                            element={
+                                <AddNewJob
+                                    limitData={jobLimitation.data.payload}
+                                />
+                            }
+                        />
                         <Route path="profile" element={<CompanyProfile />} />
-                        <Route path="manageJob" element={<ManageJob />} />
+                        <Route
+                            path="manageJob"
+                            element={
+                                <ManageJob
+                                    limitData={jobLimitation.data.payload}
+                                />
+                            }
+                        />
+                        <Route
+                            path="viewCompanyPackage"
+                            element={<ViewPackage />}
+                        />
                     </Routes>
                 </div>
             </div>
