@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import JobForm from "./JobForm";
 import { useMutation } from "@tanstack/react-query";
 import { fetchApplicantsByJobId, updateJobById } from "../../../api/job";
@@ -11,7 +11,7 @@ import ApplicantList from "./ApplicantList";
 import { useMyCompany } from "../../../hooks/myCompany";
 import LimitTationJobPost from "./LimitTationJobPost";
 
-const ManageJob = ({ limitData }) => {
+const ManageJob = () => {
     const [page, setPage] = useState(1);
     const [searchInput, setSearchInput] = useState("");
     const [search, setSearch] = useState("");
@@ -28,6 +28,11 @@ const ManageJob = ({ limitData }) => {
         mutationFn: (formData) => updateJobById(formData, jobData._id, token),
         onSuccess: () => JobsOfMyCompany.refetch(),
     });
+
+    useEffect(() => {
+        JobsOfMyCompany.refetch();
+        jobLimitation.refetch();
+    }, []);
 
     const handleEdit = (job) => {
         console.log("jobdata", job);
@@ -82,7 +87,7 @@ const ManageJob = ({ limitData }) => {
                     />
                 </div>
                 <div>
-                    <LimitTationJobPost data={limitData} />
+                    <LimitTationJobPost data={jobLimitation.data.payload} />
                 </div>
             </div>
 

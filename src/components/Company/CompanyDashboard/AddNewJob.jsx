@@ -18,9 +18,12 @@ const AddNewJob = ({ limitData }) => {
     const jobMutation = useMutation({
         mutationFn: (formData) => createNewJob(formData, token),
         onSuccess: (data) => {
-            setToastMessage("Create Job successful!");
-            setToastType("success");
-            console.log(data);
+            setTimeout(() => {
+                setToastMessage("Create Job successful!");
+                setToastType("success");
+                console.log(data);
+            }, 1000);
+            navigate("/company/dashboard/manageJob");
         },
         onError: (error) => {
             if (error?.response?.status === 400) {

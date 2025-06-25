@@ -96,9 +96,11 @@ const JobForm = ({ handleSubmit, title, initialData, limitData }) => {
                         </span>
                     </div>
                 </div>
-                <div>
-                    <LimitTationJobPost data={limitData} />
-                </div>
+                {!initialData && (
+                    <div>
+                        <LimitTationJobPost data={limitData} />
+                    </div>
+                )}
             </div>
 
             <form
