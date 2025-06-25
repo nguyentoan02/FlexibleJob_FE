@@ -104,8 +104,8 @@ export function AdminSidebar() {
           <nav className="mt-2">
             <NavItem 
               icon={<Users size={20} />} 
-              label="Manage Jobseekers" 
-              to="/admin/jobseekers"
+              label="Manage Packages" 
+              to="/admin/packages"
             />
             <NavItem
               icon={<ShieldAlert size={20} />}
@@ -123,7 +123,7 @@ export function AdminSidebar() {
             <NavItem 
               icon={<User size={20} />} 
               label="My Profile" 
-              to="/user/profile"
+              to="/admin/profile"
             />
             <NavItem 
               icon={<Key size={20} />} 

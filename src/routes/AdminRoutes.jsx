@@ -10,7 +10,7 @@ export default function AdminRoutes() {
         <Route element={<PrivateRoute role="ADMIN" />}>
             <Route path="/admin/dashboard" element={<AdminPage />} />
             <Route path="/admin/users" element={<AdminUsers />} />
-            <Route path="/user/profile" element={<AdminProfilePage />} />
+            <Route path="/admin/profile" element={<AdminProfilePage />} />
             <Route path="/admin/banned-accounts" element={<BannedAccountsPage />} />
         </Route>
     );

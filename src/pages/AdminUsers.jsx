@@ -1,14 +1,21 @@
-import { useQuery } from "@tanstack/react-query";
-import { fetchUsers } from "../api/users";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchUsers, banUser } from "../api/users";
 import { useAuth } from "../hooks/useAuth";
 import AdminLayout from '@/components/Layout/AdminLayout';
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Search, Ban, X } from "lucide-react";
 import { useState } from "react";
+import Toast from "@/components/Toast/Toast";
 
 export default function AdminUsers() {
     const { token } = useAuth();
     const [searchTerm, setSearchTerm] = useState("");
+    const [showBanModal, setShowBanModal] = useState(false);
+    const [banReason, setBanReason] = useState("");
+    const [selectedUser, setSelectedUser] = useState(null);
+    const queryClient = useQueryClient();
 
     const { data: users, isLoading, isError } = useQuery({
         queryKey: ["users"],
@@ -16,12 +23,41 @@ export default function AdminUsers() {
         enabled: !!token,
     });
 
+    const banUserMutation = useMutation({
+        mutationFn: ({ userId, reason }) => banUser(token, userId, reason),
+        onSuccess: () => {
+            queryClient.invalidateQueries(["users"]);
+            setShowBanModal(false);
+            setBanReason("");
+            setSelectedUser(null);
+        },
+    });
+
+    const handleBanUser = (user) => {
+        setSelectedUser(user);
+        setShowBanModal(true);
+    };
+
+    const handleConfirmBan = () => {
+        if (!banReason.trim()) return;
+        
+        banUserMutation.mutate({
+            userId: selectedUser._id,
+            reason: banReason.trim()
+        });
+    };
+
+    const handleCancelBan = () => {
+        setShowBanModal(false);
+        setBanReason("");
+        setSelectedUser(null);
+    };
+
     const filteredUsers = users?.filter(user => {
         if (!searchTerm) return true;
         const searchLower = searchTerm.toLowerCase();
         return (
             user.email?.toLowerCase().includes(searchLower) ||
-            user.name?.toLowerCase().includes(searchLower) ||
             user.role?.toLowerCase().includes(searchLower)
         );
     });
@@ -51,6 +87,52 @@ export default function AdminUsers() {
 
     return (
         <AdminLayout>
+            {/* Ban User Modal */}
+            {showBanModal && (
+                <div className="fixed inset-0 flex items-center justify-center z-50">
+                    <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 w-full max-w-sm shadow-lg border mx-4">
+                        <div className="flex justify-between items-center mb-3">
+                            <h3 className="text-lg font-semibold">Ban User</h3>
+                            <button onClick={handleCancelBan} className="text-gray-400 hover:text-gray-600">
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
+                        
+                        <div className="mb-3">
+                            <p className="text-sm text-gray-600 mb-2">
+                                Ban <span className="font-semibold">{selectedUser?.email}</span>?
+                            </p>
+                            
+                            <Label htmlFor="banReason" className="text-sm font-medium">
+                                Reason *
+                            </Label>
+                            <textarea
+                                id="banReason"
+                                value={banReason}
+                                onChange={(e) => setBanReason(e.target.value)}
+                                placeholder="Enter ban reason..."
+                                className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 resize-none text-sm bg-white/90"
+                                rows="3"
+                                required
+                            />
+                        </div>
+                        
+                        <div className="flex justify-end space-x-2">
+                            <Button onClick={handleCancelBan} className="bg-gray-300 hover:bg-gray-400 text-gray-700 px-3 py-1 text-sm">
+                                Cancel
+                            </Button>
+                            <Button
+                                onClick={handleConfirmBan}
+                                disabled={banUserMutation.isLoading || !banReason.trim()}
+                                className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 text-sm"
+                            >
+                                {banUserMutation.isLoading ? "Banning..." : "Ban"}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="py-6">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
                     <div className="flex justify-between items-center mb-6">
@@ -82,6 +164,9 @@ export default function AdminUsers() {
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Status
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Actions
                                     </th>
                                 </tr>
                             </thead>
@@ -120,6 +205,18 @@ export default function AdminUsers() {
                                             }`}>
                                                 {user.isBanned ? "Banned" : "Active"}
                                             </span>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            {!user.isBanned && (
+                                                <Button
+                                                    onClick={() => handleBanUser(user)}
+                                                    disabled={banUserMutation.isLoading}
+                                                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 text-sm"
+                                                >
+                                                    <Ban className="h-4 w-4 mr-1" />
+                                                    Ban
+                                                </Button>
+                                            )}
                                         </td>
                                     </tr>
                                 ))}

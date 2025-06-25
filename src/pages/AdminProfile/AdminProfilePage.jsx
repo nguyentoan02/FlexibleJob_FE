@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useProfile } from "@/hooks/profilepage";
+import { useAdminProfile } from "@/hooks/profilepage";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -7,7 +7,7 @@ import Toast from "@/components/Toast/Toast";
 import AdminLayout from '@/components/Layout/AdminLayout';
 
 export default function AdminProfilePage() {
-    const { profileQuery, profileMutation } = useProfile();
+    const { profileQuery, profileMutation } = useAdminProfile();
     const [form, setForm] = useState({
         firstName: "",
         lastName: "",
