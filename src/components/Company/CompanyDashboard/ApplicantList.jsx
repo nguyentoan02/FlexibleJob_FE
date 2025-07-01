@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CVProfileFollowID from "../../../pages/CVProfile/CVProfileFollowID";
 import { fetchApplicantsByJobId } from "../../../api/job";
 import { useAuth } from "../../../hooks/useAuth";
@@ -7,6 +7,7 @@ const ApplicantList = ({ ApplicantList: initialList, jobId }) => {
     const [appProfile, setAppProfile] = useState({});
     const [applicants, setApplicants] = useState(initialList);
     const { token } = useAuth();
+    console.log(applicants);
 
     const refetchApplicants = async () => {
         if (!jobId) return;

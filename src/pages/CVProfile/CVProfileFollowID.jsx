@@ -10,7 +10,6 @@ export default function CVProfileFollowID({ profile, onStatusChange }) {
     const [error] = useState(null);
     const { token } = useAuth();
 
-    console.log(profile);
 
     const applicationMutation = useMutation({
         mutationFn: (action) =>

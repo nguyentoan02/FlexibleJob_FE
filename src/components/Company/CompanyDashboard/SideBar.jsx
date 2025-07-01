@@ -115,7 +115,6 @@ const SideBar = ({ isCreate }) => {
                                 label="Packages"
                                 active={action === "PACKAGES"}
                                 onClick={() => {
-                                    console.log("asdfas");
                                     navigate("viewCompanyPackage");
                                     setActions("PACKAGES");
                                 }}

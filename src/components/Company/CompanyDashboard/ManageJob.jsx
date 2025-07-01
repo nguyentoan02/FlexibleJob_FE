@@ -67,9 +67,10 @@ const ManageJob = () => {
         fetchApplicantsByJobId(jobId, token)
             .then((res) => {
                 setApplicantsData(res.payload.applicants);
+                console.log("applicantsData", res.payload.applicants);
+                setApplicantsModal(true);
             })
             .catch((err) => console.log(err));
-        setApplicantsModal(true);
     };
 
     return (

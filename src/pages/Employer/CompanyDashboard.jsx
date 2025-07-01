@@ -21,7 +21,6 @@ const CompanyDashboard = () => {
     if (!isCompanyApproved.data.payload.isApproved) {
         navigate("/createCompanyProfile");
     }
-    console.log(jobLimitation.data);
     return (
         <div className="h-full">
             {/* <HeaderJobseeker /> */}

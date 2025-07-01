@@ -1,9 +1,6 @@
-import {
-    CheckOutlined,
-} from "@ant-design/icons";
+import { CheckOutlined } from "@ant-design/icons";
 
 function Detail({ companyData }) {
-    console.log(companyData);
     return (
         <>
             <div className="col-span-3">
