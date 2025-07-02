@@ -5,6 +5,8 @@ import ProfilePage from "../pages/HomeJobseeker/ProfilePage"; // Import ProfileP
 import ViewCVProfile from "../pages/CVProfile/ViewCVProfile";
 import CreateCVProfile from "../pages/CVProfile/CreateCVProfile";
 import UpdateCVProfile from "../pages/CVProfile/UpdateCVProfile";
+import MyApplicationsPage from "../pages/Application/ApplicantStatistic";
+import JobFavorite from "../pages/Job/JobFavourite";
 export default function JobseekerRoutes() {
     return (
         <Route element={<PrivateRoute role="JOBSEEKER" />}>
@@ -13,6 +15,8 @@ export default function JobseekerRoutes() {
             <Route path="/cvprofile" element={<ViewCVProfile />} />
             <Route path="/cvprofile/create" element={<CreateCVProfile />} />
             <Route path="/cvprofile/update/:id" element={<UpdateCVProfile />} />
+            <Route path="/my-applications" element={<MyApplicationsPage />} />
+            <Route path="/favorite-jobs" element={<JobFavorite />} />
         </Route>
     );
 }

@@ -10,8 +10,8 @@ import CompanyProfile from "../pages/Employer/CompanyProfile";
 // import ViewCVProfile from "../pages/CVProfile/ViewCVProfile";
 import JobList from "../pages/Job/JobList";
 import JobDetail from "../pages/Job/JobDetail";
-import Register from "../pages/Register";
-
+import SignUp from "../pages/SignUp";
+import ChangePassword from "../pages/ChangePassword";
 export default function AuthRoutes() {
     return (
         <>
@@ -36,7 +36,8 @@ export default function AuthRoutes() {
             {/* <Route path="/cvprofile/:id" element={<ViewCVProfile />} /> */}
             <Route path="/jobs" element={<JobList />} />
             <Route path="/jobs/:jobId" element={<JobDetail />} />
-            <Route path="/register" element={<Register />} />
+            <Route path="/register" element={<SignUp />} />
+            <Route path="/change-password" element={<ChangePassword />} />
         </>
     );
 }

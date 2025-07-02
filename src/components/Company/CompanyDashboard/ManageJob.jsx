@@ -73,6 +73,21 @@ const ManageJob = () => {
             .catch((err) => console.log(err));
     };
 
+    const jobs = JobsOfMyCompany.data.payload.jobs;
+    const totalPages = Math.ceil(JobsOfMyCompany.data.payload.total / limit);
+
+    const handleViewApplicants = (jobId) => {
+        // const response = await fetchApplicantsByJobId(jobId, token);
+        // console.log(response.payla);
+        fetchApplicantsByJobId(jobId, token)
+            .then((res) => {
+                setApplicantsData(res.payload.applicants);
+            })
+            .catch((err) => console.log(err));
+        setApplicantsModal(true);
+        console.log(applicantsData);
+    };
+
     return (
         <div className="px-4 py-6 md:px-10 md:py-10 relative min-h-screen">
             <div className="flex justify-between mb-2">
@@ -91,7 +106,6 @@ const ManageJob = () => {
                     <LimitTationJobPost data={jobLimitation.data.payload} />
                 </div>
             </div>
-
             <JobTable
                 onViewApplicants={handleViewApplicants}
                 jobs={jobs}

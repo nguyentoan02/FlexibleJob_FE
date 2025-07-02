@@ -25,7 +25,6 @@ const ApplicantList = ({ ApplicantList: initialList, jobId }) => {
             }
         }
     };
-
     const formatDate = (date) => {
         return new Date(date).toLocaleDateString("en-US", {
             month: "short",
