@@ -1,42 +1,31 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useState } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MapPin, Mail, Phone } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth"; // Assuming you have a useAuth hook
+import { useMutation } from "@tanstack/react-query";
+import { changeApplicationStatus } from "../../api/job";
+import { useAuth } from "../../hooks/useAuth";
 
-export default function CVProfileFollowID({ profile }) {
-    const { token } = useAuth(); // Retrieve the token from your auth context
-    const [error, setError] = useState(null);
+export default function CVProfileFollowID({ profile, onStatusChange }) {
+    const [error] = useState(null);
+    const { token } = useAuth();
 
-    // useEffect(() => {
-    //     const fetchCVProfile = async () => {
-    //         try {
-    //             const response = await axios.get(
-    //                 `${import.meta.env.VITE_API_URL}/company/${id}/details`,
-    //                 {
-    //                     headers: {
-    //                         Authorization: `Bearer ${token}`, // Include the token in the request
-    //                     },
-    //                 }
-    //             );
-    //             setProfile(response.data.payload);
-    //         } catch (err) {
-    //             setError(
-    //                 err.response?.data?.message || "Failed to fetch CV Profile"
-    //             );
-    //         } finally {
-    //             setLoading(false);
-    //         }
-    //     };
 
-    //     if (token) {
-    //         fetchCVProfile();
-    //     } else {
-    //         setError("No token provided");
-    //         setLoading(false);
-    //     }
-    // }, [id, token]);
+    const applicationMutation = useMutation({
+        mutationFn: (action) =>
+            changeApplicationStatus(profile._id, token, action),
+        onSuccess: () => {
+            if (onStatusChange) onStatusChange();
+        },
+    });
+
+    const handleAccept = () => {
+        applicationMutation.mutate("HIRED");
+    };
+
+    const handleReject = () => {
+        applicationMutation.mutate("REJECTED");
+    };
 
     if (error) {
         return (
@@ -67,7 +56,7 @@ export default function CVProfileFollowID({ profile }) {
                                     {`${profile.user?.firstName} ${profile.user?.lastName}`}
                                 </h1>
                                 <p className="text-gray-600">
-                                    {profile.cv.description}
+                                    {profile.cvSnapshot.description}
                                 </p>
                             </div>
                         </div>
@@ -77,16 +66,16 @@ export default function CVProfileFollowID({ profile }) {
                             <div className="flex flex-wrap gap-4">
                                 <div className="flex items-center text-gray-600">
                                     <MapPin className="w-5 h-5 mr-2" />
-                                    {profile.cv.experience?.[0]?.location ||
-                                        "Not specified"}
+                                    {profile.cvSnapshot.experience?.[0]
+                                        ?.location || "Not specified"}
                                 </div>
                                 <div className="flex items-center text-gray-600">
                                     <Mail className="w-5 h-5 mr-2" />
-                                    {profile.cv.user?.email}
+                                    {profile.cvSnapshot.user?.email}
                                 </div>
                                 <div className="flex items-center text-gray-600">
                                     <Phone className="w-5 h-5 mr-2" />
-                                    {profile.cv.number}
+                                    {profile.cvSnapshot.number}
                                 </div>
                             </div>
 
@@ -95,14 +84,16 @@ export default function CVProfileFollowID({ profile }) {
                                     Skills
                                 </h3>
                                 <div className="flex flex-wrap gap-2">
-                                    {profile.cv.skills?.map((skill, index) => (
-                                        <span
-                                            key={index}
-                                            className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium"
-                                        >
-                                            {skill}
-                                        </span>
-                                    ))}
+                                    {profile.cvSnapshot.skills?.map(
+                                        (skill, index) => (
+                                            <span
+                                                key={index}
+                                                className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium"
+                                            >
+                                                {skill}
+                                            </span>
+                                        )
+                                    )}
                                 </div>
                             </div>
 
@@ -110,7 +101,7 @@ export default function CVProfileFollowID({ profile }) {
                                 <h3 className="text-lg font-semibold">
                                     Education
                                 </h3>
-                                {profile.cv.education?.map((edu) => (
+                                {profile.cvSnapshot.education?.map((edu) => (
                                     <div
                                         key={edu._id}
                                         className="border-b pb-4 mb-4"
@@ -131,7 +122,7 @@ export default function CVProfileFollowID({ profile }) {
                                 <h3 className="text-lg font-semibold">
                                     Experience
                                 </h3>
-                                {profile.cv.experience?.map((exp) => (
+                                {profile.cvSnapshot.experience?.map((exp) => (
                                     <div
                                         key={exp._id}
                                         className="border-b pb-4 mb-4"
@@ -156,19 +147,26 @@ export default function CVProfileFollowID({ profile }) {
                                     Certifications
                                 </h3>
                                 <p>
-                                    {profile.cv.certifications ||
+                                    {profile.cvSnapshot.certifications ||
                                         "No certifications listed."}
                                 </p>
                             </div>
-
-                            <Button
-                                className="bg-green-500 hover:bg-green-600 text-white"
-                                onClick={() =>
-                                    window.open(profile.cv.linkUrl, "_blank")
-                                }
-                            >
-                                Download Resume
-                            </Button>
+                            <div className="flex gap-5">
+                                <Button
+                                    className="bg-green-500 hover:bg-green-600 text-white"
+                                    onClick={handleAccept}
+                                    disabled={applicationMutation.isPending}
+                                >
+                                    Accept
+                                </Button>
+                                <Button
+                                    className="bg-red-500 hover:bg-red-600 text-white"
+                                    onClick={handleReject}
+                                    disabled={applicationMutation.isPending}
+                                >
+                                    Reject
+                                </Button>
+                            </div>
                         </div>
                     </CardContent>
                 </Card>

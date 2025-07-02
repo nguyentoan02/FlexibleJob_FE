@@ -1,6 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchMyCompanyProfile, updateCompanyProfile } from "../api/company";
-import { getJobsByUserId } from "../api/job";
+import {
+    fetchMyCompanyProfile,
+    getCompanyApproval,
+    updateCompanyProfile,
+    createCompanyProfile as createCompanyProfileApi,
+} from "../api/company";
+import { getJobLimitation, getJobsByUserId } from "../api/job";
 
 export const useMyCompany = () => {
     const token = localStorage.getItem("token");
@@ -70,9 +75,60 @@ export const useMyCompany = () => {
         queryKey: ["JobsMyCompany"],
         queryFn: () => getJobsByUserId(token),
     });
+
+    const isCompanyApproved = useQuery({
+        queryKey: ["isCompanyApproved"],
+        queryFn: () => getCompanyApproval(token),
+    });
+
+    const createCompanyProfile = useMutation({
+        mutationFn: (data) => {
+            const formData = new FormData();
+            // Append các trường cơ bản
+            Object.keys(data).forEach((key) => {
+                if (
+                    key !== "albumImage" &&
+                    key !== "identityImage" &&
+                    key !== "imageUrl" &&
+                    key !== "coverImage"
+                ) {
+                    formData.append(key, data[key]);
+                }
+            });
+            // Ảnh đại diện
+            if (data.imageUrl) formData.append("imageUrl", data.imageUrl);
+            // Ảnh cover
+            if (data.coverImage) formData.append("coverImage", data.coverImage);
+            // Album ảnh
+            if (data.albumImage && data.albumImage.length > 0) {
+                data.albumImage.forEach((file) => {
+                    formData.append("albumImage", file);
+                });
+            }
+            // Ảnh giấy tờ
+            if (data.identityImage && data.identityImage.length > 0) {
+                data.identityImage.forEach((file) => {
+                    formData.append("identityImage", file);
+                });
+            }
+            return createCompanyProfileApi(token, formData);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries(["MyCompany"]);
+        },
+    });
+
+    const jobLimitation = useQuery({
+        queryKey: ["JobLimitation"],
+        queryFn: () => getJobLimitation(token),
+    });
+
     return {
         MyCompanyProfile,
         updateCompanyProfile: updateCompanyProfileMutation,
         JobsOfMyCompany,
+        isCompanyApproved,
+        createCompany: createCompanyProfile,
+        jobLimitation,
     };
 };

@@ -167,7 +167,11 @@ export default function JobDetail() {
 
     return (
         <>
-            <HeaderJobseeker />
+            {user.role === "JOBSEEKER" ? (
+                <HeaderJobseeker />
+            ) : (
+                <HeaderCompany />
+            )}
             {toast.message && (
                 <Toast message={toast.message} type={toast.type} />
             )}

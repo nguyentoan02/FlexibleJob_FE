@@ -1,9 +1,30 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CVProfileFollowID from "../../../pages/CVProfile/CVProfileFollowID";
+import { fetchApplicantsByJobId } from "../../../api/job";
+import { useAuth } from "../../../hooks/useAuth";
 
-const ApplicantList = ({ ApplicantList }) => {
+const ApplicantList = ({ ApplicantList: initialList, jobId }) => {
     const [appProfile, setAppProfile] = useState({});
+    const [applicants, setApplicants] = useState(initialList);
+    const { token } = useAuth();
+    console.log(applicants);
 
+    const refetchApplicants = async () => {
+        if (!jobId) return;
+        const res = await fetchApplicantsByJobId(jobId, token);
+        setApplicants(res.payload.applicants);
+        // Cập nhật lại profile nếu đang xem
+        if (appProfile._id) {
+            const updated = res.payload.applicants.find(
+                (a) => a._id === appProfile._id
+            );
+            if (updated) {
+                setAppProfile(updated); // Cập nhật lại profile với dữ liệu mới nhất
+            } else {
+                setAppProfile({}); // Nếu applicant không còn, clear profile
+            }
+        }
+    };
     const formatDate = (date) => {
         return new Date(date).toLocaleDateString("en-US", {
             month: "short",
@@ -36,10 +57,10 @@ const ApplicantList = ({ ApplicantList }) => {
                     Applicants
                 </h2>
                 <div className="space-y-3">
-                    {ApplicantList.map((app, index) => (
+                    {applicants.map((app, index) => (
                         <button
                             key={index}
-                            onClick={() => handleClickApplicant(app)}
+                            onClick={() => setAppProfile({ ...app })}
                             className={`w-full p-4 rounded-lg transition-all duration-200 hover:bg-gray-50 border
                                 ${
                                     appProfile._id === app._id
@@ -80,7 +101,11 @@ const ApplicantList = ({ ApplicantList }) => {
             {/* CV Profile View */}
             <div className="lg:col-span-3 bg-white rounded-lg shadow-md overflow-y-auto">
                 {Object.keys(appProfile).length > 0 ? (
-                    <CVProfileFollowID profile={appProfile} />
+                    <CVProfileFollowID
+                        key={appProfile._id}
+                        profile={appProfile}
+                        onStatusChange={refetchApplicants}
+                    />
                 ) : (
                     <div className="h-full flex items-center justify-center text-gray-500">
                         <p>Select an applicant to view their profile</p>

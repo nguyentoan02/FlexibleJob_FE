@@ -4,6 +4,7 @@ import PrivateRoute from "../components/PrivateRoute";
 import CompanyProfile from "../pages/Employer/CompanyProfile";
 import CVProfileFollowID from "../pages/CVProfile/CVProfileFollowID";
 import CompanyDashboard from "../pages/Employer/CompanyDashboard";
+import CreateCompanyProfile from "../pages/Employer/CreateCompanyProfile";
 
 function CompanyRoutes() {
     return (
@@ -14,6 +15,10 @@ function CompanyRoutes() {
                     path="/company/dashboard/*"
                 />
                 <Route path="/cvprofile/:id" element={<CVProfileFollowID />} />
+                <Route
+                    path="/createCompanyProfile"
+                    element={<CreateCompanyProfile />}
+                />
             </Route>
         </>
     );
