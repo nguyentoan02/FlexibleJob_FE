@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useMyCompany } from "../../../hooks/myCompany";
 import Toast from "../../Toast/Toast";
@@ -25,7 +25,46 @@ const CreateCompany = () => {
     const [identityImage, setIdentityImage] = useState([]);
     const [error, setError] = useState("");
     const [toast, setToast] = useState({ message: "", type: "" });
-    const { createCompany } = useMyCompany();
+    const [removedImages, setRemovedImages] = useState({
+        albumImage: [],
+        identityImage: [],
+    });
+    const { createCompany, MyCompanyProfile, updateCompanyProfile } =
+        useMyCompany();
+
+    useEffect(() => {
+        if (MyCompanyProfile.data) {
+            setFormData({
+                companyName: MyCompanyProfile.data.payload.companyName || "",
+                industry: MyCompanyProfile.data.payload.industry || "",
+                aboutUs: MyCompanyProfile.data.payload.aboutUs || "",
+                benefit: MyCompanyProfile.data.payload.benefit || "",
+                address: MyCompanyProfile.data.payload.address || "",
+                location: MyCompanyProfile.data.payload.location || "",
+                companySize: MyCompanyProfile.data.payload.companySize || "1-9",
+                website: MyCompanyProfile.data.payload.website || "",
+                email: MyCompanyProfile.data.payload.email || "",
+                phone: MyCompanyProfile.data.payload.phone || "",
+                linkedinUrl: MyCompanyProfile.data.payload.linkedinUrl || "",
+                facebookUrl: MyCompanyProfile.data.payload.facebookUrl || "",
+            });
+            // setImageUrl(MyCompanyProfile.data.payload.imageUrl);
+            // setCoverImage(MyCompanyProfile.data.payload.coverImage);
+            // setAlbumImage(MyCompanyProfile.data.payload.albumImage || []);
+            // setIdentityImage(MyCompanyProfile.data.payload.identityImage || []);
+        }
+    }, [MyCompanyProfile.data]);
+
+    if (MyCompanyProfile.isPending)
+        return (
+            <div className="flex justify-center items-center min-h-screen">
+                Loading...
+            </div>
+        );
+    if (MyCompanyProfile.isError)
+        return (
+            <div className="text-red-500">Error loading company profile!</div>
+        );
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -41,15 +80,48 @@ const CreateCompany = () => {
             return;
         }
 
-        createCompany.mutate(
-            {
+        // Chuẩn bị payload cho update
+        const payload = {
+            ...formData,
+            // Các trường text giữ nguyên
+            newProfileImage: imageUrl instanceof File ? imageUrl : undefined,
+            newCoverImage: coverImage instanceof File ? coverImage : undefined,
+            newAlbumImages: albumImage.filter((f) => f instanceof File),
+            newIdentityImages: identityImage.filter((f) => f instanceof File),
+            // Gộp các link ảnh cần xoá thành 1 mảng
+            removeImages: [
+                ...(removedImages.albumImage || []),
+                ...(removedImages.identityImage || []),
+            ],
+        };
+        if (MyCompanyProfile.data) {
+            updateCompanyProfile.mutate(payload, {
+                onSuccess: () => {
+                    setToast({
+                        message: "Company profile updated successfully!",
+                        type: "success",
+                    });
+                    setRemovedImages({ albumImage: [], identityImage: [] });
+                },
+                onError: (err) => {
+                    setError("Error updating company profile!");
+                    setToast({
+                        message: "Error updating company profile!",
+                        type: "error",
+                    });
+                    console.error(err);
+                },
+            });
+        } else {
+            // Tạo mới
+            const createPayload = {
                 ...formData,
                 imageUrl,
                 coverImage,
                 albumImage,
                 identityImage,
-            },
-            {
+            };
+            createCompany.mutate(createPayload, {
                 onSuccess: () => {
                     setToast({
                         message: "Company profile created successfully!",
@@ -64,8 +136,8 @@ const CreateCompany = () => {
                     });
                     console.error(err);
                 },
-            }
-        );
+            });
+        }
     };
 
     return (
@@ -298,6 +370,14 @@ const CreateCompany = () => {
                         )}
                     </label>
                 </div>
+                {/* Avatar preview từ cloud nếu có */}
+                {MyCompanyProfile.data?.payload?.imageUrl && !imageUrl && (
+                    <img
+                        src={MyCompanyProfile.data.payload.imageUrl}
+                        alt="avatar-cloud"
+                        className="mt-2 w-24 h-24 object-cover rounded-full border border-gray-200 shadow"
+                    />
+                )}
                 {/* Cover image */}
                 <div>
                     <label className="block text-gray-700 font-medium mb-2">
@@ -339,6 +419,14 @@ const CreateCompany = () => {
                         )}
                     </label>
                 </div>
+                {/* Cover preview từ cloud nếu có */}
+                {MyCompanyProfile.data?.payload?.coverImage && !coverImage && (
+                    <img
+                        src={MyCompanyProfile.data.payload.coverImage}
+                        alt="cover-cloud"
+                        className="mt-2 w-full h-24 object-cover rounded-lg border border-gray-200 shadow"
+                    />
+                )}
                 {/* Album images */}
                 <div className="md:col-span-2">
                     <label className="block text-gray-700 font-medium mb-2">
@@ -389,6 +477,41 @@ const CreateCompany = () => {
                         )}
                     </label>
                 </div>
+                {/* Album preview từ cloud nếu có */}
+                {MyCompanyProfile.data?.payload?.albumImage?.length > 0 &&
+                    albumImage.length === 0 && (
+                        <div className="flex flex-wrap gap-2 mt-2">
+                            {MyCompanyProfile.data.payload.albumImage
+                                .filter(
+                                    (url) =>
+                                        !removedImages.albumImage.includes(url)
+                                )
+                                .map((url, idx) => (
+                                    <div key={idx} className="relative group">
+                                        <img
+                                            src={url}
+                                            alt={`album-cloud-${idx}`}
+                                            className="w-20 h-20 object-cover rounded border border-gray-200 shadow"
+                                        />
+                                        <button
+                                            type="button"
+                                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 text-xs opacity-80 group-hover:opacity-100"
+                                            onClick={() => {
+                                                setRemovedImages((prev) => ({
+                                                    ...prev,
+                                                    albumImage: [
+                                                        ...prev.albumImage,
+                                                        url,
+                                                    ],
+                                                }));
+                                            }}
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                ))}
+                        </div>
+                    )}
                 {/* Identity images */}
                 <div className="md:col-span-2">
                     <label className="block text-gray-700 font-medium mb-2">
@@ -439,14 +562,53 @@ const CreateCompany = () => {
                         )}
                     </label>
                 </div>
+                {/* Identity preview từ cloud nếu có */}
+                {MyCompanyProfile.data?.payload?.identityImage?.length > 0 &&
+                    identityImage.length === 0 && (
+                        <div className="flex flex-wrap gap-2 mt-2">
+                            {MyCompanyProfile.data.payload.identityImage
+                                .filter(
+                                    (url) =>
+                                        !removedImages.identityImage.includes(
+                                            url
+                                        )
+                                )
+                                .map((url, idx) => (
+                                    <div key={idx} className="relative group">
+                                        <img
+                                            src={url}
+                                            alt={`identity-cloud-${idx}`}
+                                            className="w-20 h-20 object-cover rounded border border-gray-200 shadow"
+                                        />
+                                        <button
+                                            type="button"
+                                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 text-xs opacity-80 group-hover:opacity-100"
+                                            onClick={() => {
+                                                setRemovedImages((prev) => ({
+                                                    ...prev,
+                                                    identityImage: [
+                                                        ...prev.identityImage,
+                                                        url,
+                                                    ],
+                                                }));
+                                            }}
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                ))}
+                        </div>
+                    )}
             </div>
 
             <button
                 type="submit"
                 className="w-full bg-blue-600 hover:bg-blue-700 transition-colors text-white font-semibold py-3 px-6 rounded-lg shadow mt-4 text-lg flex items-center justify-center"
-                disabled={createCompany.isLoading}
+                disabled={
+                    createCompany.isPending || updateCompanyProfile.isPending
+                }
             >
-                {createCompany.isLoading ? (
+                {createCompany.isPending || updateCompanyProfile.isPending ? (
                     <>
                         <svg
                             className="animate-spin h-5 w-5 mr-2 text-white"
@@ -467,8 +629,10 @@ const CreateCompany = () => {
                                 d="M4 12a8 8 0 018-8v8z"
                             />
                         </svg>
-                        Creating...
+                        {MyCompanyProfile.data ? "Updating..." : "Creating..."}
                     </>
+                ) : MyCompanyProfile.data ? (
+                    "Update Profile"
                 ) : (
                     "Create Profile"
                 )}

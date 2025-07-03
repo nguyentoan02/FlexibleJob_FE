@@ -58,6 +58,11 @@ export const useMyCompany = () => {
             if (data.newCoverImage) {
                 formData.append("coverImage", data.newCoverImage);
             }
+            if (data.newIdentityImages && data.newIdentityImages.length > 0) {
+                data.newIdentityImages.forEach((file) => {
+                    formData.append("identityImage", file);
+                });
+            }
 
             // Log toàn bộ FormData để debug
             for (let pair of formData.entries()) {
