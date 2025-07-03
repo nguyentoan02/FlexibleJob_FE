@@ -151,7 +151,6 @@ export default function CVProfileFollowID({ profile, onStatusChange }) {
                                         "No certifications listed."}
                                 </p>
                             </div>
-
                             <div className="flex gap-5">
                                 <Button
                                     className="bg-green-500 hover:bg-green-600 text-white"
