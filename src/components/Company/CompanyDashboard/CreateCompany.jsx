@@ -79,7 +79,6 @@ const CreateCompany = () => {
             setError("Identity images are required.");
             return;
         }
-
         // Chuẩn bị payload cho update
         const payload = {
             ...formData,
