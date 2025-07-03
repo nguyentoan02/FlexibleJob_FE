@@ -14,6 +14,8 @@ import {
   Trash2,
   LogOut,
   ShieldAlert,
+  AlertTriangle,
+  Building2,
 } from 'lucide-react'
 
 function NavItem({ icon, label, to, badge, active = false, onClick }) {
@@ -85,6 +87,11 @@ export function AdminSidebar() {
               active={location.pathname === '/admin/users'}
             />
             <NavItem 
+              icon={<Building2 size={20} />} 
+              label="Manage Companies" 
+              to="/admin/companies"
+            />
+            <NavItem 
               icon={<Briefcase size={20} />} 
               label="Manage Jobs" 
               to="/admin/jobs"
@@ -103,15 +110,16 @@ export function AdminSidebar() {
           </h3>
           <nav className="mt-2">
             <NavItem 
-              icon={<Users size={20} />} 
+              icon={<Package size={20} />} 
               label="Manage Packages" 
               to="/admin/packages"
+              active={location.pathname === '/admin/packages'}
             />
-            <NavItem
-              icon={<ShieldAlert size={20} />}
-              label="Banned Accounts"
-              to="/admin/banned-accounts"
-              badge={2}
+            <NavItem 
+              icon={<AlertTriangle size={20} />} 
+              label="Reports" 
+              to="/admin/report"
+              active={location.pathname === '/admin/reportreport'}
             />
           </nav>
         </div>
