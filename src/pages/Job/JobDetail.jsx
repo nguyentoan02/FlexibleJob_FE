@@ -5,6 +5,7 @@ import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import HeaderJobseeker from "@/components/Header/HeaderJobseeker";
+import HeaderCompany from "@/components/Header/HeaderCompany";
 import { ApplyJobModal } from "@/pages/Application/Applicant";
 import { useAuth } from "@/hooks/useAuth";
 import { useCVProfile } from "@/hooks/cvprofile";
