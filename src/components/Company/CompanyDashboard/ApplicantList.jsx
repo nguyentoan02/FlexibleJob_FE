@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import React, { useState } from "react";
-=======
 import React, { useEffect, useState } from "react";
->>>>>>> e72cb56a91d0601950a9891f3d1e92a5f1b4c42e
 import CVProfileFollowID from "../../../pages/CVProfile/CVProfileFollowID";
 import { fetchApplicantsByJobId } from "../../../api/job";
 import { useAuth } from "../../../hooks/useAuth";
@@ -13,8 +9,6 @@ const ApplicantList = ({ ApplicantList: initialList, jobId }) => {
     const { token } = useAuth();
     console.log(applicants);
 
-<<<<<<< HEAD
-=======
     const refetchApplicants = async () => {
         if (!jobId) return;
         const res = await fetchApplicantsByJobId(jobId, token);
@@ -31,7 +25,6 @@ const ApplicantList = ({ ApplicantList: initialList, jobId }) => {
             }
         }
     };
->>>>>>> e72cb56a91d0601950a9891f3d1e92a5f1b4c42e
     const formatDate = (date) => {
         return new Date(date).toLocaleDateString("en-US", {
             month: "short",
