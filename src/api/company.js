@@ -35,3 +35,22 @@ export const updateCompanyProfile = async (formData, token) => {
     });
     return response.data;
 };
+
+export const getCompanyApproval = async (token) => {
+    const response = await axios.get(`${API_URL}/company/isCompanyApproved`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+        },
+    });
+    return response.data;
+};
+
+export const createCompanyProfile = async (token, body) => {
+    const response = await axios.get(`${API_URL}/company`, body, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+        },
+    });
+};

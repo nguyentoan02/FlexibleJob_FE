@@ -1,8 +1,9 @@
 import { FileAddOutlined } from "@ant-design/icons";
 import React, { useEffect, useState } from "react";
 import { useCategory } from "../../../hooks/category";
+import LimitTationJobPost from "./LimitTationJobPost";
 
-const JobForm = ({ handleSubmit, title, initialData }) => {
+const JobForm = ({ handleSubmit, title, initialData, limitData }) => {
     const { AllCategory } = useCategory();
 
     const [formData, setFormData] = useState(
@@ -82,15 +83,24 @@ const JobForm = ({ handleSubmit, title, initialData }) => {
 
     return (
         <>
-            <h2 className="text-4xl font-semibold mb-4 flex items-center">
-                {title || "Post a new Job"}
-            </h2>
-            <div className="mb-4 text-sm text-gray-600">
-                <span className="text-gray-400">Home</span> /{" "}
-                <span className="text-gray-400">Dashboard</span> /{" "}
-                <span className="text-indigo-600 font-semibold">
-                    {title || "Post Job"}
-                </span>
+            <div className="flex justify-between mb-2">
+                <div>
+                    <h2 className="text-4xl font-semibold mb-4 flex items-center">
+                        {title || "Post a new Job"}
+                    </h2>
+                    <div className="mb-4 text-sm text-gray-600">
+                        <span className="text-gray-400">Home</span> /{" "}
+                        <span className="text-gray-400">Dashboard</span> /{" "}
+                        <span className="text-indigo-600 font-semibold">
+                            {title || "Post Job"}
+                        </span>
+                    </div>
+                </div>
+                {!initialData && (
+                    <div>
+                        <LimitTationJobPost data={limitData} />
+                    </div>
+                )}
             </div>
 
             <form

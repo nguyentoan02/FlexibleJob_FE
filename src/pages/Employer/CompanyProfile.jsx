@@ -14,18 +14,24 @@ import { useState } from "react";
 import Detail from "../../components/Company/CompanyProfile/Detail";
 import Jobs from "../../components/Company/CompanyProfile/Jobs";
 import Review from "../../components/Company/CompanyProfile/Review";
+import { useAuth } from "../../hooks/useAuth";
 
 function CompanyProfile() {
     const { companyId } = useParams();
     const { CompanyProfile, CompanyJos } = useCompany(companyId);
     const [actions, setActions] = useState("DETAIL");
+    const { user } = useAuth();
 
     if (CompanyProfile.isError || CompanyJos.isError)
         return <div>Error loading data</div>;
 
     return (
         <>
-            <HeaderJobseeker />
+            {user.role === "JOBSEEKER" ? (
+                <HeaderJobseeker />
+            ) : (
+                <HeaderCompany />
+            )}
             <div className="bg-gray-200 w-full h-56 flex items-center">
                 <div className="flex flex-col gap-4 px-4 md:ms-20 lg:ms-52">
                     <h1 className="text-3xl font-semibold">Employer Detail</h1>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import JobForm from "./JobForm";
 import { useMutation } from "@tanstack/react-query";
 import { fetchApplicantsByJobId, updateJobById } from "../../../api/job";
@@ -8,6 +8,8 @@ import JobTable from "./JobTable";
 import { Pagination } from "antd";
 import { useMyCompanyJobs } from "../../../hooks/myCompanyJobs";
 import ApplicantList from "./ApplicantList";
+import { useMyCompany } from "../../../hooks/myCompany";
+import LimitTationJobPost from "./LimitTationJobPost";
 
 const ManageJob = () => {
     const [page, setPage] = useState(1);
@@ -20,11 +22,17 @@ const ManageJob = () => {
     const limit = 5;
     const { token } = useAuth();
     const { JobsOfMyCompany } = useMyCompanyJobs(page, 5, search);
+    const { jobLimitation } = useMyCompany();
 
     const jobMutaion = useMutation({
         mutationFn: (formData) => updateJobById(formData, jobData._id, token),
         onSuccess: () => JobsOfMyCompany.refetch(),
     });
+
+    useEffect(() => {
+        JobsOfMyCompany.refetch();
+        jobLimitation.refetch();
+    }, []);
 
     const handleEdit = (job) => {
         console.log("jobdata", job);
@@ -39,7 +47,7 @@ const ManageJob = () => {
         setEditModal(false);
     };
 
-    if (JobsOfMyCompany.isLoading) {
+    if (JobsOfMyCompany.isLoading || jobLimitation.isLoading) {
         return (
             <div className="flex justify-center items-center min-h-screen">
                 <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-gray-900"></div>
@@ -47,10 +55,9 @@ const ManageJob = () => {
         );
     }
 
-    if (JobsOfMyCompany.isError) {
+    if (JobsOfMyCompany.isError || jobLimitation.isError) {
         return <div className="text-red-500">{error.message}</div>;
     }
-
     const jobs = JobsOfMyCompany.data.payload.jobs;
     const totalPages = Math.ceil(JobsOfMyCompany.data.payload.total / limit);
 
@@ -60,25 +67,30 @@ const ManageJob = () => {
         fetchApplicantsByJobId(jobId, token)
             .then((res) => {
                 setApplicantsData(res.payload.applicants);
+                console.log("applicantsData", res.payload.applicants);
+                setApplicantsModal(true);
             })
             .catch((err) => console.log(err));
-        setApplicantsModal(true);
-        console.log(applicantsData);
     };
 
     return (
         <div className="px-4 py-6 md:px-10 md:py-10 relative min-h-screen">
-            <h2 className="text-4xl font-semibold mb-4">Manage Job</h2>
-
-            <SearchBar
-                searchInput={searchInput}
-                setSearchInput={setSearchInput}
-                onSearch={() => {
-                    setPage(1);
-                    setSearch(searchInput);
-                }}
-            />
-
+            <div className="flex justify-between mb-2">
+                <div className="w-[80%]">
+                    <h2 className="text-4xl font-semibold mb-4">Manage Job</h2>
+                    <SearchBar
+                        searchInput={searchInput}
+                        setSearchInput={setSearchInput}
+                        onSearch={() => {
+                            setPage(1);
+                            setSearch(searchInput);
+                        }}
+                    />
+                </div>
+                <div>
+                    <LimitTationJobPost data={jobLimitation.data.payload} />
+                </div>
+            </div>
             <JobTable
                 onViewApplicants={handleViewApplicants}
                 jobs={jobs}
@@ -140,7 +152,14 @@ const ManageJob = () => {
                         onClick={() => setApplicantsModal(false)}
                     ></div>
                     <div className="relative min-h-screen items-center justify-start p-5 bg-white rounded-3xl">
+<<<<<<< HEAD
                         <ApplicantList ApplicantList={applicantsData} />
+=======
+                        <ApplicantList
+                            ApplicantList={applicantsData}
+                            jobId={jobData?._id}
+                        />
+>>>>>>> e72cb56a91d0601950a9891f3d1e92a5f1b4c42e
                     </div>
                 </div>
             )}

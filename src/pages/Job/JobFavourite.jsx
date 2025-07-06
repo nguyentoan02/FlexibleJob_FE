@@ -84,27 +84,27 @@ export default function JobFavorite() {
                                                     )
                                                 }
                                             >
-                                                {favorite.job.title}
+                                                {favorite.job?.title}
                                             </h3>
 
                                             <div className="mt-2 space-y-2">
                                                 <div className="flex items-center text-gray-600">
                                                     <Building className="h-4 w-4 mr-2" />
                                                     {
-                                                        favorite.job.company
+                                                        favorite.job?.company
                                                             .companyName
                                                     }
                                                 </div>
 
                                                 <div className="flex items-center text-gray-600">
                                                     <MapPin className="h-4 w-4 mr-2" />
-                                                    {favorite.job.location}
+                                                    {favorite.job?.location}
                                                 </div>
 
                                                 <div className="flex items-center text-gray-600">
                                                     <DollarSign className="h-4 w-4 mr-2" />
                                                     {formatSalary(
-                                                        favorite.job.salary
+                                                        favorite.job?.salary
                                                     )}
                                                 </div>
                                             </div>

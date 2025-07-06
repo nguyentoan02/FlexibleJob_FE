@@ -5,6 +5,7 @@ import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import HeaderJobseeker from "@/components/Header/HeaderJobseeker";
+import HeaderCompany from "@/components/Header/HeaderCompany";
 import { ApplyJobModal } from "@/pages/Application/Applicant";
 import { useAuth } from "@/hooks/useAuth";
 import { useCVProfile } from "@/hooks/cvprofile";
@@ -167,7 +168,11 @@ export default function JobDetail() {
 
     return (
         <>
-            <HeaderJobseeker />
+            {user.role === "JOBSEEKER" ? (
+                <HeaderJobseeker />
+            ) : (
+                <HeaderCompany />
+            )}
             {toast.message && (
                 <Toast message={toast.message} type={toast.type} />
             )}

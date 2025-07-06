@@ -1,5 +1,5 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { fetchProfile, updateProfile } from "@/api/profilepage";
+import { fetchProfile, updateProfile, fetchAdminProfile, updateAdminProfile } from "@/api/profilepage";
 import { useAuth } from "@/hooks/useAuth";
 
 /**
@@ -18,6 +18,27 @@ export const useProfile = () => {
     // Update profile data
     const profileMutation = useMutation({
         mutationFn: (profileData) => updateProfile(token, profileData),
+    });
+
+    return { profileQuery, profileMutation };
+};
+
+/**
+ * Custom hook for managing admin profile-related logic.
+ */
+export const useAdminProfile = () => {
+    const { token } = useAuth();
+
+    // Fetch admin profile data
+    const profileQuery = useQuery({
+        queryKey: ["adminProfile"],
+        queryFn: () => fetchAdminProfile(token),
+        enabled: !!token,
+    });
+
+    // Update admin profile data
+    const profileMutation = useMutation({
+        mutationFn: (profileData) => updateAdminProfile(token, profileData),
     });
 
     return { profileQuery, profileMutation };
