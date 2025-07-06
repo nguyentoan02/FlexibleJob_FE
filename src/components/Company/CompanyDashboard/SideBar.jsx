@@ -102,7 +102,7 @@ const SideBar = ({ isCreate }) => {
                             <SideBarItem
                                 icon={<UsergroupAddOutlined />}
                                 label="Manage Applicants"
-                                active={action === "MANAGEAPPPLICATION"}
+                                active={action === "MANAGEAPPLICATION"}
                                 onClick={() => {
                                     navigate("manageApplication");
                                     setActions("MANAGEAPPLICATION");
