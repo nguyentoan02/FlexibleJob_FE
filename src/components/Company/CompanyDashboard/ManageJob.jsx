@@ -152,14 +152,10 @@ const ManageJob = () => {
                         onClick={() => setApplicantsModal(false)}
                     ></div>
                     <div className="relative min-h-screen items-center justify-start p-5 bg-white rounded-3xl">
-<<<<<<< HEAD
-                        <ApplicantList ApplicantList={applicantsData} />
-=======
                         <ApplicantList
                             ApplicantList={applicantsData}
                             jobId={jobData?._id}
                         />
->>>>>>> e72cb56a91d0601950a9891f3d1e92a5f1b4c42e
                     </div>
                 </div>
             )}
