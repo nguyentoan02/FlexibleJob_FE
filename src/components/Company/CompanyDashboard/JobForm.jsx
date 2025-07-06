@@ -69,16 +69,51 @@ const JobForm = ({ handleSubmit, title, initialData }) => {
     console.log("form data", formData.category);
 
     useEffect(() => {
-        if (AllCategory.isSuccess && AllCategory.data?.payload) {
+        // Nếu là tạo mới (không có initialData), set category mặc định là rỗng
+        if (
+            !initialData &&
+            AllCategory.isSuccess &&
+            AllCategory.data?.payload
+        ) {
             setFormData((prevFormData) => ({
                 ...prevFormData,
-                category: AllCategory.data.payload,
+                category: "",
             }));
         }
-    }, [AllCategory.data, AllCategory.isSuccess]);
+    }, [AllCategory.data, AllCategory.isSuccess, initialData]);
 
     if (AllCategory.isLoading) return <div>...loading</div>;
     if (AllCategory.isError) return <div>{AllCategory.error.message}</div>;
+
+    const handleUpdate = (formData, e) => {
+        e.preventDefault();
+        // Nếu category là array object, lấy _id
+        let category = formData.category;
+        if (
+            Array.isArray(category) &&
+            category.length > 0 &&
+            typeof category[0] === "object"
+        ) {
+            category = category.map((c) => c._id);
+            // Nếu chỉ cho phép 1 category, lấy category[0]
+            category = category[0];
+        }
+        const submitData = { ...formData, category };
+        jobMutaion.mutate(submitData);
+        setEditModal(false);
+    };
+
+    const handleEdit = (job) => {
+        // Nếu job.category là object, lấy _id, nếu là string thì giữ nguyên
+        setJobdata({
+            ...job,
+            category:
+                typeof job.category === "object"
+                    ? job.category._id
+                    : job.category,
+        });
+        setEditModal(true);
+    };
 
     return (
         <>

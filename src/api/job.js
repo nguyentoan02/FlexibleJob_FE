@@ -5,7 +5,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 export const createNewJob = async (formdata, token) => {
     console.log("token khi goi api", token);
     const response = await axios.post(
-        `${API_URL}/manageJob/createJob`,
+        `${API_URL}/manageJobs/createJob`,
         {
             ...formdata,
         },

@@ -61,14 +61,21 @@ export default function JobFavorite() {
                 <h1 className="text-2xl font-bold mb-6">My Favorite Jobs</h1>
 
                 <div className="space-y-4">
-                    {favoritesQuery.data?.payload?.length === 0 ? (
+                    {favoritesQuery.data?.payload?.filter(
+                        (favorite) => favorite.job
+                    ).length === 0 && (
                         <div className="text-center py-8">
                             <p className="text-gray-500">
-                                No favorite jobs yet
+                                No favorite jobs available.
                             </p>
                         </div>
-                    ) : (
-                        favoritesQuery.data?.payload?.map((favorite) => (
+                    )}
+                    {favoritesQuery.data?.payload?.map((favorite) => {
+                        if (!favorite.job) {
+                            return null; // Bỏ qua nếu job bị null
+                        }
+
+                        return (
                             <Card
                                 key={favorite._id}
                                 className="hover:shadow-md transition-shadow"
@@ -90,15 +97,18 @@ export default function JobFavorite() {
                                             <div className="mt-2 space-y-2">
                                                 <div className="flex items-center text-gray-600">
                                                     <Building className="h-4 w-4 mr-2" />
-                                                    {
-                                                        favorite.job.company
-                                                            .companyName
-                                                    }
+                                                    {favorite.job.company
+                                                        .companyName
+                                                        ? favorite.job.company
+                                                              .companyName
+                                                        : "Unknown"}
                                                 </div>
 
                                                 <div className="flex items-center text-gray-600">
                                                     <MapPin className="h-4 w-4 mr-2" />
-                                                    {favorite.job.location}
+                                                    {favorite.job.location
+                                                        ? favorite.job.location
+                                                        : "Unknown"}
                                                 </div>
 
                                                 <div className="flex items-center text-gray-600">
@@ -128,8 +138,8 @@ export default function JobFavorite() {
                                     </div>
                                 </CardContent>
                             </Card>
-                        ))
-                    )}
+                        );
+                    })}
                 </div>
             </div>
         </>
