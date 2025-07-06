@@ -9,6 +9,7 @@ import ManageJob from "../../components/Company/CompanyDashboard/ManageJob";
 import HeaderCompany from "../../components/Header/HeaderCompany";
 import { useMyCompany } from "../../hooks/myCompany";
 import ViewPackage from "../../components/Company/CompanyDashboard/ViewPackage";
+import ApplicationManage from "../../components/Company/CompanyDashboard/ApplicationManage";
 
 const CompanyDashboard = () => {
     const { isCompanyApproved } = useMyCompany();
@@ -50,6 +51,10 @@ const CompanyDashboard = () => {
                         <Route
                             path="viewCompanyPackage"
                             element={<ViewPackage />}
+                        />
+                        <Route
+                            path="manageApplication"
+                            element={<ApplicationManage />}
                         />
                     </Routes>
                 </div>
