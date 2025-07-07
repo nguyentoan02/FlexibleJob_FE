@@ -1,9 +1,8 @@
-import React from "react";
-import HeaderCompany from "../../components/Header/HeaderCompany";
+import CompanyProfileForm from "../../components/Company/CompanyDashboard/CompanyProfileForm";
 import SideBar from "../../components/Company/CompanyDashboard/SideBar";
-import CreateCompany from "../../components/Company/CompanyDashboard/CreateCompany";
+import HeaderCompany from "../../components/Header/HeaderCompany";
 
-function CreateCompanyProfile() {
+function CompanyProfilePage() {
     return (
         <div className="h-full">
             {/* <HeaderJobseeker /> */}
@@ -11,11 +10,11 @@ function CreateCompanyProfile() {
             <div className="flex h-full">
                 <SideBar isCreate={true} />
                 <div className="flex-1 p-6">
-                    <CreateCompany />
+                    <CompanyProfileForm />
                 </div>
             </div>
         </div>
     );
 }
 
-export default CreateCompanyProfile;
+export default CompanyProfilePage;

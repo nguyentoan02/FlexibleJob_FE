@@ -9,21 +9,40 @@ import { useAuth } from "../../hooks/useAuth";
 export default function CVProfileFollowID({ profile, onStatusChange }) {
     const [error] = useState(null);
     const { token } = useAuth();
+    const [toast, setToast] = useState({ open: false, message: "", type: "" });
+    const [confirmModal, setConfirmModal] = useState({
+        open: false,
+        action: null,
+    });
+    const [note, setNote] = useState("");
 
     const applicationMutation = useMutation({
         mutationFn: (action) =>
-            changeApplicationStatus(profile._id, token, action),
+            changeApplicationStatus(profile._id, token, action, note),
         onSuccess: () => {
+            setToast({
+                open: true,
+                message: "Update status successfully!",
+                type: "success",
+            });
             if (onStatusChange) onStatusChange();
+        },
+        onError: () => {
+            setToast({
+                open: true,
+                message: "Failed to update status!",
+                type: "error",
+            });
         },
     });
 
-    const handleAccept = () => {
-        applicationMutation.mutate("HIRED");
+    const handleConfirm = (action) => {
+        setConfirmModal({ open: true, action });
     };
 
-    const handleReject = () => {
-        applicationMutation.mutate("REJECTED");
+    const handleAction = () => {
+        setConfirmModal({ open: false, action: null });
+        applicationMutation.mutate(confirmModal.action);
     };
 
     if (error) {
@@ -153,14 +172,14 @@ export default function CVProfileFollowID({ profile, onStatusChange }) {
                             <div className="flex gap-5">
                                 <Button
                                     className="bg-green-500 hover:bg-green-600 text-white"
-                                    onClick={handleAccept}
+                                    onClick={() => handleConfirm("HIRED")}
                                     disabled={applicationMutation.isPending}
                                 >
                                     Accept
                                 </Button>
                                 <Button
                                     className="bg-red-500 hover:bg-red-600 text-white"
-                                    onClick={handleReject}
+                                    onClick={() => handleConfirm("REJECTED")}
                                     disabled={applicationMutation.isPending}
                                 >
                                     Reject
@@ -170,6 +189,66 @@ export default function CVProfileFollowID({ profile, onStatusChange }) {
                     </CardContent>
                 </Card>
             </div>
+            {confirmModal.open && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+                    <div className="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full">
+                        <h2 className="text-lg font-semibold mb-4 text-gray-800">
+                            {confirmModal.action === "HIRED"
+                                ? "Accept Applicant"
+                                : "Reject Applicant"}
+                        </h2>
+                        <label className="block mb-2 text-gray-700 font-medium">
+                            Reason (optional)
+                        </label>
+                        <textarea
+                            className="w-full border rounded p-2 mb-4"
+                            rows={3}
+                            value={note}
+                            onChange={(e) => setNote(e.target.value)}
+                            placeholder="Enter reason..."
+                        />
+                        <div className="flex justify-end gap-3">
+                            <button
+                                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                                onClick={() =>
+                                    setConfirmModal({
+                                        open: false,
+                                        action: null,
+                                    })
+                                }
+                                disabled={applicationMutation.isPending}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                className={`px-4 py-2 rounded text-white ${
+                                    confirmModal.action === "HIRED"
+                                        ? "bg-green-600 hover:bg-green-700"
+                                        : "bg-red-600 hover:bg-red-700"
+                                }`}
+                                onClick={handleAction}
+                                disabled={applicationMutation.isPending}
+                            >
+                                Confirm
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {toast.open && (
+                <div
+                    className={`fixed top-6 right-6 z-50 px-6 py-3 rounded shadow-lg text-white transition-all
+        ${toast.type === "success" ? "bg-green-500" : "bg-red-500"}`}
+                >
+                    {toast.message}
+                    <button
+                        className="ml-4 text-white font-bold"
+                        onClick={() => setToast({ ...toast, open: false })}
+                    >
+                        ×
+                    </button>
+                </div>
+            )}
         </div>
     );
 }

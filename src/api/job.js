@@ -61,10 +61,10 @@ export const fetchApplicantsByJobId = async (jId, token) => {
     return response.data;
 };
 
-export const changeApplicationStatus = async (appId, token, action) => {
+export const changeApplicationStatus = async (appId, token, action, note) => {
     const response = await axios.patch(
         `${API_URL}/applications/changeStatus/${appId}`,
-        {},
+        { note },
         {
             headers: {
                 Authorization: `Bearer ${token}`,

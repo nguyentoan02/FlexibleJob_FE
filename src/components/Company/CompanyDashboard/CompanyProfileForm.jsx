@@ -29,8 +29,7 @@ const CreateCompany = () => {
         albumImage: [],
         identityImage: [],
     });
-    const { createCompany, MyCompanyProfile, updateCompanyProfile } =
-        useMyCompany();
+    const { MyCompanyProfile, updateCompanyProfile } = useMyCompany();
 
     useEffect(() => {
         if (MyCompanyProfile.data) {
@@ -75,68 +74,40 @@ const CreateCompany = () => {
         setError("");
         setToast({ message: "", type: "" });
 
-        if (!identityImage || identityImage.length === 0) {
-            setError("Identity images are required.");
-            return;
-        }
-        // Chuẩn bị payload cho update
+        // if (!identityImage || identityImage.length === 0) {
+        //     setError("Identity images are required.");
+        //     return;
+        // }
+
         const payload = {
             ...formData,
-            // Các trường text giữ nguyên
             newProfileImage: imageUrl instanceof File ? imageUrl : undefined,
             newCoverImage: coverImage instanceof File ? coverImage : undefined,
             newAlbumImages: albumImage.filter((f) => f instanceof File),
             newIdentityImages: identityImage.filter((f) => f instanceof File),
-            // Gộp các link ảnh cần xoá thành 1 mảng
             removeImages: [
                 ...(removedImages.albumImage || []),
                 ...(removedImages.identityImage || []),
             ],
         };
-        if (MyCompanyProfile.data) {
-            updateCompanyProfile.mutate(payload, {
-                onSuccess: () => {
-                    setToast({
-                        message: "Company profile updated successfully!",
-                        type: "success",
-                    });
-                    setRemovedImages({ albumImage: [], identityImage: [] });
-                },
-                onError: (err) => {
-                    setError("Error updating company profile!");
-                    setToast({
-                        message: "Error updating company profile!",
-                        type: "error",
-                    });
-                    console.error(err);
-                },
-            });
-        } else {
-            // Tạo mới
-            const createPayload = {
-                ...formData,
-                imageUrl,
-                coverImage,
-                albumImage,
-                identityImage,
-            };
-            createCompany.mutate(createPayload, {
-                onSuccess: () => {
-                    setToast({
-                        message: "Company profile created successfully!",
-                        type: "success",
-                    });
-                },
-                onError: (err) => {
-                    setError("Error creating company profile!");
-                    setToast({
-                        message: "Error creating company profile!",
-                        type: "error",
-                    });
-                    console.error(err);
-                },
-            });
-        }
+
+        updateCompanyProfile.mutate(payload, {
+            onSuccess: () => {
+                setToast({
+                    message: "Company profile updated successfully!",
+                    type: "success",
+                });
+                setRemovedImages({ albumImage: [], identityImage: [] });
+            },
+            onError: (err) => {
+                setError("Error updating company profile!");
+                setToast({
+                    message: "Error updating company profile!",
+                    type: "error",
+                });
+                console.error(err);
+            },
+        });
     };
 
     return (
@@ -145,7 +116,7 @@ const CreateCompany = () => {
             className="p-8 bg-white rounded-2xl shadow-lg max-w-3xl mx-auto mt-10 border border-gray-100"
         >
             <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">
-                Create Company Profile
+                Company Profile
             </h2>
 
             {error && (
@@ -603,11 +574,11 @@ const CreateCompany = () => {
             <button
                 type="submit"
                 className="w-full bg-blue-600 hover:bg-blue-700 transition-colors text-white font-semibold py-3 px-6 rounded-lg shadow mt-4 text-lg flex items-center justify-center"
-                disabled={
-                    createCompany.isPending || updateCompanyProfile.isPending
-                }
+                // disabled={
+                //     createCompany.isPending || updateCompanyProfile.isPending
+                // }
             >
-                {createCompany.isPending || updateCompanyProfile.isPending ? (
+                {updateCompanyProfile.isPending ? (
                     <>
                         <svg
                             className="animate-spin h-5 w-5 mr-2 text-white"
@@ -628,12 +599,10 @@ const CreateCompany = () => {
                                 d="M4 12a8 8 0 018-8v8z"
                             />
                         </svg>
-                        {MyCompanyProfile.data ? "Updating..." : "Creating..."}
+                        Updating...
                     </>
-                ) : MyCompanyProfile.data ? (
-                    "Update Profile"
                 ) : (
-                    "Create Profile"
+                    "Update Profile"
                 )}
             </button>
         </form>

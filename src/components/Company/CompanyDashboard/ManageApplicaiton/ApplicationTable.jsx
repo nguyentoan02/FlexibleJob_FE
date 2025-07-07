@@ -10,7 +10,7 @@ const SkeletonRow = () => (
     </tr>
 );
 
-const ApplicationTable = ({ data, isLoading }) => {
+const ApplicationTable = ({ data, isLoading, onViewProfile }) => {
     if (isLoading)
         return (
             <table className="min-w-full border">
@@ -21,11 +21,11 @@ const ApplicationTable = ({ data, isLoading }) => {
                             "Avatar",
                             "Applicant",
                             "Email",
-                            "Job ID",
                             "Job Title",
                             "Status",
                             "Applied At",
                             "CV PDF",
+                            "Note",
                         ].map((h) => (
                             <th
                                 key={h}
@@ -67,9 +67,6 @@ const ApplicationTable = ({ data, isLoading }) => {
                         Email
                     </th>
                     <th className="border px-4 py-2 bg-blue-50 text-blue-700">
-                        Job ID
-                    </th>
-                    <th className="border px-4 py-2 bg-blue-50 text-blue-700">
                         Job Title
                     </th>
                     <th className="border px-4 py-2 bg-blue-50 text-blue-700">
@@ -80,6 +77,9 @@ const ApplicationTable = ({ data, isLoading }) => {
                     </th>
                     <th className="border px-4 py-2 bg-blue-50 text-blue-700">
                         CV PDF
+                    </th>
+                    <th className="border px-4 py-2 bg-blue-50 text-blue-700">
+                        Note
                     </th>
                 </tr>
             </thead>
@@ -98,13 +98,19 @@ const ApplicationTable = ({ data, isLoading }) => {
                             />
                         </td>
                         <td className="border px-4 py-2 font-medium">
-                            {app.cvSnapshot?.user?.firstName}{" "}
-                            {app.cvSnapshot?.user?.lastName}
+                            <button
+                                className="text-blue-600 underline hover:text-blue-800 transition"
+                                onClick={() =>
+                                    onViewProfile && onViewProfile(app)
+                                }
+                            >
+                                {app.cvSnapshot?.user?.firstName}{" "}
+                                {app.cvSnapshot?.user?.lastName}
+                            </button>
                         </td>
                         <td className="border px-4 py-2">
                             {app.cvSnapshot?.user?.email}
                         </td>
-                        <td className="border px-4 py-2">{app.job}</td>
                         <td className="border px-4 py-2">{app.jobTitle}</td>
                         <td className="border px-4 py-2">
                             <span
@@ -134,6 +140,11 @@ const ApplicationTable = ({ data, isLoading }) => {
                                 >
                                     View PDF
                                 </a>
+                            )}
+                        </td>
+                        <td className="border px-4 py-2">
+                            {app.noted || (
+                                <span className="text-gray-400">-</span>
                             )}
                         </td>
                     </tr>

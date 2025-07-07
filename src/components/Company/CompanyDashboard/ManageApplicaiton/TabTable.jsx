@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useCompanyApplications } from "@/hooks/companyApplication";
 import ApplicationTable from "./ApplicationTable";
 import Pagination from "../Pagination";
+import CVProfileFollowID from "@/pages/CVProfile/CVProfileFollowID";
 
 const TABS = [
     { label: "All", value: "all" },
@@ -14,9 +15,15 @@ const TabTable = () => {
     const [tab, setTab] = useState("all");
     const [page, setPage] = useState(1);
     const [isTabLoading, setIsTabLoading] = useState(false);
+    const [selectedProfile, setSelectedProfile] = useState(null);
+    const [showProfileModal, setShowProfileModal] = useState(false);
     const limit = 10;
 
-    const { data, isLoading } = useCompanyApplications(tab, page, limit);
+    const { data, isLoading, refetch } = useCompanyApplications(
+        tab,
+        page,
+        limit
+    );
 
     // Khi đổi tab thì reset page về 1 và lazy loading 0.5s
     const handleTabChange = (value) => {
@@ -26,6 +33,17 @@ const TabTable = () => {
             setPage(1);
             setIsTabLoading(false);
         }, 500);
+    };
+
+    // Khi click vào tên applicant
+    const handleViewProfile = (app) => {
+        setSelectedProfile({
+            ...app,
+            ...app.cvSnapshot,
+            user: app.cvSnapshot?.user,
+            cvSnapshot: app.cvSnapshot,
+        });
+        setShowProfileModal(true);
     };
 
     return (
@@ -52,7 +70,11 @@ const TabTable = () => {
                         <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 border-solid"></div>
                     </div>
                 ) : (
-                    <ApplicationTable data={data} isLoading={isLoading} />
+                    <ApplicationTable
+                        data={data}
+                        isLoading={isLoading}
+                        onViewProfile={handleViewProfile}
+                    />
                 )}
             </div>
             <Pagination
@@ -60,6 +82,27 @@ const TabTable = () => {
                 totalPages={data?.totalPage || 1}
                 setPage={setPage}
             />
+
+            {/* Modal xem CV */}
+            {showProfileModal && selectedProfile && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                    <div className="relative bg-white rounded-xl shadow-xl max-w-3xl w-full p-4 overflow-y-auto max-h-[90vh]">
+                        <button
+                            className="absolute top-2 right-2 text-gray-500 hover:text-red-500 text-2xl"
+                            onClick={() => setShowProfileModal(false)}
+                        >
+                            ×
+                        </button>
+                        <CVProfileFollowID
+                            profile={selectedProfile}
+                            onStatusChange={() => {
+                                setShowProfileModal(false);
+                                refetch();
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
