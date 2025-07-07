@@ -3,7 +3,7 @@ import {
     fetchMyCompanyProfile,
     getCompanyApproval,
     updateCompanyProfile,
-    createCompanyProfile as createCompanyProfileApi,
+    // createCompanyProfile as createCompanyProfileApi,
 } from "../api/company";
 import { getJobLimitation, getJobsByUserId } from "../api/job";
 
