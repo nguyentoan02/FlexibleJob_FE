@@ -168,7 +168,7 @@ export default function JobDetail() {
 
     return (
         <>
-            {user.role === "JOBSEEKER" ? (
+            {user?.role === "JOBSEEKER" ? (
                 <HeaderJobseeker />
             ) : (
                 <HeaderCompany />
