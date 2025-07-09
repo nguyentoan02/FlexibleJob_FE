@@ -67,6 +67,7 @@ export default function SignUp() {
                     lastName: form.lastName,
                     email: form.email,
                     password: form.password,
+                    role: "EMPLOYER",
                 }
             );
 
