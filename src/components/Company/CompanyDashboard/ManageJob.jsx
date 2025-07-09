@@ -26,12 +26,14 @@ const ManageJob = () => {
 
     // AI Analysis State
     const [isAnalysisModalOpen, setAnalysisModalOpen] = useState(false);
+    const [analyzeJobId, setAnalyzeJobId] = useState(null);
+    const [analyzeEnabled, setAnalyzeEnabled] = useState(false);
     const {
-        mutate: runAnalysis,
-        isLoading: isAnalyzing,
         data: analysisResult,
         error: analysisError,
-    } = useAnalyzeApplicants();
+        isFetching: isAnalyzing,
+        refetch: refetchAnalysis,
+    } = useAnalyzeApplicants(analyzeJobId, analyzeEnabled);
     const limit = 5;
     const { token } = useAuth();
     const { JobsOfMyCompany } = useMyCompanyJobs(page, 5, search);
@@ -86,10 +88,20 @@ const ManageJob = () => {
 
     const handleAnalyzeClick = () => {
         if (!selectedJobId) return;
-        runAnalysis(selectedJobId, {
-            onSuccess: () => setAnalysisModalOpen(true),
-            onError: (err) => alert(err.message || "Failed to run analysis."),
-        });
+        setAnalyzeJobId(selectedJobId);
+        setAnalyzeEnabled(true);
+        refetchAnalysis();
+    };
+
+    useEffect(() => {
+        if (analysisResult) {
+            setAnalysisModalOpen(true);
+        }
+    }, [analysisResult]);
+
+    const handleCloseAnalysisModal = () => {
+        setAnalysisModalOpen(false);
+        setAnalyzeEnabled(false);
     };
 
     return (
@@ -178,9 +190,33 @@ const ManageJob = () => {
                                 disabled={isAnalyzing}
                                 className="px-4 py-2 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 flex items-center gap-2"
                             >
-                                {isAnalyzing
-                                    ? "Analyzing..."
-                                    : "🤖 Analyze & Rank with AI"}
+                                {isAnalyzing ? (
+                                    <>
+                                        <svg
+                                            className="animate-spin h-5 w-5 text-white"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <circle
+                                                className="opacity-25"
+                                                cx="12"
+                                                cy="12"
+                                                r="10"
+                                                stroke="currentColor"
+                                                strokeWidth="4"
+                                            ></circle>
+                                            <path
+                                                className="opacity-75"
+                                                fill="currentColor"
+                                                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                                            ></path>
+                                        </svg>
+                                        Analyzing...
+                                    </>
+                                ) : (
+                                    <>🤖 Analyze & Rank with AI</>
+                                )}
                             </button>
                         </div>
                         <ApplicantList
