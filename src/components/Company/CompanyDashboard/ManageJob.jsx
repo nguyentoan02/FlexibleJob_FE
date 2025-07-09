@@ -11,6 +11,9 @@ import ApplicantList from "./ApplicantList";
 import { useMyCompany } from "../../../hooks/myCompany";
 import LimitTationJobPost from "./LimitTationJobPost";
 
+import { useAnalyzeApplicants } from "../../../hooks/useAnalyzeApplicants";
+import AnalysisResultModal from "../../AI/AnalysisResultModal";
+
 const ManageJob = () => {
     const [page, setPage] = useState(1);
     const [searchInput, setSearchInput] = useState("");
@@ -19,6 +22,16 @@ const ManageJob = () => {
     const [applicantsModal, setApplicantsModal] = useState(false);
     const [jobData, setJobdata] = useState(null);
     const [applicantsData, setApplicantsData] = useState([]);
+    const [selectedJobId, setSelectedJobId] = useState(null);
+
+    // AI Analysis State
+    const [isAnalysisModalOpen, setAnalysisModalOpen] = useState(false);
+    const {
+        mutate: runAnalysis,
+        isLoading: isAnalyzing,
+        data: analysisResult,
+        error: analysisError,
+    } = useAnalyzeApplicants();
     const limit = 5;
     const { token } = useAuth();
     const { JobsOfMyCompany } = useMyCompanyJobs(page, 5, search);
@@ -62,15 +75,21 @@ const ManageJob = () => {
     const totalPages = Math.ceil(JobsOfMyCompany.data.payload.total / limit);
 
     const handleViewApplicants = (jobId) => {
-        // const response = await fetchApplicantsByJobId(jobId, token);
-        // console.log(response.payla);
+        setSelectedJobId(jobId); // Lưu lại jobId đang xem
         fetchApplicantsByJobId(jobId, token)
             .then((res) => {
                 setApplicantsData(res.payload.applicants);
-                console.log("applicantsData", res.payload.applicants);
                 setApplicantsModal(true);
             })
             .catch((err) => console.log(err));
+    };
+
+    const handleAnalyzeClick = () => {
+        if (!selectedJobId) return;
+        runAnalysis(selectedJobId, {
+            onSuccess: () => setAnalysisModalOpen(true),
+            onError: (err) => alert(err.message || "Failed to run analysis."),
+        });
     };
 
     return (
@@ -152,6 +171,18 @@ const ManageJob = () => {
                         onClick={() => setApplicantsModal(false)}
                     ></div>
                     <div className="relative min-h-screen items-center justify-start p-5 bg-white rounded-3xl">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-2xl font-bold">Applicants</h3>
+                            <button
+                                onClick={handleAnalyzeClick}
+                                disabled={isAnalyzing}
+                                className="px-4 py-2 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 flex items-center gap-2"
+                            >
+                                {isAnalyzing
+                                    ? "Analyzing..."
+                                    : "🤖 Analyze & Rank with AI"}
+                            </button>
+                        </div>
                         <ApplicantList
                             ApplicantList={applicantsData}
                             jobId={jobData?._id}
@@ -159,6 +190,14 @@ const ManageJob = () => {
                     </div>
                 </div>
             )}
+
+            <AnalysisResultModal
+                isOpen={isAnalysisModalOpen}
+                onClose={() => setAnalysisModalOpen(false)}
+                data={analysisResult}
+                error={analysisError}
+                isLoading={isAnalyzing}
+            />
         </div>
     );
 };
