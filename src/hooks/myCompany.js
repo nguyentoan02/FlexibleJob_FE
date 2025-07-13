@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
     fetchMyCompanyProfile,
+    getAllPackage,
     getCompanyApproval,
     updateCompanyProfile,
     // createCompanyProfile as createCompanyProfileApi,
@@ -128,6 +129,11 @@ export const useMyCompany = () => {
         queryFn: () => getJobLimitation(token),
     });
 
+    const companyPackage = useQuery({
+        queryKey: ["Package"],
+        queryFn: () => getAllPackage(),
+    });
+
     return {
         MyCompanyProfile,
         updateCompanyProfile: updateCompanyProfileMutation,
@@ -135,5 +141,6 @@ export const useMyCompany = () => {
         isCompanyApproved,
         createCompany: createCompanyProfile,
         jobLimitation,
+        companyPackage,
     };
 };
