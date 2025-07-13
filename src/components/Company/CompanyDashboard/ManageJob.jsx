@@ -48,6 +48,11 @@ const ManageJob = () => {
         JobsOfMyCompany.refetch();
         jobLimitation.refetch();
     }, []);
+    useEffect(() => {
+        if (analysisResult) {
+            setAnalysisModalOpen(true);
+        }
+    }, [analysisResult]);
 
     const handleEdit = (job) => {
         console.log("jobdata", job);
@@ -91,17 +96,6 @@ const ManageJob = () => {
         setAnalyzeJobId(selectedJobId);
         setAnalyzeEnabled(true);
         refetchAnalysis();
-    };
-
-    useEffect(() => {
-        if (analysisResult) {
-            setAnalysisModalOpen(true);
-        }
-    }, [analysisResult]);
-
-    const handleCloseAnalysisModal = () => {
-        setAnalysisModalOpen(false);
-        setAnalyzeEnabled(false);
     };
 
     return (

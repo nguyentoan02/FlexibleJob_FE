@@ -10,6 +10,8 @@ import HeaderCompany from "../../components/Header/HeaderCompany";
 import { useMyCompany } from "../../hooks/myCompany";
 import ViewPackage from "../../components/Company/CompanyDashboard/ViewPackage";
 import ApplicationManage from "../../components/Company/CompanyDashboard/ApplicationManage";
+import PaymentSuccess from "../../components/Company/CompanyDashboard/Payment/PaymentSuccess";
+import PaymentCancel from "../../components/Company/CompanyDashboard/Payment/PaymentCancel";
 
 const CompanyDashboard = () => {
     const { isCompanyApproved } = useMyCompany();
@@ -55,6 +57,14 @@ const CompanyDashboard = () => {
                         <Route
                             path="manageApplication"
                             element={<ApplicationManage />}
+                        />
+                        <Route
+                            path="payment/success"
+                            element={<PaymentSuccess />}
+                        />
+                        <Route
+                            path="payment/cancel"
+                            element={<PaymentCancel />}
                         />
                     </Routes>
                 </div>

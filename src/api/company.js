@@ -46,15 +46,22 @@ export const getCompanyApproval = async (token) => {
 };
 
 export const getPendingCompanies = async (token) => {
-    const response = await axios.get(`${API_URL}/company/admin/pending-approvals`, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    });
+    const response = await axios.get(
+        `${API_URL}/company/admin/pending-approvals`,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
     return response.data;
 };
 
-export const updateCompanyApproval = async ({ companyId, isApproved, token }) => {
+export const updateCompanyApproval = async ({
+    companyId,
+    isApproved,
+    token,
+}) => {
     const response = await axios.patch(
         `${API_URL}/company/admin/approve/${companyId}`,
         { isApproved },
@@ -64,5 +71,10 @@ export const updateCompanyApproval = async ({ companyId, isApproved, token }) =>
             },
         }
     );
+    return response.data;
+};
+
+export const getAllPackage = async () => {
+    const response = await axios.get(`${API_URL}/packages`);
     return response.data;
 };
