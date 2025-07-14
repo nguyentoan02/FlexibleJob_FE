@@ -78,3 +78,21 @@ export const getAllPackage = async () => {
     const response = await axios.get(`${API_URL}/packages`);
     return response.data;
 };
+
+export const getJobStats = async (token) => {
+    const response = await axios.get(`${API_URL}/company/stats/job`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+    return response.data;
+};
+
+export const getInVoices = async (token) => {
+    const response = await axios.get(`${API_URL}/company/stats/invoices`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+    return response.data;
+};

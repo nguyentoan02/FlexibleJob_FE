@@ -3,6 +3,8 @@ import {
     fetchMyCompanyProfile,
     getAllPackage,
     getCompanyApproval,
+    getInVoices,
+    getJobStats,
     updateCompanyProfile,
     // createCompanyProfile as createCompanyProfileApi,
 } from "../api/company";
@@ -134,6 +136,16 @@ export const useMyCompany = () => {
         queryFn: () => getAllPackage(),
     });
 
+    const companyJobStats = useQuery({
+        queryKey: ["CompanyJobStats"],
+        queryFn: () => getJobStats(token),
+    });
+
+    const companyInvoices = useQuery({
+        queryKey: ["CompanyInvoices"],
+        queryFn: () => getInVoices(token),
+    });
+
     return {
         MyCompanyProfile,
         updateCompanyProfile: updateCompanyProfileMutation,
@@ -142,5 +154,7 @@ export const useMyCompany = () => {
         createCompany: createCompanyProfile,
         jobLimitation,
         companyPackage,
+        companyJobStats,
+        companyInvoices,
     };
 };
