@@ -63,13 +63,13 @@ const ApplicantList = ({ ApplicantList: initialList, jobId }) => {
                                 }`}
                         >
                             <img
-                                src={app.user.imageUrl}
-                                alt={`${app.user.firstName} ${app.user.lastName}`}
+                                src={app.user?.imageUrl}
+                                alt={`${app.user?.firstName} ${app.user?.lastName}`}
                                 className="w-14 h-14 rounded-full object-cover border-2 border-indigo-100 shadow"
                             />
                             <div className="flex-1 text-left">
                                 <h3 className="font-semibold text-gray-900 text-lg">
-                                    {app.user.firstName} {app.user.lastName}
+                                    {app.user?.firstName} {app.user?.lastName}
                                 </h3>
                                 <div className="flex flex-col gap-1 mt-1">
                                     <span
