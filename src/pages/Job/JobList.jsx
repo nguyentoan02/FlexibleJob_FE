@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/select";
 import HeaderJobseeker from "@/components/Header/HeaderJobseeker";
 import { MapPin, Clock, Search, DollarSign, Building } from "lucide-react";
+import { useAuth } from "../../hooks/useAuth";
+import HeaderCompany from "../../components/Header/HeaderCompany";
 
 export default function JobList() {
     const [searchParams, setSearchParams] = useState({
@@ -25,6 +27,8 @@ export default function JobList() {
         page: 1,
         limit: 2,
     });
+
+    const { user } = useAuth();
 
     // Kiểm tra có đang filter/search không
     const isFiltering =
@@ -71,7 +75,11 @@ export default function JobList() {
 
     return (
         <>
-            <HeaderJobseeker />
+            {user?.role === "JOBSEEKER" ? (
+                <HeaderJobseeker />
+            ) : (
+                <HeaderCompany />
+            )}
             <div className="min-h-screen bg-gray-50 py-8">
                 <div className="container mx-auto px-4">
                     {/* Search Form */}

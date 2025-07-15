@@ -12,6 +12,7 @@ import JobList from "../pages/Job/JobList";
 import JobDetail from "../pages/Job/JobDetail";
 import SignUp from "../pages/SignUp";
 import ChangePassword from "../pages/ChangePassword";
+import CompanyList from "../pages/Employer/CompanyList";
 export default function AuthRoutes() {
     return (
         <>
@@ -38,6 +39,7 @@ export default function AuthRoutes() {
             <Route path="/jobs/:jobId" element={<JobDetail />} />
             <Route path="/register" element={<SignUp />} />
             <Route path="/change-password" element={<ChangePassword />} />
+            <Route path="/companies" element={<CompanyList />} />
         </>
     );
 }

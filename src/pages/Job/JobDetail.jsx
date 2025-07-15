@@ -193,10 +193,13 @@ export default function JobDetail() {
                                                 {job.title}
                                             </h1>
                                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm text-gray-600">
-                                                <div className="flex items-center">
+                                                <a
+                                                    href={`/company/${job.company._id}`}
+                                                    className="flex items-center text-indigo-400"
+                                                >
                                                     <Building className="h-4 w-4 mr-2" />
                                                     {job.company.companyName}
-                                                </div>
+                                                </a>
                                                 <div className="flex items-center">
                                                     <MapPin className="h-4 w-4 mr-2" />
                                                     {job.location}
