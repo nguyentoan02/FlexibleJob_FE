@@ -75,41 +75,36 @@ export default function JobList() {
             <div className="min-h-screen bg-gray-50 py-8">
                 <div className="container mx-auto px-4">
                     {/* Search Form */}
-                    <div className="bg-white rounded-xl shadow-md p-6 mb-8">
-                        <div className="flex flex-col space-y-4">
-                            {/* Row 1: Search and Location */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="relative">
-                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                                    <Input
-                                        name="title"
-                                        placeholder="Job title, keywords..."
-                                        value={searchParams.title}
-                                        onChange={handleInputChange}
-                                        className="pl-10 bg-gray-50 border border-gray-200 focus:border-blue-500"
-                                    />
-                                </div>
-                                <div className="relative">
-                                    <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                                    <Input
-                                        name="location"
-                                        placeholder="Location..."
-                                        value={searchParams.location}
-                                        onChange={handleInputChange}
-                                        className="pl-10 bg-gray-50 border border-gray-200 focus:border-blue-500"
-                                    />
-                                </div>
+                    <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
+                        <div className="flex flex-wrap items-center gap-3 md:gap-4">
+                            <div className="relative flex-1 min-w-[220px]">
+                                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-400 h-5 w-5" />
+                                <Input
+                                    name="title"
+                                    placeholder="Job title, keywords..."
+                                    value={searchParams.title}
+                                    onChange={handleInputChange}
+                                    className="pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-blue-500 shadow-sm"
+                                />
                             </div>
-
-                            {/* Row 2: Filters */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="relative flex-1 min-w-[180px]">
+                                <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-400 h-5 w-5" />
+                                <Input
+                                    name="location"
+                                    placeholder="Location..."
+                                    value={searchParams.location}
+                                    onChange={handleInputChange}
+                                    className="pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-blue-500 shadow-sm"
+                                />
+                            </div>
+                            <div className="flex items-center gap-3 flex-1 min-w-[160px]">
                                 <Select
                                     value={searchParams.level}
                                     onValueChange={(value) =>
                                         handleSelectChange("level", value)
                                     }
                                 >
-                                    <SelectTrigger className="bg-gray-50 border border-gray-200 focus:border-blue-500">
+                                    <SelectTrigger className="bg-gray-50 border border-gray-200 rounded-xl focus:border-blue-500 py-3 px-4 shadow-sm w-full">
                                         <SelectValue placeholder="Select Level" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -130,14 +125,15 @@ export default function JobList() {
                                         </SelectItem>
                                     </SelectContent>
                                 </Select>
-
+                            </div>
+                            <div className="flex items-center gap-3 flex-1 min-w-[160px]">
                                 <Select
                                     value={searchParams.jobType}
                                     onValueChange={(value) =>
                                         handleSelectChange("jobType", value)
                                     }
                                 >
-                                    <SelectTrigger className="bg-gray-50 border border-gray-200 focus:border-blue-500">
+                                    <SelectTrigger className="bg-gray-50 border border-gray-200 rounded-xl focus:border-blue-500 py-3 px-4 shadow-sm w-full">
                                         <SelectValue placeholder="Job Type" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -155,29 +151,26 @@ export default function JobList() {
                                         </SelectItem>
                                     </SelectContent>
                                 </Select>
-
-                                <div className="relative">
-                                    <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                                    <Input
-                                        name="experienceYears"
-                                        type="number"
-                                        placeholder="Experience years..."
-                                        value={searchParams.experienceYears}
-                                        onChange={handleInputChange}
-                                        className="pl-10 bg-gray-50 border border-gray-200 focus:border-blue-500"
-                                    />
-                                </div>
                             </div>
-
-                            {/* Search Button */}
-                            <div className="flex justify-end">
+                            <div className="relative flex-1 min-w-[160px]">
+                                <Clock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-400 h-5 w-5" />
+                                <Input
+                                    name="experienceYears"
+                                    type="number"
+                                    placeholder="Experience years..."
+                                    value={searchParams.experienceYears}
+                                    onChange={handleInputChange}
+                                    className="pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-blue-500 shadow-sm"
+                                />
+                            </div>
+                            <div className="flex items-center">
                                 <Button
-                                    className="bg-blue-600 hover:bg-blue-700 text-white px-8"
+                                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow font-semibold flex gap-2"
                                     onClick={() =>
                                         setSearchParams((prev) => ({ ...prev }))
                                     }
                                 >
-                                    <Search className="h-4 w-4 mr-2" />
+                                    <Search className="h-5 w-5" />
                                     Search Jobs
                                 </Button>
                             </div>
@@ -187,13 +180,15 @@ export default function JobList() {
                     {/* Results Section */}
                     <div className="lg:col-span-3">
                         <div className="mb-4 flex justify-between items-center">
-                            <h2 className="text-xl font-semibold">
-                                {isLoading
-                                    ? "Searching..."
-                                    : `${
-                                          data?.payload?.totalJobs || 0
-                                      } Jobs Found`}
-                            </h2>
+                            {isLoading ? (
+                                <h2 className="text-xl font-semibold text-blue-600 animate-pulse">
+                                    Searching...
+                                </h2>
+                            ) : data?.payload?.jobs?.length > 0 ? (
+                                <h2 className="text-xl font-semibold">
+                                    {data?.payload?.totalJobs} Jobs Found
+                                </h2>
+                            ) : null}
                         </div>
 
                         {isLoading && !data ? (
@@ -209,51 +204,116 @@ export default function JobList() {
                                 {" "}
                                 {/* Thêm min-height */}
                                 {data?.payload?.jobs.map((job) => (
-                                    <Link key={job._id} to={`/jobs/${job._id}`}>
-                                        <Card className="hover:shadow-lg transition-shadow duration-200">
-                                            <CardContent className="p-6">
-                                                <div className="flex items-start gap-4">
-                                                    <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
-                                                        <Building className="h-8 w-8 text-gray-400" />
-                                                    </div>
-                                                    <div className="flex-1">
-                                                        <h3 className="text-lg font-semibold text-blue-600 mb-2">
+                                    <Link
+                                        key={job._id}
+                                        to={`/jobs/${job._id}`}
+                                        className="block group"
+                                        style={{ textDecoration: "none" }}
+                                    >
+                                        <Card className="relative overflow-hidden border-0 shadow-lg group-hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-blue-50 via-white to-indigo-100 rounded-2xl">
+                                            {/* Ribbon HOT */}
+                                            {job.isHot && (
+                                                <span className="absolute top-4 right-4 bg-gradient-to-r from-pink-500 to-yellow-400 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg z-10">
+                                                    HOT
+                                                </span>
+                                            )}
+                                            <CardContent className="p-6 flex gap-6 items-center">
+                                                {/* Company Logo */}
+                                                <div className="w-20 h-20 rounded-xl border-4 border-blue-200 bg-white flex items-center justify-center overflow-hidden shadow-md group-hover:scale-105 transition-transform duration-300">
+                                                    {job.company?.imageUrl ? (
+                                                        <img
+                                                            src={
+                                                                job.company
+                                                                    .imageUrl
+                                                            }
+                                                            alt={
+                                                                job.company
+                                                                    .companyName
+                                                            }
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <Building className="h-10 w-10 text-blue-300" />
+                                                    )}
+                                                </div>
+                                                {/* Job Info */}
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <span className="text-base font-bold text-blue-700 group-hover:text-indigo-700 transition-colors">
                                                             {job.title}
-                                                        </h3>
-                                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600 mb-4">
-                                                            <div className="flex items-center">
-                                                                <Building className="h-4 w-4 mr-2" />
-                                                                {
-                                                                    job.company
-                                                                        .companyName
-                                                                }
-                                                            </div>
-                                                            <div className="flex items-center">
-                                                                <MapPin className="h-4 w-4 mr-2" />
+                                                        </span>
+                                                        {job.isUrgent && (
+                                                            <span className="bg-red-100 text-red-600 px-2 py-0.5 rounded-full text-xs font-semibold ml-2">
+                                                                Urgent
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <Building className="h-4 w-4 text-blue-400" />
+                                                        <span className="font-medium text-gray-700">
+                                                            {
+                                                                job.company
+                                                                    ?.companyName
+                                                            }
+                                                        </span>
+                                                    </div>
+                                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm text-gray-600 mb-3">
+                                                        <div className="flex items-center gap-1">
+                                                            <MapPin className="h-4 w-4 text-indigo-400" />
+                                                            <span>
                                                                 {job.location}
-                                                            </div>
-                                                            <div className="flex items-center">
-                                                                <DollarSign className="h-4 w-4 mr-2" />
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex items-center gap-1">
+                                                            <DollarSign className="h-4 w-4 text-green-500" />
+                                                            <span>
                                                                 {formatSalary(
                                                                     job.salary
                                                                 )}
-                                                            </div>
-                                                            <div className="flex items-center">
-                                                                <Clock className="h-4 w-4 mr-2" />
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex items-center gap-1">
+                                                            <Clock className="h-4 w-4 text-yellow-500" />
+                                                            <span>
                                                                 {formatDate(
                                                                     job.datePosted
                                                                 )}
-                                                            </div>
-                                                        </div>
-                                                        <div className="flex flex-wrap gap-2">
-                                                            <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm">
-                                                                {job.level}
                                                             </span>
-                                                            <span className="px-3 py-1 bg-green-50 text-green-600 rounded-full text-sm">
-                                                                {job.jobType}
+                                                        </div>
+                                                        <div className="flex items-center gap-1">
+                                                            <span className="bg-gradient-to-r from-blue-200 to-blue-400 text-blue-800 px-2 py-0.5 rounded-full text-xs font-semibold">
+                                                                {job.level}
                                                             </span>
                                                         </div>
                                                     </div>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold shadow">
+                                                            {job.jobType}
+                                                        </span>
+                                                        {job.skills
+                                                            ?.slice(0, 3)
+                                                            .map(
+                                                                (
+                                                                    skill,
+                                                                    idx
+                                                                ) => (
+                                                                    <span
+                                                                        key={
+                                                                            idx
+                                                                        }
+                                                                        className="px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded-full text-xs"
+                                                                    >
+                                                                        {skill}
+                                                                    </span>
+                                                                )
+                                                            )}
+                                                    </div>
+                                                </div>
+                                                {/* Apply Button */}
+                                                <div className="hidden md:block">
+                                                    <Button className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold px-6 py-2 rounded-full shadow-lg hover:scale-105 hover:from-indigo-500 hover:to-blue-500 transition-all">
+                                                        View Details
+                                                    </Button>
                                                 </div>
                                             </CardContent>
                                         </Card>
@@ -263,15 +323,16 @@ export default function JobList() {
                         )}
 
                         {/* Pagination Section */}
-                        <div className="mt-6 flex justify-between items-center">
+                        <div className="mt-8 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                             <div className="text-sm text-gray-600">
                                 Page {searchParams.page} of{" "}
                                 {data?.payload?.totalPages || 1}
                             </div>
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 items-center">
                                 <Button
                                     variant="outline"
                                     size="sm"
+                                    className="rounded-full border-blue-300 hover:bg-blue-50 transition"
                                     disabled={searchParams.page === 1}
                                     onClick={() =>
                                         setSearchParams((prev) => ({
@@ -282,21 +343,22 @@ export default function JobList() {
                                 >
                                     Previous
                                 </Button>
-                                {/* Add page numbers */}
                                 <div className="flex gap-1">
                                     {[
                                         ...Array(
                                             data?.payload?.totalPages || 1
                                         ),
                                     ].map((_, index) => (
-                                        <Button
+                                        <button
                                             key={index + 1}
-                                            variant={
-                                                searchParams.page === index + 1
-                                                    ? "default"
-                                                    : "outline"
-                                            }
-                                            size="sm"
+                                            className={`w-9 h-9 flex items-center justify-center rounded-full border transition-all duration-200 font-semibold
+                                                ${
+                                                    searchParams.page ===
+                                                    index + 1
+                                                        ? "bg-gradient-to-br from-blue-500 to-indigo-500 text-white border-blue-500 shadow-lg scale-110"
+                                                        : "bg-white text-blue-700 border-blue-200 hover:bg-blue-50"
+                                                }
+                                            `}
                                             onClick={() =>
                                                 setSearchParams((prev) => ({
                                                     ...prev,
@@ -305,12 +367,13 @@ export default function JobList() {
                                             }
                                         >
                                             {index + 1}
-                                        </Button>
+                                        </button>
                                     ))}
                                 </div>
                                 <Button
                                     variant="outline"
                                     size="sm"
+                                    className="rounded-full border-blue-300 hover:bg-blue-50 transition"
                                     disabled={
                                         !data?.payload?.totalPages ||
                                         searchParams.page >=
