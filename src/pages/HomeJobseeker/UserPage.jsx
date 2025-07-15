@@ -26,7 +26,8 @@ export default function UserPage() {
             <div className="text-center mt-20">
                 <h1 className="text-3xl mb-4">User Dashboard</h1>
                 <p>
-                    Welcome, <strong>{user?.username || "Unknown user"}</strong>!
+                    Welcome, <strong>{user?.username || "Unknown user"}</strong>
+                    !
                 </p>
                 <p>
                     Your ID: <strong>{user?.id || "Unknown user"}</strong>
