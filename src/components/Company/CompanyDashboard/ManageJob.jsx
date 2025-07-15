@@ -11,6 +11,9 @@ import ApplicantList from "./ApplicantList";
 import { useMyCompany } from "../../../hooks/myCompany";
 import LimitTationJobPost from "./LimitTationJobPost";
 
+import { useAnalyzeApplicants } from "../../../hooks/useAnalyzeApplicants";
+import AnalysisResultModal from "../../AI/AnalysisResultModal";
+
 const ManageJob = () => {
     const [page, setPage] = useState(1);
     const [searchInput, setSearchInput] = useState("");
@@ -19,6 +22,18 @@ const ManageJob = () => {
     const [applicantsModal, setApplicantsModal] = useState(false);
     const [jobData, setJobdata] = useState(null);
     const [applicantsData, setApplicantsData] = useState([]);
+    const [selectedJobId, setSelectedJobId] = useState(null);
+
+    // AI Analysis State
+    const [isAnalysisModalOpen, setAnalysisModalOpen] = useState(false);
+    const [analyzeJobId, setAnalyzeJobId] = useState(null);
+    const [analyzeEnabled, setAnalyzeEnabled] = useState(false);
+    const {
+        data: analysisResult,
+        error: analysisError,
+        isFetching: isAnalyzing,
+        refetch: refetchAnalysis,
+    } = useAnalyzeApplicants(analyzeJobId, analyzeEnabled);
     const limit = 5;
     const { token } = useAuth();
     const { JobsOfMyCompany } = useMyCompanyJobs(page, 5, search);
@@ -33,6 +48,11 @@ const ManageJob = () => {
         JobsOfMyCompany.refetch();
         jobLimitation.refetch();
     }, []);
+    useEffect(() => {
+        if (analysisResult) {
+            setAnalysisModalOpen(true);
+        }
+    }, [analysisResult]);
 
     const handleEdit = (job) => {
         console.log("jobdata", job);
@@ -62,15 +82,20 @@ const ManageJob = () => {
     const totalPages = Math.ceil(JobsOfMyCompany.data.payload.total / limit);
 
     const handleViewApplicants = (jobId) => {
-        // const response = await fetchApplicantsByJobId(jobId, token);
-        // console.log(response.payla);
+        setSelectedJobId(jobId); // Lưu lại jobId đang xem
         fetchApplicantsByJobId(jobId, token)
             .then((res) => {
                 setApplicantsData(res.payload.applicants);
-                console.log("applicantsData", res.payload.applicants);
                 setApplicantsModal(true);
             })
             .catch((err) => console.log(err));
+    };
+
+    const handleAnalyzeClick = () => {
+        if (!selectedJobId) return;
+        setAnalyzeJobId(selectedJobId);
+        setAnalyzeEnabled(true);
+        refetchAnalysis();
     };
 
     return (
@@ -152,6 +177,42 @@ const ManageJob = () => {
                         onClick={() => setApplicantsModal(false)}
                     ></div>
                     <div className="relative min-h-screen items-center justify-start p-5 bg-white rounded-3xl">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-2xl font-bold">Applicants</h3>
+                            <button
+                                onClick={handleAnalyzeClick}
+                                disabled={isAnalyzing}
+                                className="px-4 py-2 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 flex items-center gap-2"
+                            >
+                                {isAnalyzing ? (
+                                    <>
+                                        <svg
+                                            className="animate-spin h-5 w-5 text-white"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <circle
+                                                className="opacity-25"
+                                                cx="12"
+                                                cy="12"
+                                                r="10"
+                                                stroke="currentColor"
+                                                strokeWidth="4"
+                                            ></circle>
+                                            <path
+                                                className="opacity-75"
+                                                fill="currentColor"
+                                                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                                            ></path>
+                                        </svg>
+                                        Analyzing...
+                                    </>
+                                ) : (
+                                    <>🤖 Analyze & Rank with AI</>
+                                )}
+                            </button>
+                        </div>
                         <ApplicantList
                             ApplicantList={applicantsData}
                             jobId={jobData?._id}
@@ -159,6 +220,14 @@ const ManageJob = () => {
                     </div>
                 </div>
             )}
+
+            <AnalysisResultModal
+                isOpen={isAnalysisModalOpen}
+                onClose={() => setAnalysisModalOpen(false)}
+                data={analysisResult}
+                error={analysisError}
+                isLoading={isAnalyzing}
+            />
         </div>
     );
 };
