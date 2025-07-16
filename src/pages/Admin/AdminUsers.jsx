@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchUsers, fetchBannedUsers, banUser, unbanUser } from "../api/users";
-import { useAuth } from "../hooks/useAuth";
+import { fetchUsers, fetchBannedUsers, banUser, unbanUser } from "../../api/users";
+import { useAuth } from "../../hooks/useAuth";
 import AdminLayout from '@/components/Layout/AdminLayout';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";

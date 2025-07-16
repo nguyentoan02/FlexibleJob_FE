@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ArrowLeft } from 'lucide-react'
-import { createPackage } from '../api/users'
-import { useAuth } from '../hooks/useAuth'
+import { createPackage } from "../../api/users";
+import { useAuth } from "../../hooks/useAuth";
 import { useNavigate } from 'react-router-dom'
 import AdminLayout from '@/components/Layout/AdminLayout'
 import { CreatePackageForm } from '@/components/PackagesForm/CreatePackageForm'
@@ -79,3 +79,5 @@ export function CreatePackage() {
     </AdminLayout>
   )
 } 
+
+export default CreatePackage; 
