@@ -11,8 +11,13 @@ import {
     CardDescription,
 } from "@/components/ui/card";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
-import axios from "axios";
 import Toast from "@/components/Toast/Toast";
+import axios from "axios";
+
+const TABS = [
+    { label: "Jobseeker", value: "JOBSEEKER" },
+    { label: "Employer", value: "EMPLOYER" },
+];
 
 export default function SignUp() {
     const navigate = useNavigate();
@@ -20,6 +25,7 @@ export default function SignUp() {
     const [toastMessage, setToastMessage] = useState("");
     const [toastType, setToastType] = useState("success");
     const [isLoading, setIsLoading] = useState(false);
+    const [activeTab, setActiveTab] = useState("JOBSEEKER");
 
     const [form, setForm] = useState({
         firstName: "",
@@ -37,7 +43,6 @@ export default function SignUp() {
         e.preventDefault();
         setIsLoading(true);
 
-        // Validate form
         if (!validateEmail(form.email)) {
             setToastMessage("Please enter a valid email address");
             setToastType("error");
@@ -67,17 +72,24 @@ export default function SignUp() {
                     lastName: form.lastName,
                     email: form.email,
                     password: form.password,
-                    role: "EMPLOYER",
+                    role: activeTab,
                 }
             );
 
-            setToastMessage("Registration successful!");
+            setToastMessage(
+                response.data.message ||
+                    "Registration successful! Please check your email to verify your account."
+            );
             setToastType("success");
 
-            // Redirect to login after 2 seconds
-            setTimeout(() => {
-                navigate("/login");
-            }, 2000);
+            // Không chuyển hướng ngay, yêu cầu xác thực email
+            setForm({
+                firstName: "",
+                lastName: "",
+                email: "",
+                password: "",
+                confirmPassword: "",
+            });
         } catch (error) {
             setToastMessage(
                 error.response?.data?.message || "Registration failed"
@@ -103,6 +115,23 @@ export default function SignUp() {
                 </CardHeader>
 
                 <CardContent>
+                    <div className="flex justify-center mb-4 gap-2">
+                        {TABS.map((tab) => (
+                            <button
+                                key={tab.value}
+                                type="button"
+                                className={`px-4 py-2 rounded font-semibold border ${
+                                    activeTab === tab.value
+                                        ? "bg-green-600 text-white"
+                                        : "bg-white text-green-600 border-green-600"
+                                }`}
+                                onClick={() => setActiveTab(tab.value)}
+                                disabled={isLoading}
+                            >
+                                {tab.label}
+                            </button>
+                        ))}
+                    </div>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">

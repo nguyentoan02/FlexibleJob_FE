@@ -13,6 +13,7 @@ import JobDetail from "../pages/Job/JobDetail";
 import SignUp from "../pages/SignUp";
 import ChangePassword from "../pages/ChangePassword";
 import CompanyList from "../pages/Employer/CompanyList";
+import VerifyEmail from "../pages/VerifyEmail";
 export default function AuthRoutes() {
     return (
         <>
@@ -40,6 +41,7 @@ export default function AuthRoutes() {
             <Route path="/register" element={<SignUp />} />
             <Route path="/change-password" element={<ChangePassword />} />
             <Route path="/companies" element={<CompanyList />} />
+            <Route path="/verify-email/:token" element={<VerifyEmail />} />
         </>
     );
 }

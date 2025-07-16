@@ -1,35 +1,31 @@
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { useState } from "react";
-import { useParams } from "react-router-dom";
-import { useCVProfile } from "@/hooks/cvprofile";
 import {
-    Briefcase,
-    GraduationCap,
+    Download,
     Mail,
     MapPin,
-    Download,
-    Clock,
     Phone,
+    Briefcase,
+    GraduationCap,
 } from "lucide-react";
+import { useCVProfile } from "@/hooks/cvprofile";
 
 export default function ViewCVProfile() {
-    const { data, isLoading, error } = useCVProfile(); // Không cần truyền ID nữa
-    const [activeTab, setActiveTab] = useState("about");
+    const { data, isLoading, error } = useCVProfile();
 
     if (isLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-green-500"></div>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
                 <div className="text-center">
-                    <h2 className="text-2xl font-bold text-red-600 mb-2">
+                    <h2 className="text-2xl font-bold text-red-600">
                         Error Loading CV Profile
                     </h2>
                     <p className="text-gray-600">
@@ -41,16 +37,15 @@ export default function ViewCVProfile() {
     }
 
     const profile = data?.payload;
-
     if (!profile) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
                 <div className="text-center">
-                    <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                    <h2 className="text-2xl font-bold text-gray-800">
                         CV Profile Not Found
                     </h2>
                     <p className="text-gray-600">
-                        The requested CV profile could not be found
+                        The requested CV profile could not be found.
                     </p>
                 </div>
             </div>
@@ -58,153 +53,97 @@ export default function ViewCVProfile() {
     }
 
     return (
-        <>
-            <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-                <div className="max-w-7xl mx-auto">
-                    {/* Profile Header Card */}
-                    <Card className="mb-8">
-                        <CardContent className="p-6">
-                            <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
-                                {/* Avatar Section */}
-                                <div className="flex flex-col items-center space-y-4">
-                                    <div className="relative">
-                                        <img
-                                            src={
-                                                profile.user?.imageUrl ||
-                                                profile.avatar
-                                            }
-                                            alt={`${profile.user?.firstName} ${profile.user?.lastName}`}
-                                            className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"
-                                        />
-                                        <div className="absolute -bottom-2 -right-2 bg-green-500 w-6 h-6 rounded-full border-4 border-white"></div>
-                                    </div>
-                                    <Button
-                                        className="bg-green-500 hover:bg-green-600 text-white w-full flex items-center justify-center px-4 py-2 rounded-md transition-colors"
-                                        onClick={() => {
-                                            const a =
-                                                document.createElement("a");
-                                            a.href = profile.linkUrl;
-                                            a.setAttribute(
-                                                "download",
-                                                "resume.pdf"
-                                            );
-                                            a.style.display = "none";
-                                            document.body.appendChild(a);
-                                            a.click();
-                                            document.body.removeChild(a);
-                                        }}
-                                    >
-                                        <Download className="w-4 h-4 mr-2" />
-                                        Download Resume
-                                    </Button>
-                                </div>
-
-                                {/* Profile Info */}
-                                <div className="flex-1 text-center md:text-left">
-                                    <h1 className="text-3xl font-bold text-gray-900">
-                                        {`${profile.user?.firstName} ${profile.user?.lastName}`}
-                                    </h1>
-                                    <p className="text-xl text-gray-600 mt-1">
-                                        {profile.description}
-                                    </p>
-
-                                    <div className="flex flex-wrap gap-4 justify-center md:justify-start mt-4">
-                                        <div className="flex items-center text-gray-600">
-                                            <MapPin className="w-5 h-5 mr-2" />
+        <div className="min-h-screen bg-gray-50 py-10 px-4">
+            <div className="max-w-4xl mx-auto">
+                <div className="bg-white shadow rounded-lg overflow-hidden">
+                    {/* Header Section */}
+                    <div className="p-8 border-b border-gray-200">
+                        <div className="flex flex-col md:flex-row items-center md:items-start">
+                            <div className="flex-shrink-0">
+                                <img
+                                    src={
+                                        profile.user?.imageUrl || profile.avatar
+                                    }
+                                    alt={`${profile.user?.firstName} ${profile.user?.lastName}`}
+                                    className="w-32 h-32 rounded-full object-cover border-4 border-green-500"
+                                />
+                            </div>
+                            <div className="mt-6 md:mt-0 md:ml-8 text-center md:text-left">
+                                <h1 className="text-4xl font-bold text-gray-900">
+                                    {profile.user?.firstName}{" "}
+                                    {profile.user?.lastName}
+                                </h1>
+                                <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-center md:justify-start space-y-2 sm:space-y-0 sm:space-x-6">
+                                    <div className="flex items-center text-gray-600">
+                                        <MapPin className="w-5 h-5 mr-2" />
+                                        <span>
                                             {profile.experience?.[0]
                                                 ?.location || "Not specified"}
-                                        </div>
-                                        <div className="flex items-center text-gray-600">
-                                            <Mail className="w-5 h-5 mr-2" />
-                                            {profile.user?.email}
-                                        </div>
-                                        <div className="flex items-center text-gray-600">
-                                            <Phone className="w-5 h-5 mr-2" />
-                                            {profile.number}
-                                        </div>
+                                        </span>
                                     </div>
-
-                                    <div className="mt-6 flex flex-wrap gap-2">
-                                        {profile.skills?.map((skill, index) => (
-                                            <span
-                                                key={index}
-                                                className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium"
-                                            >
-                                                {skill}
-                                            </span>
-                                        ))}
+                                    <div className="flex items-center text-gray-600">
+                                        <Mail className="w-5 h-5 mr-2" />
+                                        <span>{profile.user?.email}</span>
+                                    </div>
+                                    <div className="flex items-center text-gray-600">
+                                        <Phone className="w-5 h-5 mr-2" />
+                                        <span>{profile.number}</span>
                                     </div>
                                 </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Navigation Tabs */}
-                    <div className="flex space-x-1 bg-white p-1 rounded-lg shadow mb-8">
-                        {["about", "experience", "education"].map((tab) => (
-                            <button
-                                key={tab}
-                                className={`flex-1 py-3 px-6 rounded-md text-sm font-medium capitalize transition-colors ${
-                                    activeTab === tab
-                                        ? "bg-green-500 text-white"
-                                        : "text-gray-600 hover:bg-gray-100"
-                                }`}
-                                onClick={() => setActiveTab(tab)}
-                            >
-                                {tab}
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* Content Sections */}
-                    {activeTab === "about" && (
-                        <Card>
-                            <CardContent className="p-6">
-                                <h2 className="text-2xl font-semibold mb-4">
-                                    About
-                                </h2>
-                                <p className="text-gray-600 mb-8">
-                                    {profile.description}
-                                </p>
-                                {profile.certifications && (
-                                    <>
-                                        <h3 className="text-xl font-semibold mb-4">
-                                            Certifications
-                                        </h3>
-                                        <p className="text-gray-600">
-                                            {profile.certifications}
-                                        </p>
-                                    </>
-                                )}
-                            </CardContent>
-                        </Card>
-                    )}
-
-                    {activeTab === "experience" && (
-                        <Card>
-                            <CardContent className="p-6">
-                                <h2 className="text-2xl font-semibold mb-6 flex items-center">
-                                    <Briefcase className="w-6 h-6 mr-2 text-green-500" />
-                                    Work Experience
-                                </h2>
-
-                                <div className="space-y-6">
-                                    {profile.experience?.map((exp, index) => (
-                                        <div
-                                            key={index}
-                                            className="border-l-2 border-green-500 pl-4 pb-6"
+                                <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-2">
+                                    {profile.skills?.map((skill, idx) => (
+                                        <span
+                                            key={idx}
+                                            className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium"
                                         >
-                                            <h3 className="text-lg font-semibold text-gray-900">
+                                            {skill}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                        <div className="mt-6 text-center md:text-left">
+                            <Button
+                                className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors"
+                                onClick={() => {
+                                    const a = document.createElement("a");
+                                    a.href = profile.linkUrl;
+                                    a.setAttribute("download", "resume.pdf");
+                                    a.style.display = "none";
+                                    document.body.appendChild(a);
+                                    a.click();
+                                    document.body.removeChild(a);
+                                }}
+                            >
+                                <Download className="w-4 h-4 mr-2" />
+                                Download Resume
+                            </Button>
+                        </div>
+                    </div>
+                    {/* Description Section (Moved Below Header) */}
+                    {profile.description && (
+                        <div className="p-8 border-b border-gray-200">
+                            <p className="text-lg text-gray-700">
+                                {profile.description}
+                            </p>
+                        </div>
+                    )}
+                    {/* Main Content */}
+                    <div className="p-8">
+                        {/* Experience Section */}
+                        <div className="mb-8">
+                            <h2 className="text-2xl font-semibold text-green-700 mb-4 flex items-center gap-2">
+                                <Briefcase className="w-6 h-6" />
+                                Experience
+                            </h2>
+                            {profile.experience?.length > 0 ? (
+                                profile.experience.map((exp, idx) => (
+                                    <div key={idx} className="mb-6 last:mb-0">
+                                        <div className="flex justify-between items-center">
+                                            <h3 className="text-xl font-bold text-gray-900">
                                                 {exp.position}
                                             </h3>
-                                            <p className="text-green-600 font-medium">
-                                                {exp.company}
-                                            </p>
-                                            <div className="flex items-center text-sm text-gray-500 mt-1">
-                                                <MapPin className="w-4 h-4 mr-1" />
-                                                {exp.location}
-                                                <span className="mx-2">•</span>
-                                                <Clock className="w-4 h-4 mr-1" />
+                                            <span className="text-sm text-gray-500">
                                                 {new Date(
                                                     exp.startDate
                                                 ).getFullYear()}{" "}
@@ -212,45 +151,88 @@ export default function ViewCVProfile() {
                                                 {new Date(
                                                     exp.endDate
                                                 ).getFullYear()}
-                                            </div>
-                                            <p className="mt-2 text-gray-600">
-                                                {exp.description}
-                                            </p>
+                                            </span>
                                         </div>
-                                    ))}
-                                </div>
-                            </CardContent>
-                        </Card>
-                    )}
-
-                    {activeTab === "education" && (
-                        <Card>
-                            <CardContent className="p-6">
-                                <h2 className="text-2xl font-semibold mb-6 flex items-center">
-                                    <GraduationCap className="w-6 h-6 mr-2 text-green-500" />
-                                    Education
-                                </h2>
-
-                                <div className="space-y-6">
-                                    {profile.education?.map((edu, index) => (
-                                        <div
-                                            key={index}
-                                            className="border-l-2 border-green-500 pl-4 pb-6"
-                                        >
-                                            <h3 className="text-lg font-semibold text-gray-900">
-                                                {edu.degree}
-                                            </h3>
-                                            <p className="text-green-600 font-medium">
-                                                {edu.school}
-                                            </p>
+                                        <p className="mt-1 text-green-600 font-medium">
+                                            {exp.company}
+                                        </p>
+                                        <p className="text-gray-500 text-sm">
+                                            {exp.location}
+                                        </p>
+                                        <p className="mt-2 text-gray-700">
+                                            {exp.description}
+                                        </p>
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="text-gray-400">
+                                    No experience listed.
+                                </p>
+                            )}
+                        </div>
+                        {/* Education Section */}
+                        <div className="mb-8">
+                            <h2 className="text-2xl font-semibold text-green-700 mb-4 flex items-center gap-2">
+                                <GraduationCap className="w-6 h-6" />
+                                Education
+                            </h2>
+                            {profile.education?.length > 0 ? (
+                                profile.education.map((edu, idx) => (
+                                    <div key={idx} className="mb-6 last:mb-0">
+                                        <h3 className="text-xl font-bold text-gray-900">
+                                            {edu.degree}
+                                        </h3>
+                                        <p className="text-green-600 font-medium">
+                                            {edu.school}
+                                        </p>
+                                        <div className="text-sm text-gray-500">
+                                            {edu.startDate
+                                                ? new Date(
+                                                      edu.startDate
+                                                  ).getFullYear()
+                                                : "?"}{" "}
+                                            -{" "}
+                                            {edu.endDate
+                                                ? new Date(
+                                                      edu.endDate
+                                                  ).getFullYear()
+                                                : "?"}
                                         </div>
-                                    ))}
+                                        <p className="mt-2 text-gray-700">
+                                            {edu.description}
+                                        </p>
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="text-gray-400">
+                                    No education listed.
+                                </p>
+                            )}
+                        </div>
+                        {/* Certifications Section */}
+                        {profile.certifications &&
+                            profile.certifications.length > 0 && (
+                                <div className="mb-8">
+                                    <h2 className="text-2xl font-semibold text-green-700 mb-4">
+                                        Certifications
+                                    </h2>
+                                    <ul className="list-disc pl-6">
+                                        {profile.certifications.map(
+                                            (cert, idx) => (
+                                                <li
+                                                    key={idx}
+                                                    className="text-gray-700 mb-2"
+                                                >
+                                                    {cert}
+                                                </li>
+                                            )
+                                        )}
+                                    </ul>
                                 </div>
-                            </CardContent>
-                        </Card>
-                    )}
+                            )}
+                    </div>
                 </div>
             </div>
-        </>
+        </div>
     );
 }

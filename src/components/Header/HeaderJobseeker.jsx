@@ -137,44 +137,14 @@ export default function HeaderJobseeker() {
                                 </button>
 
                                 {isDropdownOpen && (
-                                    <div
-                                        className="fixed right-4 top-16 w-56 bg-white rounded-md shadow-lg py-1 z-50"
-                                        // Có thể điều chỉnh top/right nếu muốn
-                                    >
-                                        {cvData?.payload ? (
-                                            <Link
-                                                to={`/cvprofile/update/${cvData.payload._id}`}
-                                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                            >
-                                                Update CV
-                                            </Link>
-                                        ) : (
-                                            <Link
-                                                to="/cvprofile/create"
-                                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                            >
-                                                Create CV
-                                            </Link>
-                                        )}
+                                    <div className="fixed right-4 top-16 w-56 bg-white rounded-md shadow-lg py-1 z-50">
                                         <Link
-                                            to="/cvprofile"
-                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                        >
-                                            View CV Profile
-                                        </Link>
-                                        <Link
-                                            to="/my-applications"
-                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                        >
-                                            My Applications
-                                        </Link>
-                                        <Link
-                                            to="/favorite-jobs"
+                                            to="/user/dashboard"
                                             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                         >
                                             <div className="flex items-center">
                                                 <Heart className="h-4 w-4 mr-2" />
-                                                Favorite Jobs
+                                                Dashboard Jobseeker
                                             </div>
                                         </Link>
                                         <button

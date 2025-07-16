@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import HeaderJobseeker from "@/components/Header/HeaderJobseeker";
 import HeaderCompany from "@/components/Header/HeaderCompany";
 import { ApplyJobModal } from "@/pages/Application/Applicant";
@@ -21,14 +21,32 @@ import {
     Share2,
     BookmarkPlus,
     Heart,
+    AlertTriangle, // Import AlertTriangle icon
 } from "lucide-react";
 import { useFavoriteJobs } from "@/hooks/favoriteJob";
+import { Badge } from "@/components/ui/badge";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 
 const fetchJobDetail = async (jobId, token) => {
-    const headers = token ? { Authorization: `Bearer ${token}` } : undefined; // Include token only if available
+    const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
     const res = await axios.get(
         `${import.meta.env.VITE_API_URL}/jobs/${jobId}`,
         { headers }
+    );
+    return res.data;
+};
+
+const fetchActiveJobsByCompany = async (companyId) => {
+    const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/jobs/active/${companyId}`
     );
     return res.data;
 };
@@ -44,12 +62,36 @@ export default function JobDetail() {
     const [showApplyModal, setShowApplyModal] = useState(false);
     const [toast, setToast] = useState({ message: "", type: "" });
     const [isFavorited, setIsFavorited] = useState(false);
+    const [showReportModal, setShowReportModal] = useState(false); // State to control the report modal
+    const [reportReason, setReportReason] = useState(""); // State to hold the report reason
 
     // Fetch job details
     const { data, isLoading } = useQuery({
         queryKey: ["job", jobId],
         queryFn: () => fetchJobDetail(jobId, token),
     });
+
+    // Fetch active jobs by company
+    // const { data: activeJobsData } = useQuery({
+    //     queryKey: ["activeJobs", data?.payload?.company?._id],
+    //     queryFn: () => fetchActiveJobsByCompany(data?.payload?.company?._id),
+    //     enabled: !!data?.payload?.company?._id,
+    // });
+
+    const job = data?.payload;
+
+    const formatSalary = (salary) => {
+        if (!salary) return "Negotiable";
+        const { min, max, currency } = salary;
+        return `${currency} ${min / 1000}k - ${max / 1000}k`;
+    };
+
+    const formatDate = (date) => {
+        return new Date(date).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+        });
+    };
 
     // Apply mutation
     const applyMutation = useMutation({
@@ -150,12 +192,43 @@ export default function JobDetail() {
         });
     };
 
-    const job = data?.payload;
+    const handleReportClick = () => {
+        if (!user) {
+            navigate("/login");
+            return;
+        }
+        setShowReportModal(true);
+    };
 
-    const formatSalary = (salary) => {
-        if (!salary) return "Negotiable";
-        const { min, max, currency } = salary;
-        return `${currency} ${min / 1000}k - ${max / 1000}k`;
+    const handleReportConfirm = async () => {
+        try {
+            // Call the report API
+            await axios.post(
+                `${import.meta.env.VITE_API_URL}/jobs/${jobId}/report`,
+                { reason: reportReason },
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+            setToast({
+                message: "Job reported successfully!",
+                type: "success",
+            });
+        } catch (error) {
+            setToast({
+                message:
+                    error.response?.data?.message || "Failed to report job",
+                type: "error",
+            });
+        } finally {
+            setShowReportModal(false);
+            setReportReason("");
+        }
+    };
+
+    const handleReportCancel = () => {
+        setShowReportModal(false);
+        setReportReason("");
     };
 
     if (isLoading) {
@@ -176,20 +249,31 @@ export default function JobDetail() {
             {toast.message && (
                 <Toast message={toast.message} type={toast.type} />
             )}
-            <div className="min-h-screen bg-gray-50 py-8">
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 py-10">
                 <div className="container mx-auto px-4">
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                         {/* Main Content */}
-                        <div className="lg:col-span-2">
+                        <div className="lg:col-span-2 space-y-8">
                             {/* Job Header */}
-                            <Card className="mb-8">
-                                <CardContent className="p-6">
-                                    <div className="flex items-start gap-6">
-                                        <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center">
-                                            <Building className="h-10 w-10 text-gray-400" />
+                            <Card className="mb-0 shadow-xl border-0 bg-white/90 backdrop-blur-lg rounded-2xl">
+                                <CardContent className="p-8">
+                                    <div className="flex items-center gap-8">
+                                        {/* Company avatar */}
+                                        <div className="w-24 h-24 bg-gradient-to-tr from-blue-200 to-indigo-200 rounded-2xl flex items-center justify-center overflow-hidden shadow-lg border-4 border-white">
+                                            {job.company.imageUrl ? (
+                                                <img
+                                                    src={job.company.imageUrl}
+                                                    alt={
+                                                        job.company.companyName
+                                                    }
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            ) : (
+                                                <Building className="h-12 w-12 text-indigo-400" />
+                                            )}
                                         </div>
                                         <div className="flex-1">
-                                            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                                            <h1 className="text-3xl font-extrabold text-gray-900 mb-2 tracking-tight">
                                                 {job.title}
                                             </h1>
                                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm text-gray-600">
@@ -204,24 +288,26 @@ export default function JobDetail() {
                                                     <MapPin className="h-4 w-4 mr-2" />
                                                     {job.location}
                                                 </div>
-                                                <div className="flex items-center">
-                                                    <Clock className="h-4 w-4 mr-2" />
-                                                    Posted{" "}
-                                                    {new Date(
-                                                        job.datePosted
-                                                    ).toLocaleDateString()}
+                                                <div className="flex items-center gap-2">
+                                                    <Clock className="h-5 w-5 text-yellow-500" />
+                                                    <span>
+                                                        Posted{" "}
+                                                        {formatDate(
+                                                            job.datePosted
+                                                        )}
+                                                    </span>
                                                 </div>
                                             </div>
-                                            <div className="flex flex-wrap gap-2 mt-4">
-                                                <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm">
+                                            <div className="flex flex-wrap gap-3 mt-4">
+                                                <Badge className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow">
                                                     {job.level}
-                                                </span>
-                                                <span className="px-3 py-1 bg-green-50 text-green-600 rounded-full text-sm">
+                                                </Badge>
+                                                <Badge className="bg-green-500 text-white shadow">
                                                     {job.jobType}
-                                                </span>
-                                                <span className="px-3 py-1 bg-yellow-50 text-yellow-600 rounded-full text-sm">
-                                                    {job.experienceYears}+ years
-                                                </span>
+                                                </Badge>
+                                                <Badge className="bg-yellow-400 text-white shadow">
+                                                    {job.experienceYears}+ yrs
+                                                </Badge>
                                             </div>
                                         </div>
                                     </div>
@@ -229,48 +315,46 @@ export default function JobDetail() {
                             </Card>
 
                             {/* Job Description */}
-                            <Card className="mb-8">
-                                <CardContent className="p-6 space-y-6">
+                            <Card className="shadow-lg border-0 bg-white/90 backdrop-blur-lg rounded-2xl">
+                                <CardContent className="p-8 space-y-8">
                                     <div>
-                                        <h2 className="text-xl font-semibold mb-4">
+                                        <h2 className="text-2xl font-bold mb-3 text-blue-700">
                                             Job Description
                                         </h2>
-                                        <p className="text-gray-600 whitespace-pre-line">
+                                        <p className="text-gray-700 whitespace-pre-line leading-relaxed">
                                             {job.description}
                                         </p>
                                     </div>
-
                                     <div>
-                                        <h2 className="text-xl font-semibold mb-4">
+                                        <h2 className="text-2xl font-bold mb-3 text-blue-700">
                                             Requirements
                                         </h2>
-                                        <ul className="space-y-2">
+                                        <ul className="space-y-3">
                                             {job.requirements.map(
                                                 (req, index) => (
                                                     <li
                                                         key={index}
-                                                        className="flex items-start gap-2 text-gray-600"
+                                                        className="flex items-center gap-3 text-gray-700"
                                                     >
-                                                        <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
+                                                        <CheckCircle className="h-6 w-6 text-green-500" />
                                                         <span>{req}</span>
                                                     </li>
                                                 )
                                             )}
                                         </ul>
                                     </div>
-
                                     <div>
-                                        <h2 className="text-xl font-semibold mb-4">
+                                        <h2 className="text-2xl font-bold mb-3 text-blue-700">
                                             Benefits
                                         </h2>
-                                        <ul className="space-y-2">
+                                        <ul className="space-y-3">
                                             {job.benefits.map(
                                                 (benefit, index) => (
                                                     <li
                                                         key={index}
-                                                        className="flex items-start gap-2 text-gray-600"
+                                                        className="flex items-center gap-3 text-gray-700"
                                                     >
-                                                        <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
+                                                        <CheckCircle className="h-6 w-6 text-indigo-500" />
                                                         <span>{benefit}</span>
                                                     </li>
                                                 )
@@ -279,67 +363,153 @@ export default function JobDetail() {
                                     </div>
                                 </CardContent>
                             </Card>
+
+                            {/* Active Jobs from the Same Company */}
+                            <Card className="shadow-lg border-0 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-2xl">
+                                <CardHeader>
+                                    <CardTitle className="text-lg font-bold text-indigo-700">
+                                        Other Active Jobs from{" "}
+                                        {job.company.companyName}
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="p-6">
+                                    {job.activeJobs &&
+                                    job.activeJobs.length > 0 ? (
+                                        <div className="grid gap-4">
+                                            {job.activeJobs.map((activeJob) => (
+                                                <div
+                                                    key={activeJob._id}
+                                                    className="border rounded-xl p-4 bg-white/80 hover:bg-blue-50 transition-all shadow flex flex-col md:flex-row md:items-center md:justify-between gap-2"
+                                                >
+                                                    <div className="flex-1">
+                                                        <Link
+                                                            to={`/jobs/${activeJob._id}`}
+                                                            className="text-lg font-semibold text-blue-600 hover:underline"
+                                                        >
+                                                            {activeJob.title}
+                                                        </Link>
+                                                        <div className="flex flex-wrap gap-3 mt-2 text-sm text-gray-600">
+                                                            <span className="flex items-center gap-1">
+                                                                <MapPin className="w-4 h-4 text-green-500" />
+                                                                {
+                                                                    activeJob.location
+                                                                }
+                                                            </span>
+                                                            <span className="flex items-center gap-1">
+                                                                <Clock className="w-4 h-4 text-yellow-500" />
+                                                                {formatDate(
+                                                                    activeJob.datePosted
+                                                                )}
+                                                            </span>
+                                                            <span className="flex items-center gap-1">
+                                                                <Briefcase className="w-4 h-4 text-blue-500" />
+                                                                {
+                                                                    activeJob.jobType
+                                                                }
+                                                            </span>
+                                                            <span className="flex items-center gap-1">
+                                                                <DollarSign className="w-4 h-4 text-green-600" />
+                                                                {formatSalary(
+                                                                    activeJob.salary
+                                                                )}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="mt-2 md:mt-0">
+                                                        <Badge className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow mr-2">
+                                                            {activeJob.level}
+                                                        </Badge>
+                                                        <Badge className="bg-yellow-400 text-white shadow">
+                                                            {
+                                                                activeJob.experienceYears
+                                                            }
+                                                            + yrs
+                                                        </Badge>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p className="text-gray-500">
+                                            This company currently has no other
+                                            active jobs.
+                                        </p>
+                                    )}
+                                </CardContent>
+                            </Card>
                         </div>
 
                         {/* Sidebar */}
                         <div>
-                            <Card className="sticky top-8">
-                                <CardContent className="p-6 space-y-6">
+                            <Card className="sticky top-8 shadow-2xl border-0 bg-white/95 backdrop-blur-lg rounded-2xl">
+                                <CardContent className="p-8 space-y-8">
                                     <div>
-                                        <h3 className="text-lg font-semibold mb-4">
+                                        <h3 className="text-xl font-bold mb-4 text-blue-700">
                                             Job Overview
                                         </h3>
-                                        <div className="space-y-4">
-                                            <div className="flex items-center gap-3">
-                                                <DollarSign className="h-5 w-5 text-blue-500" />
+                                        <div className="space-y-5">
+                                            <div className="flex items-center gap-4">
+                                                <DollarSign className="h-6 w-6 text-green-600" />
                                                 <div>
                                                     <p className="text-sm text-gray-500">
                                                         Salary
                                                     </p>
-                                                    <p className="font-medium">
+                                                    <p className="font-bold text-lg text-green-700">
                                                         {formatSalary(
                                                             job.salary
                                                         )}
                                                     </p>
                                                 </div>
                                             </div>
-                                            <div className="flex items-center gap-3">
-                                                <Briefcase className="h-5 w-5 text-blue-500" />
+                                            <div className="flex items-center gap-4">
+                                                <Briefcase className="h-6 w-6 text-blue-600" />
                                                 <div>
                                                     <p className="text-sm text-gray-500">
                                                         Job Type
                                                     </p>
-                                                    <p className="font-medium">
+                                                    <p className="font-semibold">
                                                         {job.jobType}
                                                     </p>
                                                 </div>
                                             </div>
-                                            <div className="flex items-center gap-3">
-                                                <GraduationCap className="h-5 w-5 text-blue-500" />
+                                            <div className="flex items-center gap-4">
+                                                <GraduationCap className="h-6 w-6 text-yellow-600" />
                                                 <div>
                                                     <p className="text-sm text-gray-500">
                                                         Experience
                                                     </p>
-                                                    <p className="font-medium">
+                                                    <p className="font-semibold">
                                                         {job.experienceYears}+
                                                         years
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-4">
+                                                <Briefcase className="h-6 w-6 text-indigo-600" />
+                                                <div>
+                                                    <p className="text-sm text-gray-500">
+                                                        Applicants
+                                                    </p>
+                                                    <p className="font-semibold">
+                                                        {job.applicantCount}{" "}
+                                                        applicants
                                                     </p>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="space-y-3">
+                                    <div className="space-y-4">
                                         {job.hasApplied ? (
                                             <Button
-                                                className="w-full bg-gray-400 cursor-not-allowed"
+                                                className="w-full bg-gray-400 cursor-not-allowed text-white font-bold py-3 rounded-xl"
                                                 disabled
                                             >
                                                 Already Applied
                                             </Button>
                                         ) : (
                                             <Button
-                                                className="w-full bg-blue-600 hover:bg-blue-700"
+                                                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg transition-all"
                                                 onClick={handleApplyClick}
                                                 disabled={
                                                     applyMutation.isLoading
@@ -350,24 +520,28 @@ export default function JobDetail() {
                                                     : "Apply Now"}
                                             </Button>
                                         )}
-                                        <div className="flex gap-2">
+                                        <div className="flex gap-2 mt-2">
                                             <Button
                                                 variant="outline"
-                                                className="flex-1"
+                                                className="flex-1 border-blue-200 hover:bg-blue-50 rounded-lg shadow"
                                             >
-                                                <BookmarkPlus className="h-4 w-4 mr-2" />
+                                                <BookmarkPlus className="h-5 w-5 mr-2 text-blue-500" />
                                                 Share
                                             </Button>
                                             <Button
                                                 variant="outline"
-                                                className="flex-1"
+                                                className="flex-1 border-indigo-200 hover:bg-indigo-50 rounded-lg shadow"
                                             >
-                                                <Share2 className="h-4 w-4 mr-2" />
+                                                <Share2 className="h-5 w-5 mr-2 text-indigo-500" />
                                                 Share
                                             </Button>
                                             <Button
                                                 variant="outline"
-                                                className="flex-1"
+                                                className={`flex-1 rounded-lg shadow ${
+                                                    isFavorited
+                                                        ? "border-red-200 bg-red-50"
+                                                        : "border-gray-200"
+                                                }`}
                                                 onClick={handleFavoriteClick}
                                                 disabled={
                                                     addToFavorites.isLoading ||
@@ -375,13 +549,21 @@ export default function JobDetail() {
                                                 }
                                             >
                                                 <Heart
-                                                    className={`h-4 w-4 mr-2 ${
+                                                    className={`h-5 w-5 mr-2 ${
                                                         isFavorited
                                                             ? "fill-red-500 text-red-500"
-                                                            : ""
+                                                            : "text-gray-400"
                                                     }`}
                                                 />
                                                 {isFavorited ? "Saved" : "Save"}
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                className="flex-1 border-red-200 text-red-600 hover:bg-red-50 rounded-lg shadow"
+                                                onClick={handleReportClick}
+                                            >
+                                                <AlertTriangle className="h-5 w-5 mr-2" />
+                                                Report
                                             </Button>
                                         </div>
                                     </div>
@@ -392,7 +574,37 @@ export default function JobDetail() {
                 </div>
             </div>
 
-            {/* Add Modal */}
+            {/* Report Modal */}
+            <Dialog open={showReportModal} onOpenChange={setShowReportModal}>
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Report Job</DialogTitle>
+                        <DialogDescription>
+                            Please provide a reason for reporting this job.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <Textarea
+                        value={reportReason}
+                        onChange={(e) => setReportReason(e.target.value)}
+                        placeholder="Enter your reason here..."
+                        className="mt-4"
+                    />
+                    <DialogFooter>
+                        <Button variant="ghost" onClick={handleReportCancel}>
+                            Cancel
+                        </Button>
+                        <Button
+                            className="bg-red-600 hover:bg-red-700 text-white"
+                            onClick={handleReportConfirm}
+                            disabled={!reportReason}
+                        >
+                            Submit Report
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Apply Modal */}
             <ApplyJobModal
                 isOpen={showApplyModal}
                 onClose={() => setShowApplyModal(false)}
