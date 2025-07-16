@@ -1,8 +1,10 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const Jobs = ({ jobs, companyAvatar }) => {
     console.log(jobs);
     console.log(companyAvatar);
+    const navigate = useNavigate();
     const formatSalary = (salary) => {
         const { min, max, currency } = salary;
         return `${currency} ${min / 1_000_000}M - ${max / 1_000_000}M`;
@@ -25,7 +27,12 @@ const Jobs = ({ jobs, companyAvatar }) => {
                         />
 
                         <div className="flex-1 space-y-2">
-                            <h2 className="text-xl font-semibold">
+                            <h2
+                                className="text-xl font-semibold hover:cursor-pointer"
+                                onClick={() => {
+                                    navigate(`/jobs/${job._id}`);
+                                }}
+                            >
                                 {job.title}
                             </h2>
                             <div className="text-gray-600 flex gap-4 flex-wrap text-sm">

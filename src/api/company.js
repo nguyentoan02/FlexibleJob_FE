@@ -13,7 +13,9 @@ export const fetchCompanyProfile = async (companyId) => {
 export const fetchCompanyJobs = async (companyId) => {
     return new Promise((resolve) => {
         setTimeout(async () => {
-            const res = await axios.get(`${API_URL}/jobs/company/${companyId}`);
+            const res = await axios.get(
+                `${API_URL}/manageJobs/company/${companyId}`
+            );
             resolve(res.data);
         }, 2000);
     });
@@ -94,5 +96,10 @@ export const getInVoices = async (token) => {
             Authorization: `Bearer ${token}`,
         },
     });
+    return response.data;
+};
+
+export const fetchAllCompany = async () => {
+    const response = await axios.get(`${API_URL}/company`);
     return response.data;
 };
