@@ -96,11 +96,6 @@ export function AdminSidebar() {
                             to="/admin/companies"
                         />
                         <NavItem
-                            icon={<Briefcase size={20} />}
-                            label="Manage Jobs"
-                            to="/admin/jobs"
-                        />
-                        <NavItem
                             icon={<MessageSquare size={20} />}
                             label="Messages"
                             to="/admin/messages"

@@ -96,3 +96,37 @@ export const getInVoices = async (token) => {
     });
     return response.data;
 };
+
+export async function fetchCompanyApprovalStats(token) {
+  const API_URL = import.meta.env.VITE_API_URL || '';
+  const res = await fetch(`${API_URL}/company/admin/company-approval-stats`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {}
+  });
+  if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+  const data = await res.json();
+  return data.payload;
+}
+
+export const fetchCompanyList = async (token, { location = [], industry = [], companySize = [] } = {}) => {
+  const API_URL = import.meta.env.VITE_API_URL || '';
+  let url = `${API_URL}/company/admin/filter-companies`;
+  const params = [];
+  if (location && location.length > 0) {
+    params.push(`location=${location.map(encodeURIComponent).join(',')}`);
+  }
+  if (industry && industry.length > 0) {
+    params.push(`industry=${industry.map(encodeURIComponent).join(',')}`);
+  }
+  if (companySize && companySize.length > 0) {
+    params.push(`companySize=${companySize.map(encodeURIComponent).join(',')}`);
+  }
+  if (params.length > 0) {
+    url += `?${params.join('&')}`;
+  }
+  const res = await fetch(url, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {}
+  });
+  if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+  const data = await res.json();
+  return data.payload;
+};

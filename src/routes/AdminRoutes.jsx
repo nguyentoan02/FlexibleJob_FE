@@ -8,8 +8,7 @@ import { CreatePackage } from "../pages/CreatePackage";
 import { EditPackage } from "../pages/EditPackage";
 import ChangePassword from "../pages/ChangePassword";
 import Report from "../pages/Report";
-import ManageJob from "../pages/ManageJob";
-import ManageCompany from "../pages/ManageCompany";
+import ManageCompany from "@/pages/Admin/ManageCompany";
 
 export default function AdminRoutes() {
     return (
@@ -25,7 +24,6 @@ export default function AdminRoutes() {
             />
             <Route path="/admin/change-password" element={<ChangePassword />} />
             <Route path="/admin/report" element={<Report />} />
-            <Route path="/admin/jobs" element={<ManageJob />} />
             <Route path="/admin/companies" element={<ManageCompany />} />
         </Route>
     );
