@@ -10,20 +10,15 @@ import {
     PhoneOutlined,
 } from "@ant-design/icons";
 import Footer from "../../components/Footer/Footer";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Detail from "../../components/Company/CompanyProfile/Detail";
 import Jobs from "../../components/Company/CompanyProfile/Jobs";
 import Review from "../../components/Company/CompanyProfile/Review";
 import { useAuth } from "../../hooks/useAuth";
-import HeaderCompany from "../../components/Header/HeaderCompany";
 
 function CompanyProfile() {
     const { companyId } = useParams();
     const { CompanyProfile, CompanyJos } = useCompany(companyId);
-    useEffect(() => {
-        CompanyProfile.refetch();
-        CompanyJos.refetch();
-    }, [companyId]);
     const [actions, setActions] = useState("DETAIL");
     const { user } = useAuth();
 
@@ -32,7 +27,7 @@ function CompanyProfile() {
 
     return (
         <>
-            {user?.role === "JOBSEEKER" ? (
+            {user.role === "JOBSEEKER" ? (
                 <HeaderJobseeker />
             ) : (
                 <HeaderCompany />

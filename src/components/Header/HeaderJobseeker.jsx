@@ -24,7 +24,7 @@ export default function HeaderJobseeker() {
         navigate("/");
     };
     const menuItems = [
-        { label: "Home", to: "/", subItems: [] },
+        { label: "Home", subItems: [] },
         {
             label: "Jobs",
             to: "/jobs", // Thêm đường dẫn trực tiếp
@@ -32,8 +32,7 @@ export default function HeaderJobseeker() {
         },
         {
             label: "Recruiters",
-            to: "/companies",
-            subItems: [],
+            subItems: ["Recruiter List", "Recruiter Details"],
         },
         {
             label: "Candidates",

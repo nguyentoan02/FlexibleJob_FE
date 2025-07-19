@@ -15,7 +15,7 @@ const HeaderCompany = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const menuItems = [
-        { label: "Home", to: "/", subItems: [] },
+        { label: "Home", subItems: [] },
         {
             label: "Jobs",
             to: "/jobs", // Thêm đường dẫn trực tiếp
@@ -23,8 +23,7 @@ const HeaderCompany = () => {
         },
         {
             label: "Recruiters",
-            to: "/companies",
-            subItems: [],
+            subItems: ["Recruiter List", "Recruiter Details"],
         },
         {
             label: "Candidates",

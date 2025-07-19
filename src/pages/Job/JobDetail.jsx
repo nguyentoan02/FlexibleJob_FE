@@ -276,17 +276,19 @@ export default function JobDetail() {
                                             <h1 className="text-3xl font-extrabold text-gray-900 mb-2 tracking-tight">
                                                 {job.title}
                                             </h1>
-                                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm text-gray-600">
-                                                <a
-                                                    href={`/company/${job.company._id}`}
-                                                    className="flex items-center text-indigo-400"
-                                                >
-                                                    <Building className="h-4 w-4 mr-2" />
-                                                    {job.company.companyName}
-                                                </a>
-                                                <div className="flex items-center">
-                                                    <MapPin className="h-4 w-4 mr-2" />
-                                                    {job.location}
+                                            <div className="flex flex-wrap gap-4 text-base text-gray-600 font-medium">
+                                                <div className="flex items-center gap-2">
+                                                    <Building className="h-5 w-5 text-blue-500" />
+                                                    <span>
+                                                        {
+                                                            job.company
+                                                                .companyName
+                                                        }
+                                                    </span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <MapPin className="h-5 w-5 text-green-500" />
+                                                    <span>{job.location}</span>
                                                 </div>
                                                 <div className="flex items-center gap-2">
                                                     <Clock className="h-5 w-5 text-yellow-500" />
