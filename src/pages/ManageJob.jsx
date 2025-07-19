@@ -1,5 +1,5 @@
 import AdminLayout from "@/components/Layout/AdminLayout";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,9 +29,12 @@ import {
 } from "@/components/ui/dialog";
 import axios from "axios";
 import { useAuth } from "@/hooks/useAuth";
-const fetchJobList = async (page, limit) => {
+
+const fetchJobList = async (page, limit, isHidden) => {
     const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/jobs?page=${page}&limit=${limit}`
+        `${
+            import.meta.env.VITE_API_URL
+        }/jobs?page=${page}&limit=${limit}&isHidden=${isHidden}`
     );
     return res.data;
 };
@@ -39,6 +42,19 @@ const fetchJobList = async (page, limit) => {
 const hideJob = async (jobId, token) => {
     const res = await axios.patch(
         `${import.meta.env.VITE_API_URL}/jobs/${jobId}/hide`,
+        {},
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+    return res.data;
+};
+
+const unhideJob = async (jobId, token) => {
+    const res = await axios.patch(
+        `${import.meta.env.VITE_API_URL}/jobs/${jobId}/unhide`,
         {},
         {
             headers: {
@@ -58,35 +74,39 @@ export default function ManageJob() {
     const [selectedJobId, setSelectedJobId] = useState(null);
     const [showConfirmationModal, setShowConfirmationModal] = useState(false);
     const { user, token } = useAuth();
+
+    // Query jobs
     const {
         data: jobsData,
         isLoading,
         isError,
     } = useQuery({
-        queryKey: ["jobs", page, limit],
-        queryFn: () => fetchJobList(page, limit),
+        queryKey: ["jobs", page, limit, activeTab],
+        queryFn: () =>
+            fetchJobList(page, limit, activeTab === "hidden" ? true : false),
         keepPreviousData: true,
     });
 
+    // Lấy danh sách jobs và tổng số jobs an toàn
+    const jobs = jobsData?.payload?.jobs || [];
+    const totalJobs = jobsData?.payload?.totalJobs ?? 0;
+    const totalPages = jobsData?.payload?.totalPages || 1;
+
+    // Hide job mutation
     const hideJobMutation = useMutation({
         mutationFn: ({ jobId, token }) => hideJob(jobId, token),
         onSuccess: () => {
-            queryClient.invalidateQueries(["jobs", page, limit]);
+            queryClient.invalidateQueries(["jobs", page, limit, activeTab]);
         },
     });
 
-    // Filter jobs by tab and search
-    const jobs = jobsData?.payload?.jobs || [];
-    const filteredJobs = jobs.filter((job) => {
-        const matchesTab =
-            activeTab === "active" ? !job.isHidden : job.isHidden;
-        const matchesSearch = job.title
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase());
-        return matchesTab && matchesSearch;
+    // Unhide job mutation
+    const unhideJobMutation = useMutation({
+        mutationFn: ({ jobId, token }) => unhideJob(jobId, token),
+        onSuccess: () => {
+            queryClient.invalidateQueries(["jobs", page, limit, activeTab]);
+        },
     });
-
-    const totalPages = jobsData?.payload?.totalPages || 1;
 
     const handleHideJob = (jobId) => {
         setSelectedJobId(jobId);
@@ -103,6 +123,13 @@ export default function ManageJob() {
         setShowConfirmationModal(false);
         setSelectedJobId(null);
     };
+
+    // Lọc jobs theo searchTerm (nếu cần)
+    const filteredJobs = searchTerm
+        ? jobs.filter((job) =>
+              job.title.toLowerCase().includes(searchTerm.toLowerCase())
+          )
+        : jobs;
 
     return (
         <AdminLayout>
@@ -129,7 +156,10 @@ export default function ManageJob() {
                                 ? "border-green-500 text-green-600 bg-white"
                                 : "border-transparent text-gray-500 bg-gray-100"
                         }`}
-                        onClick={() => setActiveTab("active")}
+                        onClick={() => {
+                            setActiveTab("active");
+                            setPage(1);
+                        }}
                     >
                         Active Jobs
                     </button>
@@ -139,7 +169,10 @@ export default function ManageJob() {
                                 ? "border-red-500 text-red-600 bg-white"
                                 : "border-transparent text-gray-500 bg-gray-100"
                         }`}
-                        onClick={() => setActiveTab("hidden")}
+                        onClick={() => {
+                            setActiveTab("hidden");
+                            setPage(1);
+                        }}
                     >
                         Hidden Jobs
                     </button>
@@ -150,20 +183,17 @@ export default function ManageJob() {
                     <p className="text-sm text-gray-700">
                         Showing{" "}
                         <span className="font-medium">
-                            {(page - 1) * limit + 1}
+                            {filteredJobs.length === 0
+                                ? 0
+                                : (page - 1) * limit + 1}
                         </span>{" "}
                         to{" "}
                         <span className="font-medium">
-                            {Math.min(
-                                page * limit,
-                                jobsData?.payload?.totalJobs
-                            )}
+                            {filteredJobs.length === 0
+                                ? 0
+                                : Math.min(page * limit, totalJobs)}
                         </span>{" "}
-                        of{" "}
-                        <span className="font-medium">
-                            {jobsData?.payload?.totalJobs}
-                        </span>{" "}
-                        jobs
+                        of <span className="font-medium">{totalJobs}</span> jobs
                     </p>
                     <div className="flex items-center space-x-2">
                         <Button
@@ -247,9 +277,25 @@ export default function ManageJob() {
                                                         : "Hide"}
                                                 </Button>
                                             ) : (
-                                                <span className="text-gray-400">
-                                                    Hidden
-                                                </span>
+                                                <Button
+                                                    onClick={() =>
+                                                        unhideJobMutation.mutate(
+                                                            {
+                                                                jobId: job._id,
+                                                                token,
+                                                            }
+                                                        )
+                                                    }
+                                                    disabled={
+                                                        unhideJobMutation.isLoading
+                                                    }
+                                                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                                                >
+                                                    {unhideJobMutation.isLoading &&
+                                                    selectedJobId === job._id
+                                                        ? "Unhiding..."
+                                                        : "Unhide"}
+                                                </Button>
                                             )}
                                         </TableCell>
                                     </TableRow>

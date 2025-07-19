@@ -27,12 +27,13 @@ export default function HeaderJobseeker() {
         { label: "Home", subItems: [] },
         {
             label: "Jobs",
-            to: "/jobs", // Thêm đường dẫn trực tiếp
+            to: "/jobs",
             subItems: [],
         },
         {
             label: "Recruiters",
-            subItems: ["Recruiter List", "Recruiter Details"],
+            to: "/company-public", // Thêm đường dẫn tới Company List
+            subItems: [],
         },
         {
             label: "Candidates",
@@ -185,9 +186,19 @@ export default function HeaderJobseeker() {
                     <nav className="flex flex-col space-y-4">
                         {menuItems.map((item, index) => (
                             <div key={index}>
-                                <div className="text-gray-700 font-medium">
-                                    {item.label}
-                                </div>
+                                {item.to ? (
+                                    <Link
+                                        to={item.to}
+                                        className="text-gray-700 font-medium hover:text-blue-600"
+                                        onClick={() => setMobileMenuOpen(false)}
+                                    >
+                                        {item.label}
+                                    </Link>
+                                ) : (
+                                    <div className="text-gray-700 font-medium">
+                                        {item.label}
+                                    </div>
+                                )}
                                 {item.subItems.length > 0 && (
                                     <ul className="ml-4 mt-1 space-y-1">
                                         {item.subItems.map(

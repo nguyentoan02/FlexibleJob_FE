@@ -21,12 +21,26 @@ const getMyApplications = async (token) => {
     return response.data;
 };
 
+// Make sure your hook handles empty arrays properly
 export const useMyApplications = () => {
     const { token } = useAuth();
     return useQuery({
-        queryKey: ["myApplications", token],
-        queryFn: () => getMyApplications(token),
+        queryKey: ["myApplications"],
+        queryFn: async () => {
+            const response = await axios.get(
+                `${import.meta.env.VITE_API_URL}/applications/my-applications`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            // Đảm bảo luôn trả về mảng
+            if (!Array.isArray(response.data.payload)) {
+                response.data.payload = [];
+            }
+            return response.data;
+        },
         enabled: !!token,
-        staleTime: 5 * 60 * 1000, // 5 minutes
     });
 };

@@ -199,7 +199,7 @@ export default function UpdateCVProfile() {
                 data.append("cvPdf", formData.cvPdf);
             }
 
-            // Fix: Handle skills properly
+            // Skills
             const validSkills = formData.skills.filter(
                 (skill) => skill.trim() !== ""
             );
@@ -207,10 +207,51 @@ export default function UpdateCVProfile() {
                 data.append(`skills[${index}]`, skill);
             });
 
+            // Education (thêm đầy đủ trường degree, school, ...)
+            formData.education.forEach((edu, index) => {
+                data.append(`education[${index}][school]`, edu.school || "");
+                data.append(`education[${index}][degree]`, edu.degree || "");
+                data.append(
+                    `education[${index}][fieldOfStudy]`,
+                    edu.fieldOfStudy || ""
+                );
+                data.append(
+                    `education[${index}][startDate]`,
+                    edu.startDate || ""
+                );
+                data.append(`education[${index}][endDate]`, edu.endDate || "");
+                data.append(
+                    `education[${index}][description]`,
+                    edu.description || ""
+                );
+            });
+
+            // Experience
+            formData.experience.forEach((exp, index) => {
+                data.append(`experience[${index}][company]`, exp.company || "");
+                data.append(
+                    `experience[${index}][position]`,
+                    exp.position || ""
+                );
+                data.append(
+                    `experience[${index}][startDate]`,
+                    exp.startDate || ""
+                );
+                data.append(`experience[${index}][endDate]`, exp.endDate || "");
+                data.append(
+                    `experience[${index}][description]`,
+                    exp.description || ""
+                );
+                data.append(
+                    `experience[${index}][location]`,
+                    exp.location || ""
+                );
+            });
+
             // Rest of the form data
             data.append("description", formData.description);
             data.append("number", formData.number);
-            data.append("certification", formData.certification); // chỉ 1 chứng chỉ
+            data.append("certification", formData.certification);
 
             const response = await axios.put(
                 `${import.meta.env.VITE_API_URL}/cv-profiles/${id}`,
@@ -393,6 +434,25 @@ export default function UpdateCVProfile() {
                                                     newEducation[index] = {
                                                         ...newEducation[index],
                                                         school: e.target.value,
+                                                    };
+                                                    setFormData({
+                                                        ...formData,
+                                                        education: newEducation,
+                                                    });
+                                                }}
+                                            />
+                                            {/* Thêm input cho degree */}
+                                            <Input
+                                                placeholder="Degree"
+                                                value={edu.degree}
+                                                className="border rounded-lg"
+                                                onChange={(e) => {
+                                                    const newEducation = [
+                                                        ...formData.education,
+                                                    ];
+                                                    newEducation[index] = {
+                                                        ...newEducation[index],
+                                                        degree: e.target.value,
                                                     };
                                                     setFormData({
                                                         ...formData,

@@ -9,6 +9,7 @@ import {
     GraduationCap,
 } from "lucide-react";
 import { useCVProfile } from "@/hooks/cvprofile";
+import HeaderJobseeker from "@/components/Header/HeaderJobseeker";
 
 export default function ViewCVProfile() {
     const { data, isLoading, error } = useCVProfile();
@@ -36,16 +37,18 @@ export default function ViewCVProfile() {
         );
     }
 
+    // Sửa đoạn này: nếu không có CV thì hiện thông báo
     const profile = data?.payload;
     if (!profile) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <HeaderJobseeker />
                 <div className="text-center">
                     <h2 className="text-2xl font-bold text-gray-800">
                         CV Profile Not Found
                     </h2>
                     <p className="text-gray-600">
-                        The requested CV profile could not be found.
+                        You have not created a CV profile yet.
                     </p>
                 </div>
             </div>
