@@ -9,6 +9,7 @@ import JobFavorite from "../pages/Job/JobFavourite";
 import CVProfileFollowIdApply from "../pages/Application/CVProfileFollowIdApply";
 import { SidebarJobseeker } from "@/pages/SideBarJSeeker/DashboardJSeeker";
 import JobseekerDashboardLayout from "@/pages/SideBarJSeeker/JSeekerLayout";
+import DashboardStatistic from "@/pages/SideBarJSeeker/DashboardStatistic";
 
 export default function JobseekerRoutes() {
     return (
@@ -17,10 +18,7 @@ export default function JobseekerRoutes() {
                 path="/user/dashboard"
                 element={<JobseekerDashboardLayout />}
             >
-                <Route
-                    index
-                    element={<div>Welcome to Jobseeker Dashboard!</div>}
-                />
+                <Route index element={<DashboardStatistic />} />
                 <Route path="favorite-jobs" element={<JobFavorite />} />
                 <Route
                     path="my-applications"

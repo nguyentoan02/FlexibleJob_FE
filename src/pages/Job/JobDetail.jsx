@@ -177,7 +177,7 @@ export default function JobDetail() {
                 type: "error",
             });
             setTimeout(() => {
-                navigate("/cvprofile/create");
+                navigate("/user/dashboard/cvprofile/create");
             }, 2000);
             return;
         }

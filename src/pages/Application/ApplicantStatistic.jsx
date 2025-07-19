@@ -67,7 +67,9 @@ const MyApplicationsPage = () => {
         );
     }
 
-    const applications = data?.payload || [];
+    // Handle empty data or no applications
+    const applications = Array.isArray(data?.payload) ? data.payload : [];
+    const hasApplications = applications.length > 0;
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-100">
@@ -79,7 +81,8 @@ const MyApplicationsPage = () => {
                         My Applications
                     </span>
                 </h1>
-                {applications.length > 0 ? (
+
+                {hasApplications ? (
                     <div className="grid md:grid-cols-2 gap-8">
                         {applications.map((app) => (
                             <Card
@@ -187,23 +190,29 @@ const MyApplicationsPage = () => {
                         ))}
                     </div>
                 ) : (
-                    <div className="text-center py-20 border-2 border-dashed rounded-lg bg-white shadow-lg">
+                    <div className="text-center py-20 border-2 border-dashed border-gray-300 rounded-2xl bg-white shadow-lg">
                         <Briefcase
-                            size={56}
-                            className="mx-auto text-gray-300"
+                            size={80}
+                            className="mx-auto text-gray-300 mb-6"
                         />
-                        <h2 className="mt-6 text-2xl font-bold text-gray-700">
-                            No Applications Found
+                        <h2 className="text-3xl font-bold text-gray-700 mb-3">
+                            No Applications Yet
                         </h2>
-                        <p className="text-gray-500 mt-2">
-                            You haven't applied for any jobs yet. Keep
-                            searching!
+                        <p className="text-gray-500 text-lg mb-2">
+                            You haven't applied for any jobs yet.
+                        </p>
+                        <p className="text-gray-400 mb-8">
+                            Start exploring opportunities and apply to your
+                            dream jobs!
                         </p>
                         <Button
                             asChild
-                            className="mt-8 px-8 py-3 text-lg bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow"
+                            className="px-8 py-3 text-lg bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all"
                         >
-                            <Link to="/jobs">Find Jobs</Link>
+                            <Link to="/jobs">
+                                <Briefcase size={20} className="mr-2" />
+                                Find Jobs
+                            </Link>
                         </Button>
                     </div>
                 )}
