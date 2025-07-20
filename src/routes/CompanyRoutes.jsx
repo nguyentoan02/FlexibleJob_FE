@@ -1,11 +1,10 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
 import PrivateRoute from "../components/PrivateRoute";
-// import CompanyProfile from "../pages/Employer/CompanyProfile";
 import CVProfileFollowID from "../pages/CVProfile/CVProfileFollowID";
 import CompanyDashboard from "../pages/Employer/CompanyDashboard";
-// import CreateCompanyProfile from "../pages/Employer/CreateCompanyProfile";
 import CompanyProfilePage from "../pages/Employer/CompanyProfilePage";
+import ChatPage from "../pages/Chat/ChatPage";
 
 function CompanyRoutes() {
     return (
@@ -20,6 +19,7 @@ function CompanyRoutes() {
                     path="/createCompanyProfile"
                     element={<CompanyProfilePage />}
                 />
+                <Route path="/company/chat" element={<ChatPage />} />
             </Route>
         </>
     );

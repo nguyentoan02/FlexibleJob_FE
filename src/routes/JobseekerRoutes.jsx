@@ -10,6 +10,7 @@ import CVProfileFollowIdApply from "../pages/Application/CVProfileFollowIdApply"
 import { SidebarJobseeker } from "@/pages/SideBarJSeeker/DashboardJSeeker";
 import JobseekerDashboardLayout from "@/pages/SideBarJSeeker/JSeekerLayout";
 import DashboardStatistic from "@/pages/SideBarJSeeker/DashboardStatistic";
+import ChatPage from "../pages/Chat/ChatPage";
 
 export default function JobseekerRoutes() {
     return (
@@ -30,6 +31,7 @@ export default function JobseekerRoutes() {
                     path="cvprofile/update/:id"
                     element={<UpdateCVProfile />}
                 />
+                <Route path="chat" element={<ChatPage />} />
             </Route>
             <Route path="/user/profile" element={<ProfilePage />} />
             <Route
