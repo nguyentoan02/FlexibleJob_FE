@@ -126,8 +126,10 @@ const SideBar = ({ isCreate }) => {
                             <SideBarItem
                                 icon={<MessageOutlined />}
                                 label="Messages"
-                                badge={4}
-                                onClick={() => {}}
+                                active={action === "MESSAGES"}
+                                onClick={() => {
+                                    navigate("/company/chat");
+                                }}
                             />
                         </>
                     )}

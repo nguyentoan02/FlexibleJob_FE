@@ -2,21 +2,42 @@ import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useCVProfile } from "@/hooks/cvprofile";
-import { LayoutDashboard, FileText, Heart, LogOut } from "lucide-react";
+import {
+    LayoutDashboard,
+    FileText,
+    Heart,
+    LogOut,
+    MessageCircle,
+} from "lucide-react";
 
 function NavItem({ icon, label, to, active = false, onClick }) {
+    if (onClick) {
+        return (
+            <button
+                onClick={onClick}
+                className={`w-full flex items-center gap-3 px-4 py-3 text-left rounded-lg transition-colors ${
+                    active
+                        ? "bg-blue-100 text-blue-700 font-medium"
+                        : "text-gray-600 hover:bg-gray-100"
+                }`}
+            >
+                {icon}
+                <span>{label}</span>
+            </button>
+        );
+    }
+
     return (
         <Link
             to={to}
-            onClick={onClick}
-            className={`flex items-center px-3 py-2 rounded-md my-1 ${
+            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                 active
-                    ? "bg-green-50 text-green-500"
-                    : "text-gray-700 hover:bg-gray-50"
+                    ? "bg-blue-100 text-blue-700 font-medium"
+                    : "text-gray-600 hover:bg-gray-100"
             }`}
         >
-            <div className="mr-3 text-gray-400">{icon}</div>
-            <span className="flex-1">{label}</span>
+            {icon}
+            <span>{label}</span>
         </Link>
     );
 }
@@ -66,6 +87,15 @@ export function SidebarJobseeker() {
                                 "/user/dashboard/my-applications"
                             }
                         />
+                        {/* Add Chat Navigation */}
+                        <NavItem
+                            icon={<MessageCircle size={20} />}
+                            label="Messages"
+                            to="chat"
+                            active={
+                                location.pathname === "/user/dashboard/chat"
+                            }
+                        />
                         {/* CV logic */}
                         {!isLoading && !hasCV && (
                             <NavItem
@@ -113,6 +143,13 @@ export function SidebarJobseeker() {
                             active={location.pathname === "/jobs"}
                         />
                     </nav>
+                </div>
+                <div className="mt-auto pt-6">
+                    <NavItem
+                        icon={<LogOut size={20} />}
+                        label="Logout"
+                        onClick={handleLogout}
+                    />
                 </div>
             </div>
         </aside>

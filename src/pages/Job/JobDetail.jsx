@@ -34,6 +34,7 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import ChatButton from "@/components/Chat/ChatButton";
 
 const fetchJobDetail = async (jobId, token) => {
     const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
@@ -269,47 +270,100 @@ export default function JobDetail() {
                                                     className="w-full h-full object-cover"
                                                 />
                                             ) : (
-                                                <Building className="h-12 w-12 text-indigo-400" />
+                                                <Building className="h-12 w-12 text-indigo-600" />
                                             )}
                                         </div>
+
                                         <div className="flex-1">
-                                            <h1 className="text-3xl font-extrabold text-gray-900 mb-2 tracking-tight">
+                                            <div className="flex items-center gap-3 mb-2">
+                                                <Badge className="bg-green-100 text-green-800 px-3 py-1 text-sm font-medium">
+                                                    {job.jobType}
+                                                </Badge>
+                                                <Badge className="bg-blue-100 text-blue-800 px-3 py-1 text-sm font-medium">
+                                                    {job.level}
+                                                </Badge>
+                                            </div>
+                                            <h1 className="text-4xl font-bold text-gray-800 mb-3">
                                                 {job.title}
                                             </h1>
-                                            <div className="flex flex-wrap gap-4 text-base text-gray-600 font-medium">
+                                            <Link
+                                                to={`/company/${job.company._id}`}
+                                                className="text-2xl font-semibold text-indigo-600 hover:underline mb-4 block"
+                                            >
+                                                {job.company.companyName}
+                                            </Link>
+
+                                            <div className="flex flex-wrap gap-4 text-gray-600 mb-6">
                                                 <div className="flex items-center gap-2">
-                                                    <Building className="h-5 w-5 text-blue-500" />
-                                                    <span>
-                                                        {
-                                                            job.company
-                                                                .companyName
-                                                        }
+                                                    <MapPin className="h-5 w-5 text-indigo-500" />
+                                                    <span className="font-medium">
+                                                        {job.location}
                                                     </span>
                                                 </div>
                                                 <div className="flex items-center gap-2">
-                                                    <MapPin className="h-5 w-5 text-green-500" />
-                                                    <span>{job.location}</span>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <Clock className="h-5 w-5 text-yellow-500" />
-                                                    <span>
+                                                    <Clock className="h-5 w-5 text-green-500" />
+                                                    <span className="font-medium">
                                                         Posted{" "}
                                                         {formatDate(
-                                                            job.datePosted
+                                                            job.createdAt
+                                                        )}
+                                                    </span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <DollarSign className="h-5 w-5 text-yellow-500" />
+                                                    <span className="font-medium">
+                                                        {formatSalary(
+                                                            job.salary
                                                         )}
                                                     </span>
                                                 </div>
                                             </div>
-                                            <div className="flex flex-wrap gap-3 mt-4">
-                                                <Badge className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow">
-                                                    {job.level}
-                                                </Badge>
-                                                <Badge className="bg-green-500 text-white shadow">
-                                                    {job.jobType}
-                                                </Badge>
-                                                <Badge className="bg-yellow-400 text-white shadow">
-                                                    {job.experienceYears}+ yrs
-                                                </Badge>
+
+                                            {/* Action Buttons */}
+                                            <div className="flex flex-wrap gap-4">
+                                                <Button
+                                                    onClick={handleApplyClick}
+                                                    className="bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+                                                >
+                                                    Apply Now
+                                                </Button>
+
+                                                {/* Add Chat Button here */}
+                                                <ChatButton
+                                                    company={job.company}
+                                                />
+
+                                                <Button
+                                                    variant="outline"
+                                                    onClick={
+                                                        handleFavoriteClick
+                                                    }
+                                                    className={`border-2 font-semibold py-3 px-6 rounded-full shadow transition-all duration-300 flex items-center gap-2 ${
+                                                        isFavorited
+                                                            ? "bg-red-50 border-red-300 text-red-600 hover:bg-red-100"
+                                                            : "border-gray-300 text-gray-600 hover:bg-gray-50"
+                                                    }`}
+                                                >
+                                                    <Heart
+                                                        className={`h-5 w-5 ${
+                                                            isFavorited
+                                                                ? "fill-current"
+                                                                : ""
+                                                        }`}
+                                                    />
+                                                    {isFavorited
+                                                        ? "Remove from Favorites"
+                                                        : "Add to Favorites"}
+                                                </Button>
+
+                                                <Button
+                                                    variant="outline"
+                                                    onClick={handleReportClick}
+                                                    className="border-orange-300 text-orange-600 hover:bg-orange-50 font-semibold py-3 px-6 rounded-full shadow transition-all duration-300 flex items-center gap-2"
+                                                >
+                                                    <AlertTriangle className="h-5 w-5" />
+                                                    Report Job
+                                                </Button>
                                             </div>
                                         </div>
                                     </div>
