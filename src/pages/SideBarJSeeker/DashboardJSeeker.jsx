@@ -8,6 +8,7 @@ import {
     Heart,
     LogOut,
     MessageCircle,
+    Bell, // Import Bell icon
 } from "lucide-react";
 
 function NavItem({ icon, label, to, active = false, onClick }) {
@@ -94,6 +95,16 @@ export function SidebarJobseeker() {
                             to="chat"
                             active={
                                 location.pathname === "/user/dashboard/chat"
+                            }
+                        />
+                        {/* Add Notification Navigation */}
+                        <NavItem
+                            icon={<Bell size={20} />}
+                            label="Notifications"
+                            to="notifications"
+                            active={
+                                location.pathname ===
+                                "/user/dashboard/notifications"
                             }
                         />
                         {/* CV logic */}

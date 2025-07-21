@@ -7,6 +7,7 @@ import {
     BookOutlined,
     GiftOutlined,
     MessageOutlined,
+    BellOutlined, // Import Bell icon
     UserOutlined,
     LockOutlined,
     DeleteOutlined,
@@ -129,6 +130,15 @@ const SideBar = ({ isCreate }) => {
                                 active={action === "MESSAGES"}
                                 onClick={() => {
                                     navigate("/company/chat");
+                                }}
+                            />
+                            <SideBarItem
+                                icon={<BellOutlined />}
+                                label="Notifications"
+                                active={action === "NOTIFICATIONS"}
+                                onClick={() => {
+                                    // navigate("notifications"); // You can create this route
+                                    setActions("NOTIFICATIONS");
                                 }}
                             />
                         </>

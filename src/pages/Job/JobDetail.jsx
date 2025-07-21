@@ -333,7 +333,7 @@ export default function JobDetail() {
                                                     company={job.company}
                                                 />
 
-                                                <Button
+                                                {/* <Button
                                                     variant="outline"
                                                     onClick={
                                                         handleFavoriteClick
@@ -354,7 +354,7 @@ export default function JobDetail() {
                                                     {isFavorited
                                                         ? "Remove from Favorites"
                                                         : "Add to Favorites"}
-                                                </Button>
+                                                </Button> */}
 
                                                 <Button
                                                     variant="outline"
