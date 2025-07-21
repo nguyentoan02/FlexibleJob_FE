@@ -6,10 +6,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useCVProfile } from "@/hooks/cvprofile";
 import { useNavigate } from "react-router-dom";
+import NotificationBell from "../Notification/NotificationBell"; // Add this import
 import { useState } from "react";
 import { Menu, X } from "lucide-react"; // Hamburger and close icons
-import { useCVProfile } from "@/hooks/cvprofile";
 import { Heart } from "lucide-react"; // Import Heart icon
 import { ChevronDown, ChevronUp } from "lucide-react"; // Add these imports
 export default function HeaderJobseeker() {
@@ -118,8 +119,9 @@ export default function HeaderJobseeker() {
                 <div className="hidden md:flex items-center space-x-4">
                     {user ? (
                         <>
+                            <NotificationBell />
                             <div className="relative">
-                                <button
+                                <Button
                                     onClick={() =>
                                         setIsDropdownOpen(!isDropdownOpen)
                                     }
@@ -134,7 +136,7 @@ export default function HeaderJobseeker() {
                                     ) : (
                                         <ChevronDown className="w-4 h-4" />
                                     )}
-                                </button>
+                                </Button>
 
                                 {isDropdownOpen && (
                                     <div className="fixed right-4 top-16 w-56 bg-white rounded-md shadow-lg py-1 z-50">

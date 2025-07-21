@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Menu, X } from "lucide-react"; // Hamburger and close icons
+import NotificationBell from "../Notification/NotificationBell"; // Add this import
 
 const HeaderCompany = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -38,8 +39,8 @@ const HeaderCompany = () => {
     ];
 
     return (
-        <header className="bg-white shadow-md">
-            <div className="container mx-auto flex items-center justify-between py-4 px-6">
+        <header className="bg-white shadow-md sticky top-0 z-50">
+            <div className="container mx-auto px-6 py-3 flex justify-between items-center">
                 {/* Logo */}
                 <div className="text-2xl font-bold text-blue-600">JobBox</div>
 
@@ -108,9 +109,36 @@ const HeaderCompany = () => {
                 <div className="hidden md:flex items-center space-x-4">
                     {user ? (
                         <>
-                            <span className="text-gray-700">
-                                Welcome, <strong>{user.username}</strong>
-                            </span>
+                            <NotificationBell />
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        className="text-gray-700 hover:text-blue-600"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            className="h-6 w-6"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M15 17h5l-1.405 1.405A2 2 0 0116 21H8a2 2 0 01-1.595-.405L5 19h5m5-7V3m0 0L9 8m6-5L9 3"
+                                            />
+                                        </svg>
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-80 p-4">
+                                    <div className="text-sm text-gray-500">
+                                        {/* Notification content here */}
+                                        You have new notifications
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
 
                             <Link to="/company/dashboard">
                                 <Button
