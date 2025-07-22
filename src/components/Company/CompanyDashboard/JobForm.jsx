@@ -28,6 +28,8 @@ const JobForm = ({ handleSubmit, title, initialData, limitData }) => {
         }
     );
 
+    const [errors, setErrors] = useState({});
+
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
         if (name.includes("salary.")) {
@@ -67,7 +69,68 @@ const JobForm = ({ handleSubmit, title, initialData, limitData }) => {
         return `${year}-${month}-${day}`;
     };
 
-    console.log("form data", formData.category);
+    const validate = () => {
+        const newErrors = {};
+        if (!formData.title.trim()) newErrors.title = "Title is required";
+        if (!formData.description.trim())
+            newErrors.description = "Description is required";
+        if (!formData.requirements.some((r) => r.trim()))
+            newErrors.requirements = "At least 1 requirement";
+        if (!formData.benefits.some((b) => b.trim()))
+            newErrors.benefits = "At least 1 benefit";
+        if (!formData.location.trim())
+            newErrors.location = "Location is required";
+        if (!formData.salary.min || !formData.salary.max)
+            newErrors.salary = "Salary min & max required";
+        if (Number(formData.salary.min) > Number(formData.salary.max))
+            newErrors.salary = "Min salary must be <= max";
+        if (!formData.deadline) {
+            newErrors.deadline = "Deadline is required";
+        } else {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const minDeadline = new Date(today);
+            minDeadline.setDate(minDeadline.getDate() + 7); // tối thiểu 1 tuần
+            const deadlineDate = new Date(formData.deadline);
+            if (deadlineDate <= today) {
+                newErrors.deadline = "Deadline must be after today";
+            } else if (deadlineDate < minDeadline) {
+                newErrors.deadline =
+                    "Deadline must be at least 1 week from today";
+            }
+        }
+        if (!formData.category) newErrors.category = "Category is required";
+
+        // Validate expiredAt nếu có (chỉ khi tạo mới)
+        if (!initialData) {
+            if (!formData.expiredAt) {
+                newErrors.expiredAt = "Expired date is required";
+            } else {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const minExpired = new Date(today);
+                minExpired.setDate(minExpired.getDate() + 7);
+                const expiredDate = new Date(formData.expiredAt);
+                if (expiredDate <= today) {
+                    newErrors.expiredAt = "Expired date must be after today";
+                } else if (expiredDate < minExpired) {
+                    newErrors.expiredAt =
+                        "Expired date must be at least 1 week from today";
+                }
+            }
+        }
+
+        return newErrors;
+    };
+
+    const onSubmit = (e) => {
+        e.preventDefault();
+        const foundErrors = validate();
+        setErrors(foundErrors);
+        if (Object.keys(foundErrors).length === 0) {
+            handleSubmit(formData, e);
+        }
+    };
 
     useEffect(() => {
         if (AllCategory.isSuccess && AllCategory.data?.payload) {
@@ -104,7 +167,7 @@ const JobForm = ({ handleSubmit, title, initialData, limitData }) => {
             </div>
 
             <form
-                onSubmit={(e) => handleSubmit(formData, e)}
+                onSubmit={onSubmit}
                 className="w-full mx-auto space-y-6 p-6 bg-white rounded shadow"
             >
                 <div className="flex gap-2 items-center">
@@ -121,6 +184,9 @@ const JobForm = ({ handleSubmit, title, initialData, limitData }) => {
                     placeholder="Job Title"
                     className="w-full border p-2 rounded"
                 />
+                {errors.title && (
+                    <div className="text-red-500 text-sm">{errors.title}</div>
+                )}
 
                 <textarea
                     name="description"
@@ -130,6 +196,11 @@ const JobForm = ({ handleSubmit, title, initialData, limitData }) => {
                     className="w-full border p-2 rounded"
                     rows="4"
                 />
+                {errors.description && (
+                    <div className="text-red-500 text-sm">
+                        {errors.description}
+                    </div>
+                )}
 
                 <div>
                     <label className="block font-medium mb-1">
@@ -157,6 +228,11 @@ const JobForm = ({ handleSubmit, title, initialData, limitData }) => {
                     >
                         + Add Requirement
                     </button>
+                    {errors.requirements && (
+                        <div className="text-red-500 text-sm">
+                            {errors.requirements}
+                        </div>
+                    )}
                 </div>
 
                 <div>
@@ -179,6 +255,11 @@ const JobForm = ({ handleSubmit, title, initialData, limitData }) => {
                     >
                         + Add Benefit
                     </button>
+                    {errors.benefits && (
+                        <div className="text-red-500 text-sm">
+                            {errors.benefits}
+                        </div>
+                    )}
                 </div>
                 <div>
                     <label className="block font-medium mb-1">
@@ -192,6 +273,7 @@ const JobForm = ({ handleSubmit, title, initialData, limitData }) => {
                         onChange={handleChange}
                         placeholder="Experience (Years)"
                         className="w-full border p-2 rounded"
+                        min={0}
                     />
                 </div>
 
@@ -236,6 +318,11 @@ const JobForm = ({ handleSubmit, title, initialData, limitData }) => {
                             </option>
                         ))}
                     </select>
+                    {errors.category && (
+                        <div className="text-red-500 text-sm">
+                            {errors.category}
+                        </div>
+                    )}
                 </div>
 
                 <select
@@ -264,6 +351,11 @@ const JobForm = ({ handleSubmit, title, initialData, limitData }) => {
                     placeholder="Location"
                     className="w-full border p-2 rounded"
                 />
+                {errors.location && (
+                    <div className="text-red-500 text-sm">
+                        {errors.location}
+                    </div>
+                )}
 
                 <label className="flex items-center space-x-2">
                     <input
@@ -283,6 +375,7 @@ const JobForm = ({ handleSubmit, title, initialData, limitData }) => {
                         onChange={handleChange}
                         placeholder="Min Salary"
                         className="border p-2 rounded"
+                        min={0}
                     />
                     <input
                         type="number"
@@ -291,6 +384,7 @@ const JobForm = ({ handleSubmit, title, initialData, limitData }) => {
                         onChange={handleChange}
                         placeholder="Max Salary"
                         className="border p-2 rounded"
+                        min={0}
                     />
                     <select
                         name="salary.currency"
@@ -302,6 +396,9 @@ const JobForm = ({ handleSubmit, title, initialData, limitData }) => {
                         <option value="VND">VND</option>
                     </select>
                 </div>
+                {errors.salary && (
+                    <div className="text-red-500 text-sm">{errors.salary}</div>
+                )}
 
                 <div>
                     <label className="block font-medium mb-1">
@@ -314,6 +411,11 @@ const JobForm = ({ handleSubmit, title, initialData, limitData }) => {
                         onChange={handleChange}
                         className="w-full border p-2 rounded"
                     />
+                    {errors.deadline && (
+                        <div className="text-red-500 text-sm">
+                            {errors.deadline}
+                        </div>
+                    )}
                 </div>
                 {!initialData && (
                     <div>
@@ -327,6 +429,11 @@ const JobForm = ({ handleSubmit, title, initialData, limitData }) => {
                             onChange={handleChange}
                             className="w-full border p-2 rounded"
                         />
+                        {errors.expiredAt && (
+                            <div className="text-red-500 text-sm">
+                                {errors.expiredAt}
+                            </div>
+                        )}
                     </div>
                 )}
 

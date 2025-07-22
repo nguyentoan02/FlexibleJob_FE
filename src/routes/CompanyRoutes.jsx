@@ -20,7 +20,6 @@ function CompanyRoutes() {
                     path="/createCompanyProfile"
                     element={<CompanyProfilePage />}
                 />
-                <Route path="/company/chat" element={<ChatPage />} />
                 <Route
                     path="/company/notifications"
                     element={<NotificationPage />}

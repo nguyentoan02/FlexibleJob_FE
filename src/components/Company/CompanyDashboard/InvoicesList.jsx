@@ -36,8 +36,8 @@ const InvoicesList = () => {
 
     return (
         <Card>
-            <CardContent className="p-0">
-                <div className="p-6 border-b font-semibold text-lg">
+            <CardContent className="p-0 max-h-[60vh] overflow-auto relative">
+                <div className="p-6 border-b font-semibold text-lg sticky top-0 bg-white">
                     Invoices
                 </div>
                 <ul>

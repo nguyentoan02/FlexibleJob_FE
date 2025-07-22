@@ -12,6 +12,7 @@ import ViewPackage from "../../components/Company/CompanyDashboard/ViewPackage";
 import ApplicationManage from "../../components/Company/CompanyDashboard/ApplicationManage";
 import PaymentSuccess from "../../components/Company/CompanyDashboard/Payment/PaymentSuccess";
 import PaymentCancel from "../../components/Company/CompanyDashboard/Payment/PaymentCancel";
+import ChatPage from "../Chat/ChatPage";
 
 const CompanyDashboard = () => {
     const { isCompanyApproved } = useMyCompany();
@@ -66,6 +67,7 @@ const CompanyDashboard = () => {
                             path="payment/cancel"
                             element={<PaymentCancel />}
                         />
+                        <Route path="chat" element={<ChatPage />} />
                     </Routes>
                 </div>
             </div>

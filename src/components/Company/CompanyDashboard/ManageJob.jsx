@@ -13,6 +13,7 @@ import LimitTationJobPost from "./LimitTationJobPost";
 
 import { useAnalyzeApplicants } from "../../../hooks/useAnalyzeApplicants";
 import AnalysisResultModal from "../../AI/AnalysisResultModal";
+import { unExpireJob } from "../../../api/company";
 
 const ManageJob = () => {
     const [page, setPage] = useState(1);
@@ -23,6 +24,11 @@ const ManageJob = () => {
     const [jobData, setJobdata] = useState(null);
     const [applicantsData, setApplicantsData] = useState([]);
     const [selectedJobId, setSelectedJobId] = useState(null);
+
+    const [isShowUnexpireModal, setIsShowUnexpireModal] = useState(false);
+    const [unexpireJobId, setUnexpireJobId] = useState(null);
+    const [newExpireDate, setNewExpireDate] = useState("");
+    const [isUnexpiring, setIsUnexpiring] = useState(false);
 
     // AI Analysis State
     const [isAnalysisModalOpen, setAnalysisModalOpen] = useState(false);
@@ -98,6 +104,27 @@ const ManageJob = () => {
         refetchAnalysis();
     };
 
+    const handleShowUnexpireModal = (jobId) => {
+        setUnexpireJobId(jobId);
+        setIsShowUnexpireModal(true);
+        setNewExpireDate("");
+    };
+
+    const handleUnexpireJob = async () => {
+        setIsShowUnexpireModal(true);
+        if (!newExpireDate) return;
+        setIsUnexpiring(true);
+        try {
+            await unExpireJob(token, newExpireDate, unexpireJobId);
+            setIsShowUnexpireModal(false);
+            setNewExpireDate("");
+            JobsOfMyCompany.refetch();
+        } catch (err) {
+            alert("Failed to unexpire job!");
+        }
+        setIsUnexpiring(false);
+    };
+
     return (
         <div className="px-4 py-6 md:px-10 md:py-10 relative min-h-screen">
             <div className="flex justify-between mb-2">
@@ -121,6 +148,7 @@ const ManageJob = () => {
                 jobs={jobs}
                 isFetching={JobsOfMyCompany.isFetching}
                 onEdit={handleEdit}
+                onExpire={handleShowUnexpireModal}
             />
 
             <div className="w-full flex justify-center">
@@ -228,6 +256,38 @@ const ManageJob = () => {
                 error={analysisError}
                 isLoading={isAnalyzing}
             />
+            {isShowUnexpireModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                    <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md relative">
+                        <button
+                            className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-2xl"
+                            onClick={() => setIsShowUnexpireModal(false)}
+                        >
+                            ×
+                        </button>
+                        <h3 className="text-xl font-bold mb-4 text-indigo-700">
+                            Unexpire Job
+                        </h3>
+                        <label className="block mb-2 font-medium">
+                            New Expire Date
+                        </label>
+                        <input
+                            type="date"
+                            className="border rounded p-2 w-full mb-4"
+                            value={newExpireDate}
+                            onChange={(e) => setNewExpireDate(e.target.value)}
+                            min={new Date().toISOString().split("T")[0]}
+                        />
+                        <button
+                            className="w-full py-2 rounded bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition disabled:opacity-60"
+                            onClick={handleUnexpireJob}
+                            disabled={!newExpireDate || isUnexpiring}
+                        >
+                            {isUnexpiring ? "Updating..." : "Confirm Unexpire"}
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

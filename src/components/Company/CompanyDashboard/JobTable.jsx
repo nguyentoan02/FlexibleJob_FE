@@ -1,7 +1,7 @@
 import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useCompanyJobId } from "../../../hooks/companyJob";
 
-const JobTable = ({ jobs, isFetching, onEdit, onViewApplicants }) => {
+const JobTable = ({ jobs, isFetching, onEdit, onViewApplicants, onExpire }) => {
     return (
         <div className="overflow-x-auto relative">
             {isFetching && (
@@ -74,7 +74,10 @@ const JobTable = ({ jobs, isFetching, onEdit, onViewApplicants }) => {
                                     >
                                         <EditOutlined />
                                     </button>
-                                    <button className="p-1 hover:text-red-600 transition-colors bg-red-200 rounded-full px-2">
+                                    <button
+                                        className="p-1 hover:text-red-600 transition-colors bg-red-200 rounded-full px-2"
+                                        onClick={() => onExpire(job._id)}
+                                    >
                                         <DeleteOutlined />
                                     </button>
                                 </div>

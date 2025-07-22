@@ -129,7 +129,8 @@ const SideBar = ({ isCreate }) => {
                                 label="Messages"
                                 active={action === "MESSAGES"}
                                 onClick={() => {
-                                    navigate("/company/chat");
+                                    navigate("chat");
+                                    setActions("MESSAGES");
                                 }}
                             />
                             <SideBarItem

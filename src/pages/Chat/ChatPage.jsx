@@ -204,11 +204,7 @@ const ChatPage = () => {
 
     return (
         <>
-            {user?.role === "JOBSEEKER" ? (
-                <HeaderJobseeker />
-            ) : (
-                <HeaderCompany />
-            )}
+            {user?.role === "JOBSEEKER" ? <HeaderJobseeker /> : <></>}
 
             <div className="min-h-screen bg-gray-50">
                 <div className="container mx-auto p-6">

@@ -96,3 +96,29 @@ export const getInVoices = async (token) => {
     });
     return response.data;
 };
+
+export const CompanyStats = async (token, metric, range) => {
+    const response = await axios.get(`${API_URL}/company/stats/timeseries`, {
+        params: {
+            metric,
+            range,
+        },
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+    return response.data;
+};
+
+export const unExpireJob = async (token, expireDate, jobId) => {
+    const response = await axios.put(
+        `${API_URL}/manageJobs/expireJob/${jobId}`,
+        { expireDate },
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+    return response.data;
+};
