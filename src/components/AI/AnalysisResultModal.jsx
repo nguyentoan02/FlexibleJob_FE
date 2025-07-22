@@ -19,7 +19,7 @@ const AnalysisResultModal = ({ isOpen, onClose, data, error, isLoading }) => {
             onClick={onClose}
         >
             <div
-                className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-2xl border border-blue-100 relative animate-fadeIn"
+                className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-5xl border border-blue-100 relative animate-fadeIn"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="flex justify-between items-center border-b pb-4 mb-6">
@@ -73,23 +73,27 @@ const AnalysisResultModal = ({ isOpen, onClose, data, error, isLoading }) => {
                                     key={item.applicantId}
                                     className="bg-gradient-to-br from-blue-50 via-white to-blue-100 p-6 rounded-2xl flex flex-col md:flex-row items-center gap-6 shadow-lg border border-blue-100 hover:shadow-xl transition"
                                 >
-                                    <div className="relative flex flex-col items-center md:items-start w-full md:w-1/4">
+                                    <div className="relative flex flex-col items-center">
                                         <img
-                                            src={item.imageUrl}
+                                            src={
+                                                item.imageUrl === undefined
+                                                    ? "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"
+                                                    : item.imageUrl
+                                            }
                                             alt={`${item.firstName} ${item.lastName}`}
-                                            className="w-24 h-24 object-cover rounded-full border-4 border-blue-200 shadow-lg"
-                                            onError={(e) => {
-                                                e.target.onerror = null;
-                                                e.target.src =
-                                                    "https://ui-avatars.com/api/?name=" +
-                                                    encodeURIComponent(
-                                                        `${
-                                                            item.firstName || ""
-                                                        } ${
-                                                            item.lastName || ""
-                                                        }`
-                                                    );
-                                            }}
+                                            className="w-24 h-24 object-cover rounded-full border-4 border-blue-200 shadow-lg "
+                                            // onError={(e) => {
+                                            //     e.target.onerror = null;
+                                            //     e.target.src =
+                                            //         "https://ui-avatars.com/api/?name=" +
+                                            //         encodeURIComponent(
+                                            //             `${
+                                            //                 item.firstName || ""
+                                            //             } ${
+                                            //                 item.lastName || ""
+                                            //             }`
+                                            //         );
+                                            // }}
                                         />
                                         <div
                                             className="absolute -bottom-2 left-1/2 -translate-x-1/2"
