@@ -8,13 +8,11 @@ import {
     Users,
     Bookmark,
     Package,
-    MessageSquare,
     User,
     Key,
     Trash2,
     LogOut,
     ShieldAlert,
-    AlertTriangle,
     Building2,
 } from "lucide-react";
 
@@ -95,12 +93,6 @@ export function AdminSidebar() {
                             label="Manage Companies"
                             to="/admin/companies"
                         />
-                        <NavItem
-                            icon={<MessageSquare size={20} />}
-                            label="Messages"
-                            to="/admin/messages"
-                            badge={4}
-                        />
                     </nav>
                 </div>
                 <div className="mb-6">
@@ -113,12 +105,6 @@ export function AdminSidebar() {
                             label="Manage Packages"
                             to="/admin/packages"
                             active={location.pathname === "/admin/packages"}
-                        />
-                        <NavItem
-                            icon={<AlertTriangle size={20} />}
-                            label="Reports"
-                            to="/admin/report"
-                            active={location.pathname === "/admin/reportreport"}
                         />
                     </nav>
                 </div>

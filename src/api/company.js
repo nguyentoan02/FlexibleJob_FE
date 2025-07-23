@@ -74,6 +74,18 @@ export const updateCompanyApproval = async ({
     return response.data;
 };
 
+export const deleteCompany = async (companyId, token) => {
+    const response = await axios.delete(
+        `${API_URL}/company/admin/${companyId}`,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+    return response.data;
+};
+
 export const getAllPackage = async () => {
     const response = await axios.get(`${API_URL}/packages`);
     return response.data;

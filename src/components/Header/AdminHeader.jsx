@@ -38,3 +38,5 @@ export function AdminHeader({ onMenuClick }) {
         </header>
     );
 }
+
+export default AdminHeader;

@@ -9,6 +9,8 @@ import { EditPackage } from "../pages/EditPackage";
 import ChangePassword from "../pages/ChangePassword";
 import Report from "../pages/Report";
 import ManageCompany from "@/pages/Admin/ManageCompany";
+import CompanyProfile from "../pages/Employer/CompanyProfile";
+import CompanyProfileDetail from "../pages/Admin/CompanyProfileDetail";
 
 export default function AdminRoutes() {
     return (
@@ -25,6 +27,8 @@ export default function AdminRoutes() {
             <Route path="/admin/change-password" element={<ChangePassword />} />
             <Route path="/admin/report" element={<Report />} />
             <Route path="/admin/companies" element={<ManageCompany />} />
+            <Route path="/admin/company/:companyId" element={<CompanyProfile />} />
+            <Route path="/admin/company-profile/:companyId" element={<CompanyProfileDetail />} />
         </Route>
     );
 }

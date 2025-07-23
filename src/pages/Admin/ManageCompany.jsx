@@ -1,9 +1,9 @@
 import AdminLayout from "@/components/Layout/AdminLayout";
 import { useEffect, useState } from "react";
-import { fetchCompanyApprovalStats, fetchCompanyList } from "@/api/company";
+import { fetchCompanyApprovalStats, fetchCompanyList, updateCompanyApproval, deleteCompany } from "@/api/company";
 import { useAuth } from "@/hooks/useAuth";
-import { Filter, MapPin, Search, Building, CheckCircle, Clock, XCircle } from "lucide-react";
-
+import { Filter, MapPin, Search, Building, CheckCircle, Clock, XCircle, Eye, Check, X, Trash2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 
 export default function ManageCompany() {
@@ -94,6 +94,8 @@ export default function ManageCompany() {
       );
     }
   }, [searchTerm, allCompanies]);
+
+  const navigate = useNavigate();
 
   return (
     <AdminLayout>
@@ -263,19 +265,56 @@ export default function ManageCompany() {
                     </td>
                     <td className="px-4 py-4">{company.jobCount ?? 0}</td>
                     <td className="px-4 py-4">
-                      {company.isApproved === false ? (
+                      {company.user?.isBanned === true ? (
+                        <span className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-xs font-medium">Inactive</span>
+                      ) : company.isApproved === false ? (
                         <span className="bg-yellow-100 text-yellow-600 px-3 py-1 rounded-full text-xs font-medium">Pending</span>
                       ) : (
-                        (company.user?.isActive === false || company.user?.isBanned === true) ? (
-                          <span className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-xs font-medium">Inactive</span>
-                        ) : (
-                          <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs font-medium">Active</span>
-                        )
+                        <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs font-medium">Active</span>
                       )}
                     </td>
                     <td className="px-4 py-4 flex gap-3">
-                      <button className="text-blue-500 hover:bg-blue-50 p-2 rounded" title="View">View</button>
-                      <button className="text-green-500 hover:bg-green-50 p-2 rounded" title="Edit">Edit</button>
+                      <button className="text-blue-500 hover:bg-blue-50 p-2 rounded" title="View" onClick={() => navigate(`/admin/company-profile/${company._id}`)}>
+                        <Eye size={20} />
+                      </button>
+                      {company.user?.isBanned ? (
+                        <button className="text-red-500 hover:bg-red-50 p-2 rounded" title="Delete" onClick={async () => {
+                          if (window.confirm('Are you sure you want to delete this company?')) {
+                            try {
+                              await deleteCompany(company._id, token);
+                              window.location.reload();
+                            } catch (error) {
+                              console.error("Error deleting company:", error);
+                              alert("Failed to delete company.");
+                            }
+                          }
+                        }}>
+                          <Trash2 size={20} />
+                        </button>
+                      ) : (
+                        <>
+                          <button
+                            className="text-green-500 hover:bg-green-50 p-2 rounded"
+                            title="Approve"
+                            onClick={async () => {
+                              await updateCompanyApproval({ companyId: company._id, isApproved: true, token });
+                              window.location.reload();
+                            }}
+                          >
+                            <Check size={20} />
+                          </button>
+                          <button
+                            className="text-red-500 hover:bg-red-50 p-2 rounded"
+                            title="Reject"
+                            onClick={async () => {
+                              await updateCompanyApproval({ companyId: company._id, isApproved: false, token });
+                              window.location.reload();
+                            }}
+                          >
+                            <X size={20} />
+                          </button>
+                        </>
+                      )}
                     </td>
                   </tr>
                 ))
