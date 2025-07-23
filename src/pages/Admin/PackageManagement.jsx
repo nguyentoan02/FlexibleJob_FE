@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Plus, Trash2, Edit, AlertTriangle } from 'lucide-react'
-import { fetchPackages, deletePackage } from '../api/users'
-import { useAuth } from '../hooks/useAuth'
+import { fetchPackages, deletePackage } from "../../api/users";
+import { useAuth } from "../../hooks/useAuth";
 import { useNavigate } from 'react-router-dom'
 import AdminLayout from '@/components/Layout/AdminLayout'
 import { Button } from '@/components/ui/button'
@@ -218,4 +218,6 @@ export function PackageManagement() {
       </div>
     </AdminLayout>
   )
-} 
+}
+
+export default PackageManagement; 

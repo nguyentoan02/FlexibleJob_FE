@@ -60,3 +60,27 @@ export const deletePackage = async (token, packageId) => {
   });
   return res.data;
 };
+
+export const fetchTotalUsers = async (token) => {
+  const res = await axios.get(`${API_URL}/users/total-users`, 
+    token ? { headers: { Authorization: `Bearer ${token}` } } : {});
+  return res.data.total || res.data;
+};
+
+export const fetchTotalEmployers = async (token) => {
+  const res = await axios.get(`${API_URL}/users/total-employers`, 
+    token ? { headers: { Authorization: `Bearer ${token}` } } : {});
+  return res.data.total || res.data;
+};
+
+export const fetchTotalJobseekers = async (token) => {
+  const res = await axios.get(`${API_URL}/users/total-jobseekers`, 
+    token ? { headers: { Authorization: `Bearer ${token}` } } : {});
+  return res.data.total || res.data;
+};
+
+export const fetchTotalCompanies = async (token) => {
+  const res = await axios.get(`${API_URL}/users/total-companies`, 
+    token ? { headers: { Authorization: `Bearer ${token}` } } : {});
+  return res.data.total || res.data;
+};

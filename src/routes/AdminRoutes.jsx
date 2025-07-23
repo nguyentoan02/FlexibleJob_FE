@@ -1,15 +1,16 @@
 import { Route } from "react-router-dom";
 import PrivateRoute from "../components/PrivateRoute";
-import AdminPage from "../pages/HomeEmployer/AdminPage";
-import AdminUsers from "../pages/AdminUsers";
-import AdminProfilePage from "../pages/AdminProfile/AdminProfilePage";
-import { PackageManagement } from "../pages/PackageManagement";
-import { CreatePackage } from "../pages/CreatePackage";
-import { EditPackage } from "../pages/EditPackage";
+import AdminPage from "../pages/Admin/AdminPage";
+import AdminUsers from "../pages/Admin/AdminUsers";
+import AdminProfilePage from "../pages/Admin/AdminProfilePage";
+import PackageManagement from "../pages/Admin/PackageManagement";
+import CreatePackage from "../pages/Admin/CreatePackage";
+import EditPackage from "../pages/Admin/EditPackage";
 import ChangePassword from "../pages/ChangePassword";
-import Report from "../pages/Report";
+import Report from "../pages/Admin/Report";
 import ManageJob from "../pages/ManageJob";
 import ManageCompany from "../pages/ManageCompany";
+import Message from "../pages/Admin/Message";
 
 export default function AdminRoutes() {
     return (
@@ -27,6 +28,7 @@ export default function AdminRoutes() {
             <Route path="/admin/report" element={<Report />} />
             <Route path="/admin/jobs" element={<ManageJob />} />
             <Route path="/admin/companies" element={<ManageCompany />} />
+            <Route path="/admin/messages" element={<Message />} />
         </Route>
     );
 }

@@ -17,3 +17,8 @@ export const createPaymentLink = async (packageId, token) => {
     );
     return response.data;
 };
+
+export const fetchRevenue = async (token) => {
+  const res = await axios.get(`${API_URL}/payments/revenue`, token ? { headers: { Authorization: `Bearer ${token}` } } : {});
+  return res.data.revenue || res.data;
+};
