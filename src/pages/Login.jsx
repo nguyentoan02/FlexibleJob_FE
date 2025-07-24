@@ -14,32 +14,14 @@ export default function LoginEm() {
     const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false);
 
-    // const mutation = useMutation({
-    //     mutationFn: loginApi(form),
-    //     onSuccess: (data) => {
-    //         login(data.token);
-    //         const payload = JSON.parse(atob(data.token.split(".")[1]));
-    //         // navigate(
-    //         //     payload.role === "ADMIN"
-    //         //         ? "/admin/dashboard"
-    //         //         : "/user/dashboard"
-    //         // );
-    //         alert(payload);
-    //     },
-    //     onError: () => alert("Login failed"),
-    // });
-
     const handleLogin = (e) => {
         e.preventDefault();
         loginApi(form)
             .then((res) => {
-                console.log(res);
                 login(res.payload);
                 setMessage(res.message);
             })
             .catch((err) => {
-                console.log(err);
-                console.log(err.response.data.message);
                 setMessage(err.response.data.message);
             })
             .finally(() => {

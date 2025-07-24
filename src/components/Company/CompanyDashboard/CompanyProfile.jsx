@@ -61,7 +61,52 @@ const CompanyProfile = () => {
         },
     });
 
+    const validateForm = () => {
+        const errors = {};
+
+        if (!companyData.companyName.trim())
+            errors.companyName = "Company name is required";
+        if (!companyData.industry.trim())
+            errors.industry = "Industry is required";
+        if (!companyData.phone.trim()) errors.phone = "Phone is required";
+        if (!companyData.email.trim()) errors.email = "Email is required";
+        else if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(companyData.email))
+            errors.email = "Invalid email format";
+        if (!companyData.companySize)
+            errors.companySize = "Company size is required";
+        if (!companyData.location.trim())
+            errors.location = "Location is required";
+        if (!companyData.address.trim()) errors.address = "Address is required";
+        if (!companyData.aboutUs.trim())
+            errors.aboutUs = "About Us is required";
+        if (!companyData.imageUrl) errors.imageUrl = "Company logo is required";
+        // if (
+        //     companyData.website &&
+        //     !/^https?:\/\/.+\..+/.test(companyData.website)
+        // )
+        //     errors.website = "Invalid website URL";
+        // if (
+        //     companyData.linkedinUrl &&
+        //     !/^https?:\/\/.+\..+/.test(companyData.linkedinUrl)
+        // )
+        //     errors.linkedinUrl = "Invalid LinkedIn URL";
+        // if (
+        //     companyData.facebookUrl &&
+        //     !/^https?:\/\/.+\..+/.test(companyData.facebookUrl)
+        // )
+        //     errors.facebookUrl = "Invalid Facebook URL";
+        // Thêm các validate khác nếu cần
+
+        return errors;
+    };
+
+    const [formErrors, setFormErrors] = useState({});
+
     const handleSaveChanges = () => {
+        const errors = validateForm();
+        setFormErrors(errors);
+        if (Object.keys(errors).length > 0) return;
+
         updateCompanyProfile.mutate(
             {
                 ...companyData,
@@ -194,6 +239,11 @@ const CompanyProfile = () => {
                             onChange={(e) => handleImageUpload(e, "imageUrl")}
                             className="text-sm"
                         />
+                        {formErrors.imageUrl && (
+                            <div className="text-red-500 text-xs mt-1">
+                                {formErrors.imageUrl}
+                            </div>
+                        )}
                         <div className="w-full">
                             <label className="block font-medium">Email</label>
                             <input
@@ -276,6 +326,11 @@ const CompanyProfile = () => {
                                 onChange={handleInputChange}
                                 className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
                             />
+                            {formErrors.companyName && (
+                                <div className="text-red-500 text-xs mt-1">
+                                    {formErrors.companyName}
+                                </div>
+                            )}
                         </div>
 
                         <div>
@@ -289,6 +344,11 @@ const CompanyProfile = () => {
                                 onChange={handleInputChange}
                                 className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
                             />
+                            {formErrors.industry && (
+                                <div className="text-red-500 text-xs mt-1">
+                                    {formErrors.industry}
+                                </div>
+                            )}
                         </div>
 
                         <div>
@@ -302,6 +362,11 @@ const CompanyProfile = () => {
                                 onChange={handleInputChange}
                                 className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
                             />
+                            {formErrors.phone && (
+                                <div className="text-red-500 text-xs mt-1">
+                                    {formErrors.phone}
+                                </div>
+                            )}
                         </div>
 
                         <div>
@@ -310,10 +375,16 @@ const CompanyProfile = () => {
                             </label>
                             <input
                                 type="email"
+                                name="email"
                                 value={companyData.email}
-                                disabled
-                                className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 text-sm bg-gray-100"
+                                onChange={handleInputChange}
+                                className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
                             />
+                            {formErrors.email && (
+                                <div className="text-red-500 text-xs mt-1">
+                                    {formErrors.email}
+                                </div>
+                            )}
                         </div>
 
                         <div>
@@ -336,6 +407,11 @@ const CompanyProfile = () => {
                                 <option value="51-100">51-100</option>
                                 <option value="100+">100+</option>
                             </select>
+                            {formErrors.companySize && (
+                                <div className="text-red-500 text-xs mt-1">
+                                    {formErrors.companySize}
+                                </div>
+                            )}
                         </div>
 
                         <div>
@@ -349,6 +425,11 @@ const CompanyProfile = () => {
                                 onChange={handleInputChange}
                                 className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
                             />
+                            {formErrors.address && (
+                                <div className="text-red-500 text-xs mt-1">
+                                    {formErrors.address}
+                                </div>
+                            )}
                         </div>
 
                         {/* Add more fields as needed */}
@@ -364,6 +445,11 @@ const CompanyProfile = () => {
                                 onChange={handleInputChange}
                                 className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
                             />
+                            {formErrors.aboutUs && (
+                                <div className="text-red-500 text-xs mt-1">
+                                    {formErrors.aboutUs}
+                                </div>
+                            )}
                         </div>
 
                         {/* Album Images */}

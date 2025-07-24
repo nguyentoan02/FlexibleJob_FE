@@ -60,3 +60,42 @@ export const fetchApplicantsByJobId = async (jId, token) => {
     });
     return response.data;
 };
+
+export const changeApplicationStatus = async (appId, token, action, note) => {
+    const response = await axios.patch(
+        `${API_URL}/applications/changeStatus/${appId}`,
+        { note },
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            params: { action: action },
+        }
+    );
+    return response.data;
+};
+
+export const getJobLimitation = async (token) => {
+    const response = await axios.get(`${API_URL}/manageJobs/limit`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+    return response.data;
+};
+
+/**
+ * Gửi yêu cầu phân tích các ứng viên của một job bằng AI.
+ * @param {string} jobId - ID của công việc.
+ * @param {string} token - JWT token để xác thực.
+ * @returns {Promise<object>} - Payload chứa kết quả phân tích từ AI.
+ */
+export const analyzeJobApplicants = async (jobId, token) => {
+    const response = await axios.get(
+        `${API_URL}/applications/analyze/${jobId}`,
+        {
+            headers: { Authorization: `Bearer ${token}` },
+        }
+    );
+    return response.data.payload; // Trả về payload chứa ranking
+};

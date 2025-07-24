@@ -6,10 +6,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useCVProfile } from "@/hooks/cvprofile";
 import { useNavigate } from "react-router-dom";
+import NotificationBell from "../Notification/NotificationBell"; // Add this import
 import { useState } from "react";
 import { Menu, X } from "lucide-react"; // Hamburger and close icons
-import { useCVProfile } from "@/hooks/cvprofile";
 import { Heart } from "lucide-react"; // Import Heart icon
 import { ChevronDown, ChevronUp } from "lucide-react"; // Add these imports
 export default function HeaderJobseeker() {
@@ -24,26 +25,17 @@ export default function HeaderJobseeker() {
         navigate("/");
     };
     const menuItems = [
-        { label: "Home", subItems: [] },
+        { label: "Home", to: "/", subItems: [] },
         {
             label: "Jobs",
-            to: "/jobs", // Thêm đường dẫn trực tiếp
+            to: "/jobs",
             subItems: [],
         },
         {
             label: "Recruiters",
-            subItems: ["Recruiter List", "Recruiter Details"],
+            to: "/company-public", // Thêm đường dẫn tới Company List
+            subItems: [],
         },
-        {
-            label: "Candidates",
-            subItems: ["Candidate List", "Candidate Details"],
-        },
-        { label: "Pages", subItems: ["About Us", "Contact Us"] },
-        {
-            label: "Blog",
-            subItems: ["Blog Grid", "Blog Grid 2", "Blog Single"],
-        },
-        { label: "Contact", subItems: [] },
     ];
 
     return (
@@ -117,68 +109,43 @@ export default function HeaderJobseeker() {
                 <div className="hidden md:flex items-center space-x-4">
                     {user ? (
                         <>
+                            <NotificationBell />
                             <div className="relative">
-                                <button
+                                <Button
                                     onClick={() =>
                                         setIsDropdownOpen(!isDropdownOpen)
                                     }
-                                    className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 focus:outline-none"
+                                    className="flex items-center gap-2 bg-white border border-gray-200 shadow-sm rounded-lg px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition focus:outline-none"
+                                    style={{
+                                        minWidth: 220,
+                                        justifyContent: "space-between",
+                                    }}
                                 >
-                                    <span>
+                                    <span className="truncate text-base">
                                         Welcome,{" "}
-                                        <strong>{user.username}</strong>
+                                        <strong className="font-semibold">
+                                            {user.username}
+                                        </strong>
                                     </span>
                                     {isDropdownOpen ? (
                                         <ChevronUp className="w-4 h-4" />
                                     ) : (
                                         <ChevronDown className="w-4 h-4" />
                                     )}
-                                </button>
+                                </Button>
 
                                 {isDropdownOpen && (
-                                    <div
-                                        className="fixed right-4 top-16 w-56 bg-white rounded-md shadow-lg py-1 z-50"
-                                        // Có thể điều chỉnh top/right nếu muốn
-                                    >
-                                        {cvData?.payload ? (
-                                            <Link
-                                                to={`/cvprofile/update/${cvData.payload._id}`}
-                                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                            >
-                                                Update CV
-                                            </Link>
-                                        ) : (
-                                            <Link
-                                                to="/cvprofile/create"
-                                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                            >
-                                                Create CV
-                                            </Link>
-                                        )}
+                                    <div className="absolute right-0 mt-2 w-60 bg-white rounded-xl shadow-lg py-2 z-50 border border-gray-100">
                                         <Link
-                                            to="/cvprofile"
-                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                            to="/user/dashboard"
+                                            className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition text-sm"
                                         >
-                                            View CV Profile
-                                        </Link>
-                                        <Link
-                                            to="/my-applications"
-                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                        >
-                                            My Applications
-                                        </Link>
-                                        <Link
-                                            to="/favorite-jobs"
-                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                        >
-                                            <div className="flex items-center">
-                                                <Heart className="h-4 w-4 mr-2" />
-                                                Favorite Jobs
-                                            </div>
+                                            <Heart className="h-4 w-4 text-pink-500" />
+                                            Dashboard Jobseeker
                                         </Link>
                                         <button
                                             onClick={handleLogout}
-                                            className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                                            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition"
                                         >
                                             Logout
                                         </button>
@@ -215,9 +182,19 @@ export default function HeaderJobseeker() {
                     <nav className="flex flex-col space-y-4">
                         {menuItems.map((item, index) => (
                             <div key={index}>
-                                <div className="text-gray-700 font-medium">
-                                    {item.label}
-                                </div>
+                                {item.to ? (
+                                    <Link
+                                        to={item.to}
+                                        className="text-gray-700 font-medium hover:text-blue-600"
+                                        onClick={() => setMobileMenuOpen(false)}
+                                    >
+                                        {item.label}
+                                    </Link>
+                                ) : (
+                                    <div className="text-gray-700 font-medium">
+                                        {item.label}
+                                    </div>
+                                )}
                                 {item.subItems.length > 0 && (
                                     <ul className="ml-4 mt-1 space-y-1">
                                         {item.subItems.map(

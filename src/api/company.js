@@ -35,3 +35,90 @@ export const updateCompanyProfile = async (formData, token) => {
     });
     return response.data;
 };
+
+export const getCompanyApproval = async (token) => {
+    const response = await axios.get(`${API_URL}/company/isCompanyApproved`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+    return response.data;
+};
+
+export const getPendingCompanies = async (token) => {
+    const response = await axios.get(
+        `${API_URL}/company/admin/pending-approvals`,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+    return response.data;
+};
+
+export const updateCompanyApproval = async ({
+    companyId,
+    isApproved,
+    token,
+}) => {
+    const response = await axios.patch(
+        `${API_URL}/company/admin/approve/${companyId}`,
+        { isApproved },
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+    return response.data;
+};
+
+export const getAllPackage = async () => {
+    const response = await axios.get(`${API_URL}/packages`);
+    return response.data;
+};
+
+export const getJobStats = async (token) => {
+    const response = await axios.get(`${API_URL}/company/stats/job`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+    return response.data;
+};
+
+export const getInVoices = async (token) => {
+    const response = await axios.get(`${API_URL}/company/stats/invoices`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+    return response.data;
+};
+
+export const CompanyStats = async (token, metric, range) => {
+    const response = await axios.get(`${API_URL}/company/stats/timeseries`, {
+        params: {
+            metric,
+            range,
+        },
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+    return response.data;
+};
+
+export const unExpireJob = async (token, expireDate, jobId) => {
+    const response = await axios.put(
+        `${API_URL}/manageJobs/expireJob/${jobId}`,
+        { expireDate },
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+    return response.data;
+};

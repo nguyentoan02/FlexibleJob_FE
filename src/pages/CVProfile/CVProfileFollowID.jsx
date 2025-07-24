@@ -1,42 +1,49 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useState } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MapPin, Mail, Phone } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth"; // Assuming you have a useAuth hook
+import { useMutation } from "@tanstack/react-query";
+import { changeApplicationStatus } from "../../api/job";
+import { useAuth } from "../../hooks/useAuth";
 
-export default function CVProfileFollowID({ profile }) {
-    const { token } = useAuth(); // Retrieve the token from your auth context
-    const [error, setError] = useState(null);
+export default function CVProfileFollowID({ profile, onStatusChange }) {
+    const [error] = useState(null);
+    const { token } = useAuth();
+    const [toast, setToast] = useState({ open: false, message: "", type: "" });
+    const [confirmModal, setConfirmModal] = useState({
+        open: false,
+        action: null,
+    });
+    const [note, setNote] = useState("");
 
-    // useEffect(() => {
-    //     const fetchCVProfile = async () => {
-    //         try {
-    //             const response = await axios.get(
-    //                 `${import.meta.env.VITE_API_URL}/company/${id}/details`,
-    //                 {
-    //                     headers: {
-    //                         Authorization: `Bearer ${token}`, // Include the token in the request
-    //                     },
-    //                 }
-    //             );
-    //             setProfile(response.data.payload);
-    //         } catch (err) {
-    //             setError(
-    //                 err.response?.data?.message || "Failed to fetch CV Profile"
-    //             );
-    //         } finally {
-    //             setLoading(false);
-    //         }
-    //     };
+    const applicationMutation = useMutation({
+        mutationFn: (action) =>
+            changeApplicationStatus(profile._id, token, action, note),
+        onSuccess: () => {
+            setToast({
+                open: true,
+                message: "Update status successfully!",
+                type: "success",
+            });
+            if (onStatusChange) onStatusChange();
+        },
+        onError: () => {
+            setToast({
+                open: true,
+                message: "Failed to update status!",
+                type: "error",
+            });
+        },
+    });
 
-    //     if (token) {
-    //         fetchCVProfile();
-    //     } else {
-    //         setError("No token provided");
-    //         setLoading(false);
-    //     }
-    // }, [id, token]);
+    const handleConfirm = (action) => {
+        setConfirmModal({ open: true, action });
+    };
+
+    const handleAction = () => {
+        setConfirmModal({ open: false, action: null });
+        applicationMutation.mutate(confirmModal.action);
+    };
 
     if (error) {
         return (
@@ -67,7 +74,7 @@ export default function CVProfileFollowID({ profile }) {
                                     {`${profile.user?.firstName} ${profile.user?.lastName}`}
                                 </h1>
                                 <p className="text-gray-600">
-                                    {profile.cv.description}
+                                    {profile.cvSnapshot.description}
                                 </p>
                             </div>
                         </div>
@@ -77,16 +84,16 @@ export default function CVProfileFollowID({ profile }) {
                             <div className="flex flex-wrap gap-4">
                                 <div className="flex items-center text-gray-600">
                                     <MapPin className="w-5 h-5 mr-2" />
-                                    {profile.cv.experience?.[0]?.location ||
-                                        "Not specified"}
+                                    {profile.cvSnapshot.experience?.[0]
+                                        ?.location || "Not specified"}
                                 </div>
                                 <div className="flex items-center text-gray-600">
                                     <Mail className="w-5 h-5 mr-2" />
-                                    {profile.cv.user?.email}
+                                    {profile.cvSnapshot.user?.email}
                                 </div>
                                 <div className="flex items-center text-gray-600">
                                     <Phone className="w-5 h-5 mr-2" />
-                                    {profile.cv.number}
+                                    {profile.cvSnapshot.number}
                                 </div>
                             </div>
 
@@ -95,14 +102,16 @@ export default function CVProfileFollowID({ profile }) {
                                     Skills
                                 </h3>
                                 <div className="flex flex-wrap gap-2">
-                                    {profile.cv.skills?.map((skill, index) => (
-                                        <span
-                                            key={index}
-                                            className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium"
-                                        >
-                                            {skill}
-                                        </span>
-                                    ))}
+                                    {profile.cvSnapshot.skills?.map(
+                                        (skill, index) => (
+                                            <span
+                                                key={index}
+                                                className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium"
+                                            >
+                                                {skill}
+                                            </span>
+                                        )
+                                    )}
                                 </div>
                             </div>
 
@@ -110,7 +119,7 @@ export default function CVProfileFollowID({ profile }) {
                                 <h3 className="text-lg font-semibold">
                                     Education
                                 </h3>
-                                {profile.cv.education?.map((edu) => (
+                                {profile.cvSnapshot.education?.map((edu) => (
                                     <div
                                         key={edu._id}
                                         className="border-b pb-4 mb-4"
@@ -131,7 +140,7 @@ export default function CVProfileFollowID({ profile }) {
                                 <h3 className="text-lg font-semibold">
                                     Experience
                                 </h3>
-                                {profile.cv.experience?.map((exp) => (
+                                {profile.cvSnapshot.experience?.map((exp) => (
                                     <div
                                         key={exp._id}
                                         className="border-b pb-4 mb-4"
@@ -156,23 +165,90 @@ export default function CVProfileFollowID({ profile }) {
                                     Certifications
                                 </h3>
                                 <p>
-                                    {profile.cv.certifications ||
+                                    {profile.cvSnapshot.certifications ||
                                         "No certifications listed."}
                                 </p>
                             </div>
-
-                            <Button
-                                className="bg-green-500 hover:bg-green-600 text-white"
-                                onClick={() =>
-                                    window.open(profile.cv.linkUrl, "_blank")
-                                }
-                            >
-                                Download Resume
-                            </Button>
+                            <div className="flex gap-5">
+                                <Button
+                                    className="bg-green-500 hover:bg-green-600 text-white"
+                                    onClick={() => handleConfirm("HIRED")}
+                                    disabled={applicationMutation.isPending}
+                                >
+                                    Accept
+                                </Button>
+                                <Button
+                                    className="bg-red-500 hover:bg-red-600 text-white"
+                                    onClick={() => handleConfirm("REJECTED")}
+                                    disabled={applicationMutation.isPending}
+                                >
+                                    Reject
+                                </Button>
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
             </div>
+            {confirmModal.open && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+                    <div className="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full">
+                        <h2 className="text-lg font-semibold mb-4 text-gray-800">
+                            {confirmModal.action === "HIRED"
+                                ? "Accept Applicant"
+                                : "Reject Applicant"}
+                        </h2>
+                        <label className="block mb-2 text-gray-700 font-medium">
+                            Reason (optional)
+                        </label>
+                        <textarea
+                            className="w-full border rounded p-2 mb-4"
+                            rows={3}
+                            value={note}
+                            onChange={(e) => setNote(e.target.value)}
+                            placeholder="Enter reason..."
+                        />
+                        <div className="flex justify-end gap-3">
+                            <button
+                                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                                onClick={() =>
+                                    setConfirmModal({
+                                        open: false,
+                                        action: null,
+                                    })
+                                }
+                                disabled={applicationMutation.isPending}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                className={`px-4 py-2 rounded text-white ${
+                                    confirmModal.action === "HIRED"
+                                        ? "bg-green-600 hover:bg-green-700"
+                                        : "bg-red-600 hover:bg-red-700"
+                                }`}
+                                onClick={handleAction}
+                                disabled={applicationMutation.isPending}
+                            >
+                                Confirm
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {toast.open && (
+                <div
+                    className={`fixed top-6 right-6 z-50 px-6 py-3 rounded shadow-lg text-white transition-all
+        ${toast.type === "success" ? "bg-green-500" : "bg-red-500"}`}
+                >
+                    {toast.message}
+                    <button
+                        className="ml-4 text-white font-bold"
+                        onClick={() => setToast({ ...toast, open: false })}
+                    >
+                        ×
+                    </button>
+                </div>
+            )}
         </div>
     );
 }

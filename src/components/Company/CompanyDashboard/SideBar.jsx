@@ -7,6 +7,7 @@ import {
     BookOutlined,
     GiftOutlined,
     MessageOutlined,
+    BellOutlined, // Import Bell icon
     UserOutlined,
     LockOutlined,
     DeleteOutlined,
@@ -16,12 +17,16 @@ import {
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import SideBarItem from "./SideBarItem";
+import { useAuth } from "../../../hooks/useAuth";
 
-const SideBar = () => {
+const SideBar = ({ isCreate }) => {
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
-    const [action, setActions] = useState("DASHBOARD");
+    const [action, setActions] = useState(
+        `${isCreate ? "PROFILE" : "DASHBOARD"}`
+    );
     const sidebarRef = useRef();
+    const { logout } = useAuth();
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -66,55 +71,79 @@ const SideBar = () => {
                     Main Navigation
                 </h2>
                 <ul>
-                    <SideBarItem
-                        icon={<DashboardOutlined />}
-                        label="Dashboard"
-                        active={action === "DASHBOARD"}
-                        onClick={() => {
-                            navigate("");
-                            setActions("DASHBOARD");
-                        }}
-                    />
-                    <SideBarItem
-                        icon={<PlusOutlined />}
-                        label="Post New Job"
-                        active={action === "ADDJOBS"}
-                        onClick={() => {
-                            navigate("addJob");
-                            setActions("ADDJOBS");
-                        }}
-                    />
-                    <SideBarItem
-                        icon={<FileDoneOutlined />}
-                        label="Manage Jobs"
-                        active={action === "MANAGEJOBS"}
-                        onClick={() => {
-                            navigate("manageJob");
-                            setActions("MANAGEJOBS");
-                        }}
-                    />
-                    <SideBarItem
-                        icon={<UsergroupAddOutlined />}
-                        label="Manage Applicants"
-                        onClick={() => {}}
-                    />
-                    <SideBarItem
-                        icon={<BookOutlined />}
-                        label="Bookmark Resumes"
-                        badge={4}
-                        onClick={() => {}}
-                    />
-                    <SideBarItem
-                        icon={<GiftOutlined />}
-                        label="Packages"
-                        onClick={() => {}}
-                    />
-                    <SideBarItem
-                        icon={<MessageOutlined />}
-                        label="Messages"
-                        badge={4}
-                        onClick={() => {}}
-                    />
+                    {!isCreate && (
+                        <>
+                            <SideBarItem
+                                icon={<DashboardOutlined />}
+                                label="Dashboard"
+                                active={action === "DASHBOARD"}
+                                onClick={() => {
+                                    navigate("");
+                                    setActions("DASHBOARD");
+                                }}
+                            />
+                            <SideBarItem
+                                icon={<PlusOutlined />}
+                                label="Post New Job"
+                                active={action === "ADDJOBS"}
+                                onClick={() => {
+                                    navigate("addJob");
+                                    setActions("ADDJOBS");
+                                }}
+                            />
+                            <SideBarItem
+                                icon={<FileDoneOutlined />}
+                                label="Manage Jobs"
+                                active={action === "MANAGEJOBS"}
+                                onClick={() => {
+                                    navigate("manageJob");
+                                    setActions("MANAGEJOBS");
+                                }}
+                            />
+                            <SideBarItem
+                                icon={<UsergroupAddOutlined />}
+                                label="Manage Applicants"
+                                active={action === "MANAGEAPPLICATION"}
+                                onClick={() => {
+                                    navigate("manageApplication");
+                                    setActions("MANAGEAPPLICATION");
+                                }}
+                            />
+                            <SideBarItem
+                                icon={<BookOutlined />}
+                                label="Bookmark Resumes"
+                                badge={4}
+                                onClick={() => {}}
+                            />
+                            <SideBarItem
+                                icon={<GiftOutlined />}
+                                label="Packages"
+                                active={action === "PACKAGES"}
+                                onClick={() => {
+                                    navigate("viewCompanyPackage");
+                                    setActions("PACKAGES");
+                                }}
+                            />
+                            <SideBarItem
+                                icon={<MessageOutlined />}
+                                label="Messages"
+                                active={action === "MESSAGES"}
+                                onClick={() => {
+                                    navigate("chat");
+                                    setActions("MESSAGES");
+                                }}
+                            />
+                            <SideBarItem
+                                icon={<BellOutlined />}
+                                label="Notifications"
+                                active={action === "NOTIFICATIONS"}
+                                onClick={() => {
+                                    // navigate("notifications"); // You can create this route
+                                    setActions("NOTIFICATIONS");
+                                }}
+                            />
+                        </>
+                    )}
                 </ul>
 
                 <h2 className="ps-6 text-sm font-semibold text-gray-800 uppercase mt-6 mb-4">
@@ -125,7 +154,7 @@ const SideBar = () => {
                         icon={<UserOutlined />}
                         label="My Profile"
                         onClick={() => {
-                            navigate("profile");
+                            navigate(`${isCreate ? "" : "profile"}`);
                             setActions("PROFILE");
                         }}
                         active={action === "PROFILE"}
@@ -143,7 +172,10 @@ const SideBar = () => {
                     <SideBarItem
                         icon={<PoweroffOutlined />}
                         label="Log Out"
-                        onClick={() => {}}
+                        onClick={() => {
+                            logout();
+                            navigate("/login");
+                        }}
                     />
                 </ul>
             </div>
