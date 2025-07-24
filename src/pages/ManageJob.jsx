@@ -73,6 +73,8 @@ export default function ManageJob() {
     const queryClient = useQueryClient();
     const [selectedJobId, setSelectedJobId] = useState(null);
     const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+    const [showReportModal, setShowReportModal] = useState(false);
+    const [selectedReports, setSelectedReports] = useState([]);
     const { user, token } = useAuth();
 
     // Query jobs
@@ -250,6 +252,7 @@ export default function ManageJob() {
                                         Title
                                     </TableHead>
                                     <TableHead>Company</TableHead>
+                                    <TableHead>Reports</TableHead>
                                     <TableHead>Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -259,6 +262,32 @@ export default function ManageJob() {
                                         <TableCell>{job.title}</TableCell>
                                         <TableCell>
                                             {job.company?.companyName}
+                                        </TableCell>
+                                        <TableCell>
+                                            {job.reports &&
+                                            job.reports.length > 0 ? (
+                                                <>
+                                                    <span className="font-bold text-red-600 mr-2">
+                                                        {job.reports.length}
+                                                    </span>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        onClick={() => {
+                                                            setSelectedReports(
+                                                                job.reports
+                                                            );
+                                                            setShowReportModal(
+                                                                true
+                                                            );
+                                                        }}
+                                                    >
+                                                        View
+                                                    </Button>
+                                                </>
+                                            ) : (
+                                                <span>0</span>
+                                            )}
                                         </TableCell>
                                         <TableCell>
                                             {activeTab === "active" ? (
@@ -335,6 +364,49 @@ export default function ManageJob() {
                                 {hideJobMutation.isLoading
                                     ? "Hiding..."
                                     : "Hide"}
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+
+                {/* Report Modal */}
+                <Dialog
+                    open={showReportModal}
+                    onOpenChange={setShowReportModal}
+                >
+                    <DialogContent className="max-w-md">
+                        <DialogHeader>
+                            <DialogTitle>
+                                Reports ({selectedReports.length})
+                            </DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-2">
+                            {selectedReports.map((report, idx) => (
+                                <div
+                                    key={report._id || idx}
+                                    className="border rounded p-2 bg-gray-50"
+                                >
+                                    <div className="font-semibold">
+                                        Lý do: {report.reason}
+                                    </div>
+                                    {report.reportedAt && (
+                                        <div className="text-xs text-gray-500">
+                                            Ngày báo cáo:{" "}
+                                            {new Date(
+                                                report.reportedAt
+                                            ).toLocaleString()}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                        <DialogFooter>
+                            <Button
+                                type="button"
+                                variant="secondary"
+                                onClick={() => setShowReportModal(false)}
+                            >
+                                Close
                             </Button>
                         </DialogFooter>
                     </DialogContent>
