@@ -24,7 +24,7 @@ const ApplicationTable = ({ data, isLoading, onViewProfile }) => {
                             "Job Title",
                             "Status",
                             "Applied At",
-                            "CV PDF",
+
                             "Note",
                         ].map((h) => (
                             <th
@@ -75,9 +75,7 @@ const ApplicationTable = ({ data, isLoading, onViewProfile }) => {
                     <th className="border px-4 py-2 bg-blue-50 text-blue-700">
                         Applied At
                     </th>
-                    <th className="border px-4 py-2 bg-blue-50 text-blue-700">
-                        CV PDF
-                    </th>
+
                     <th className="border px-4 py-2 bg-blue-50 text-blue-700">
                         Note
                     </th>
@@ -130,18 +128,7 @@ const ApplicationTable = ({ data, isLoading, onViewProfile }) => {
                         <td className="border px-4 py-2">
                             {new Date(app.createdAt).toLocaleDateString()}
                         </td>
-                        <td className="border px-4 py-2">
-                            {app.cvSnapshot?.linkUrl && (
-                                <a
-                                    href={app.cvSnapshot.linkUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-blue-600 underline"
-                                >
-                                    View PDF
-                                </a>
-                            )}
-                        </td>
+
                         <td className="border px-4 py-2">
                             {app.noted || (
                                 <span className="text-gray-400">-</span>

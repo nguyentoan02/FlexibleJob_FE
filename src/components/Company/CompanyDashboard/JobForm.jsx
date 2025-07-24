@@ -392,7 +392,7 @@ const JobForm = ({ handleSubmit, title, initialData, limitData }) => {
                     </div>
                 )}
 
-                <label className="flex items-center space-x-2">
+                {/* <label className="flex items-center space-x-2">
                     <input
                         type="checkbox"
                         name="isRemote"
@@ -400,7 +400,7 @@ const JobForm = ({ handleSubmit, title, initialData, limitData }) => {
                         onChange={handleChange}
                     />
                     <span>Remote?</span>
-                </label>
+                </label> */}
 
                 <div className="grid grid-cols-3 gap-4">
                     <input
