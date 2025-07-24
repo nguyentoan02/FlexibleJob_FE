@@ -27,11 +27,11 @@ export const useMyCompany = () => {
             Object.keys(data).forEach((key) => {
                 if (
                     key !== "albumImage" &&
-                    key !== "imageUrl" &&
+                    key !== "imageUrl" && // loại trừ imageUrl
                     key !== "coverImage" &&
-                    key !== "removeImages" && // Thêm removeImages vào danh sách loại trừ
+                    key !== "removeImages" &&
                     key !== "newAlbumImages" &&
-                    key !== "newProfileImage" &&
+                    key !== "newImageUrl" && // loại trừ newImageUrl
                     key !== "newCoverImage"
                 ) {
                     formData.append(key, data[key]);
@@ -52,9 +52,9 @@ export const useMyCompany = () => {
                 });
             }
 
-            // Handle profile image
-            if (data.newProfileImage) {
-                formData.append("imageUrl", data.newProfileImage);
+            // Chỉ append imageUrl nếu có file mới
+            if (data.newImageUrl) {
+                formData.append("imageUrl", data.newImageUrl);
             }
 
             // Handle cover image

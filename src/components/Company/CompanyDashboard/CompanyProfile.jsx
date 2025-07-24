@@ -154,8 +154,8 @@ const CompanyProfile = () => {
             const file = files[0];
             setCompanyData((prev) => ({
                 ...prev,
-                [`new${field.charAt(0).toUpperCase() + field.slice(1)}`]: file,
-                [field]: URL.createObjectURL(file),
+                newImageUrl: file, // Đúng tên trường backend mong đợi
+                imageUrl: URL.createObjectURL(file),
             }));
         }
     };

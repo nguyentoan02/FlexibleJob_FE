@@ -61,15 +61,31 @@ const ManageJob = () => {
     }, [analysisResult]);
 
     const handleEdit = (job) => {
-        console.log("jobdata", job);
-        setJobdata(job);
+        setJobdata({
+            ...job,
+            category:
+                typeof job.category === "object"
+                    ? job.category._id
+                    : job.category,
+        });
         setEditModal(true);
     };
 
     const handleUpdate = (formData, e) => {
         e.preventDefault();
-        console.log(formData);
-        jobMutaion.mutate(formData);
+        // Nếu category là array object, lấy _id
+        let category = formData.category;
+        if (
+            Array.isArray(category) &&
+            category.length > 0 &&
+            typeof category[0] === "object"
+        ) {
+            category = category.map((c) => c._id);
+            // Nếu chỉ cho phép 1 category, lấy category[0]
+            category = category[0];
+        }
+        const submitData = { ...formData, category };
+        jobMutaion.mutate(submitData);
         setEditModal(false);
     };
 
