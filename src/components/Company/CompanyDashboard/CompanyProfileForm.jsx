@@ -74,14 +74,9 @@ const CreateCompany = () => {
         setError("");
         setToast({ message: "", type: "" });
 
-        // if (!identityImage || identityImage.length === 0) {
-        //     setError("Identity images are required.");
-        //     return;
-        // }
-
         const payload = {
             ...formData,
-            newProfileImage: imageUrl instanceof File ? imageUrl : undefined,
+            newImageUrl: imageUrl instanceof File ? imageUrl : undefined, // Đổi từ newProfileImage thành newImageUrl
             newCoverImage: coverImage instanceof File ? coverImage : undefined,
             newAlbumImages: albumImage.filter((f) => f instanceof File),
             newIdentityImages: identityImage.filter((f) => f instanceof File),
@@ -298,114 +293,280 @@ const CreateCompany = () => {
             </div>
 
             {/* Upload image components */}
-            <div className="my-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Avatar */}
-                <div>
-                    <label className="block text-gray-700 font-medium mb-2">
-                        Avatar Image
-                    </label>
-                    <label className="flex flex-col items-center justify-center border-2 border-dashed border-blue-400 rounded-lg p-4 cursor-pointer hover:bg-blue-50 transition">
-                        <span className="text-blue-600 font-semibold mb-2">
-                            Choose avatar image
-                        </span>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={(e) => {
-                                if (e.target.files && e.target.files[0]) {
-                                    setImageUrl(e.target.files[0]);
-                                }
-                            }}
-                        />
-                        <svg
-                            className="w-8 h-8 text-blue-400 mb-2"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M12 4v16m8-8H4"
-                            />
-                        </svg>
-                        {imageUrl && (
-                            <img
-                                src={URL.createObjectURL(imageUrl)}
-                                alt="preview"
-                                className="mt-2 w-24 h-24 object-cover rounded-full border border-gray-200 shadow"
-                            />
+            <div className="my-8 space-y-8">
+                {/* Avatar và Cover trong cùng một row */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {/* Avatar */}
+                    <div className="space-y-4">
+                        <label className="block text-gray-700 font-medium text-lg">
+                            Avatar Image
+                        </label>
+
+                        {/* Preview current avatar */}
+                        {(MyCompanyProfile.data?.payload?.imageUrl ||
+                            imageUrl) && (
+                            <div className="flex justify-center mb-4">
+                                <div className="relative">
+                                    <img
+                                        src={
+                                            imageUrl
+                                                ? URL.createObjectURL(imageUrl)
+                                                : MyCompanyProfile.data.payload
+                                                      .imageUrl
+                                        }
+                                        alt="Current Avatar"
+                                        className="w-32 h-32 object-cover rounded-full border-4 border-blue-200 shadow-lg"
+                                    />
+                                    {imageUrl && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setImageUrl(null)}
+                                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors"
+                                        >
+                                            ✕
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
                         )}
-                    </label>
-                </div>
-                {/* Avatar preview từ cloud nếu có */}
-                {MyCompanyProfile.data?.payload?.imageUrl && !imageUrl && (
-                    <img
-                        src={MyCompanyProfile.data.payload.imageUrl}
-                        alt="avatar-cloud"
-                        className="mt-2 w-24 h-24 object-cover rounded-full border border-gray-200 shadow"
-                    />
-                )}
-                {/* Cover image */}
-                <div>
-                    <label className="block text-gray-700 font-medium mb-2">
-                        Cover Image
-                    </label>
-                    <label className="flex flex-col items-center justify-center border-2 border-dashed border-blue-400 rounded-lg p-4 cursor-pointer hover:bg-blue-50 transition">
-                        <span className="text-blue-600 font-semibold mb-2">
-                            Choose cover image
-                        </span>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={(e) => {
-                                if (e.target.files && e.target.files[0]) {
-                                    setCoverImage(e.target.files[0]);
-                                }
-                            }}
-                        />
-                        <svg
-                            className="w-8 h-8 text-blue-400 mb-2"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M12 4v16m8-8H4"
+
+                        {/* Upload button */}
+                        <label className="flex flex-col items-center justify-center border-2 border-dashed border-blue-400 rounded-xl p-6 cursor-pointer hover:bg-blue-50 hover:border-blue-500 transition-all duration-200">
+                            <div className="text-center space-y-2">
+                                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
+                                    <svg
+                                        className="w-6 h-6 text-blue-500"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            d="M12 4v16m8-8H4"
+                                        />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <span className="text-blue-600 font-semibold">
+                                        Choose Avatar
+                                    </span>
+                                    <p className="text-gray-500 text-sm mt-1">
+                                        PNG, JPG up to 5MB
+                                    </p>
+                                </div>
+                            </div>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => {
+                                    if (e.target.files && e.target.files[0]) {
+                                        setImageUrl(e.target.files[0]);
+                                    }
+                                }}
                             />
-                        </svg>
-                        {coverImage && (
-                            <img
-                                src={URL.createObjectURL(coverImage)}
-                                alt="preview"
-                                className="mt-2 w-full h-24 object-cover rounded-lg border border-gray-200 shadow"
-                            />
+                        </label>
+                    </div>
+
+                    {/* Cover Image */}
+                    <div className="space-y-4">
+                        <label className="block text-gray-700 font-medium text-lg">
+                            Cover Image
+                        </label>
+
+                        {/* Preview current cover */}
+                        {(MyCompanyProfile.data?.payload?.coverImage ||
+                            coverImage) && (
+                            <div className="mb-4">
+                                <div className="relative">
+                                    <img
+                                        src={
+                                            coverImage
+                                                ? URL.createObjectURL(
+                                                      coverImage
+                                                  )
+                                                : MyCompanyProfile.data.payload
+                                                      .coverImage
+                                        }
+                                        alt="Current Cover"
+                                        className="w-full h-40 object-cover rounded-xl border-2 border-gray-200 shadow-md"
+                                    />
+                                    {coverImage && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setCoverImage(null)}
+                                            className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors"
+                                        >
+                                            ✕
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
                         )}
-                    </label>
+
+                        {/* Upload button */}
+                        <label className="flex flex-col items-center justify-center border-2 border-dashed border-blue-400 rounded-xl p-6 cursor-pointer hover:bg-blue-50 hover:border-blue-500 transition-all duration-200">
+                            <div className="text-center space-y-2">
+                                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
+                                    <svg
+                                        className="w-6 h-6 text-blue-500"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                        />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <span className="text-blue-600 font-semibold">
+                                        Choose Cover Image
+                                    </span>
+                                    <p className="text-gray-500 text-sm mt-1">
+                                        Recommended: 1200x400px
+                                    </p>
+                                </div>
+                            </div>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => {
+                                    if (e.target.files && e.target.files[0]) {
+                                        setCoverImage(e.target.files[0]);
+                                    }
+                                }}
+                            />
+                        </label>
+                    </div>
                 </div>
-                {/* Cover preview từ cloud nếu có */}
-                {MyCompanyProfile.data?.payload?.coverImage && !coverImage && (
-                    <img
-                        src={MyCompanyProfile.data.payload.coverImage}
-                        alt="cover-cloud"
-                        className="mt-2 w-full h-24 object-cover rounded-lg border border-gray-200 shadow"
-                    />
-                )}
-                {/* Album images */}
-                <div className="md:col-span-2">
-                    <label className="block text-gray-700 font-medium mb-2">
+
+                {/* Album Images */}
+                <div className="space-y-4">
+                    <label className="block text-gray-700 font-medium text-lg">
                         Album Images
-                    </label>
-                    <label className="flex flex-col items-center justify-center border-2 border-dashed border-blue-400 rounded-lg p-4 cursor-pointer hover:bg-blue-50 transition">
-                        <span className="text-blue-600 font-semibold mb-2">
-                            Choose multiple album images
+                        <span className="text-gray-500 text-sm font-normal ml-2">
+                            (Multiple images allowed)
                         </span>
+                    </label>
+
+                    {/* Preview existing album images */}
+                    {MyCompanyProfile.data?.payload?.albumImage?.length > 0 && (
+                        <div className="mb-4">
+                            <p className="text-sm text-gray-600 mb-3">
+                                Current Images:
+                            </p>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                                {MyCompanyProfile.data.payload.albumImage
+                                    .filter(
+                                        (url) =>
+                                            !removedImages.albumImage.includes(
+                                                url
+                                            )
+                                    )
+                                    .map((url, idx) => (
+                                        <div
+                                            key={idx}
+                                            className="relative group"
+                                        >
+                                            <img
+                                                src={url}
+                                                alt={`Album ${idx + 1}`}
+                                                className="w-full h-24 object-cover rounded-lg border-2 border-gray-200 shadow-sm group-hover:shadow-md transition-shadow"
+                                            />
+                                            <button
+                                                type="button"
+                                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 hover:bg-red-600 transition-all"
+                                                onClick={() => {
+                                                    setRemovedImages(
+                                                        (prev) => ({
+                                                            ...prev,
+                                                            albumImage: [
+                                                                ...prev.albumImage,
+                                                                url,
+                                                            ],
+                                                        })
+                                                    );
+                                                }}
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                    ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Preview new album images */}
+                    {albumImage.length > 0 && (
+                        <div className="mb-4">
+                            <p className="text-sm text-gray-600 mb-3">
+                                New Images to Upload:
+                            </p>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                                {albumImage.map((file, idx) => (
+                                    <div key={idx} className="relative group">
+                                        <img
+                                            src={URL.createObjectURL(file)}
+                                            alt={`New Album ${idx + 1}`}
+                                            className="w-full h-24 object-cover rounded-lg border-2 border-green-200 shadow-sm group-hover:shadow-md transition-shadow"
+                                        />
+                                        <button
+                                            type="button"
+                                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 hover:bg-red-600 transition-all"
+                                            onClick={() => {
+                                                setAlbumImage((prev) =>
+                                                    prev.filter(
+                                                        (_, i) => i !== idx
+                                                    )
+                                                );
+                                            }}
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Upload button */}
+                    <label className="flex flex-col items-center justify-center border-2 border-dashed border-blue-400 rounded-xl p-8 cursor-pointer hover:bg-blue-50 hover:border-blue-500 transition-all duration-200">
+                        <div className="text-center space-y-3">
+                            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
+                                <svg
+                                    className="w-8 h-8 text-blue-500"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                    />
+                                </svg>
+                            </div>
+                            <div>
+                                <span className="text-blue-600 font-semibold text-lg">
+                                    Add Album Images
+                                </span>
+                                <p className="text-gray-500 text-sm mt-1">
+                                    Select multiple images to showcase your
+                                    company
+                                </p>
+                                <p className="text-gray-400 text-xs">
+                                    PNG, JPG up to 5MB each
+                                </p>
+                            </div>
+                        </div>
                         <input
                             type="file"
                             accept="image/*"
@@ -420,77 +581,135 @@ const CreateCompany = () => {
                                 }
                             }}
                         />
-                        <svg
-                            className="w-8 h-8 text-blue-400 mb-2"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M12 4v16m8-8H4"
-                            />
-                        </svg>
-                        {albumImage && albumImage.length > 0 && (
-                            <div className="flex flex-wrap gap-2 mt-2">
-                                {albumImage.map((file, idx) => (
-                                    <img
-                                        key={idx}
-                                        src={URL.createObjectURL(file)}
-                                        alt={`album-${idx}`}
-                                        className="w-20 h-20 object-cover rounded border border-gray-200 shadow"
-                                    />
-                                ))}
-                            </div>
-                        )}
                     </label>
                 </div>
-                {/* Album preview từ cloud nếu có */}
-                {MyCompanyProfile.data?.payload?.albumImage?.length > 0 &&
-                    albumImage.length === 0 && (
-                        <div className="flex flex-wrap gap-2 mt-2">
-                            {MyCompanyProfile.data.payload.albumImage
-                                .filter(
-                                    (url) =>
-                                        !removedImages.albumImage.includes(url)
-                                )
-                                .map((url, idx) => (
+
+                {/* Identity Images */}
+                <div className="space-y-4">
+                    <label className="block text-gray-700 font-medium text-lg">
+                        Identity Images
+                        <span className="text-red-500">*</span>
+                        <span className="text-gray-500 text-sm font-normal ml-2">
+                            (Business license, certificates, etc.)
+                        </span>
+                    </label>
+
+                    {/* Preview existing identity images */}
+                    {MyCompanyProfile.data?.payload?.identityImage?.length >
+                        0 && (
+                        <div className="mb-4">
+                            <p className="text-sm text-gray-600 mb-3">
+                                Current Documents:
+                            </p>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                                {MyCompanyProfile.data.payload.identityImage
+                                    .filter(
+                                        (url) =>
+                                            !removedImages.identityImage.includes(
+                                                url
+                                            )
+                                    )
+                                    .map((url, idx) => (
+                                        <div
+                                            key={idx}
+                                            className="relative group"
+                                        >
+                                            <img
+                                                src={url}
+                                                alt={`Identity Document ${
+                                                    idx + 1
+                                                }`}
+                                                className="w-full h-32 object-cover rounded-lg border-2 border-gray-200 shadow-sm group-hover:shadow-md transition-shadow"
+                                            />
+                                            <button
+                                                type="button"
+                                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 hover:bg-red-600 transition-all"
+                                                onClick={() => {
+                                                    setRemovedImages(
+                                                        (prev) => ({
+                                                            ...prev,
+                                                            identityImage: [
+                                                                ...prev.identityImage,
+                                                                url,
+                                                            ],
+                                                        })
+                                                    );
+                                                }}
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                    ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Preview new identity images */}
+                    {identityImage.length > 0 && (
+                        <div className="mb-4">
+                            <p className="text-sm text-gray-600 mb-3">
+                                New Documents to Upload:
+                            </p>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                                {identityImage.map((file, idx) => (
                                     <div key={idx} className="relative group">
                                         <img
-                                            src={url}
-                                            alt={`album-cloud-${idx}`}
-                                            className="w-20 h-20 object-cover rounded border border-gray-200 shadow"
+                                            src={URL.createObjectURL(file)}
+                                            alt={`New Identity Document ${
+                                                idx + 1
+                                            }`}
+                                            className="w-full h-32 object-cover rounded-lg border-2 border-green-200 shadow-sm group-hover:shadow-md transition-shadow"
                                         />
                                         <button
                                             type="button"
-                                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 text-xs opacity-80 group-hover:opacity-100"
+                                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 hover:bg-red-600 transition-all"
                                             onClick={() => {
-                                                setRemovedImages((prev) => ({
-                                                    ...prev,
-                                                    albumImage: [
-                                                        ...prev.albumImage,
-                                                        url,
-                                                    ],
-                                                }));
+                                                setIdentityImage((prev) =>
+                                                    prev.filter(
+                                                        (_, i) => i !== idx
+                                                    )
+                                                );
                                             }}
                                         >
                                             ✕
                                         </button>
                                     </div>
                                 ))}
+                            </div>
                         </div>
                     )}
-                {/* Identity images */}
-                <div className="md:col-span-2">
-                    <label className="block text-gray-700 font-medium mb-2">
-                        Identity Images <span className="text-red-500">*</span>
-                    </label>
-                    <label className="flex flex-col items-center justify-center border-2 border-dashed border-blue-400 rounded-lg p-4 cursor-pointer hover:bg-blue-50 transition">
-                        <span className="text-blue-600 font-semibold mb-2">
-                            Choose multiple identity images
-                        </span>
+
+                    {/* Upload button */}
+                    <label className="flex flex-col items-center justify-center border-2 border-dashed border-orange-400 rounded-xl p-8 cursor-pointer hover:bg-orange-50 hover:border-orange-500 transition-all duration-200">
+                        <div className="text-center space-y-3">
+                            <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto">
+                                <svg
+                                    className="w-8 h-8 text-orange-500"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                    />
+                                </svg>
+                            </div>
+                            <div>
+                                <span className="text-orange-600 font-semibold text-lg">
+                                    Upload Identity Documents
+                                </span>
+                                <p className="text-gray-500 text-sm mt-1">
+                                    Business license, certificates, legal
+                                    documents
+                                </p>
+                                <p className="text-gray-400 text-xs">
+                                    Required for company verification
+                                </p>
+                            </div>
+                        </div>
                         <input
                             type="file"
                             accept="image/*"
@@ -505,70 +724,8 @@ const CreateCompany = () => {
                                 }
                             }}
                         />
-                        <svg
-                            className="w-8 h-8 text-blue-400 mb-2"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M12 4v16m8-8H4"
-                            />
-                        </svg>
-                        {identityImage && identityImage.length > 0 && (
-                            <div className="flex flex-wrap gap-2 mt-2">
-                                {identityImage.map((file, idx) => (
-                                    <img
-                                        key={idx}
-                                        src={URL.createObjectURL(file)}
-                                        alt={`identity-${idx}`}
-                                        className="w-20 h-20 object-cover rounded border border-gray-200 shadow"
-                                    />
-                                ))}
-                            </div>
-                        )}
                     </label>
                 </div>
-                {/* Identity preview từ cloud nếu có */}
-                {MyCompanyProfile.data?.payload?.identityImage?.length > 0 &&
-                    identityImage.length === 0 && (
-                        <div className="flex flex-wrap gap-2 mt-2">
-                            {MyCompanyProfile.data.payload.identityImage
-                                .filter(
-                                    (url) =>
-                                        !removedImages.identityImage.includes(
-                                            url
-                                        )
-                                )
-                                .map((url, idx) => (
-                                    <div key={idx} className="relative group">
-                                        <img
-                                            src={url}
-                                            alt={`identity-cloud-${idx}`}
-                                            className="w-20 h-20 object-cover rounded border border-gray-200 shadow"
-                                        />
-                                        <button
-                                            type="button"
-                                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 text-xs opacity-80 group-hover:opacity-100"
-                                            onClick={() => {
-                                                setRemovedImages((prev) => ({
-                                                    ...prev,
-                                                    identityImage: [
-                                                        ...prev.identityImage,
-                                                        url,
-                                                    ],
-                                                }));
-                                            }}
-                                        >
-                                            ✕
-                                        </button>
-                                    </div>
-                                ))}
-                        </div>
-                    )}
             </div>
 
             <button

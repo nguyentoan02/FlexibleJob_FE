@@ -54,7 +54,7 @@ export const useMyCompany = () => {
 
             // Chỉ append imageUrl nếu có file mới
             if (data.newImageUrl) {
-                formData.append("imageUrl", data.newImageUrl);
+                formData.append("imageUrl", data.newImageUrl); // Backend expect field name là "imageUrl"
             }
 
             // Handle cover image
