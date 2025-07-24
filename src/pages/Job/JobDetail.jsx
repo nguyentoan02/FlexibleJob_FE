@@ -88,9 +88,10 @@ export default function JobDetail() {
     };
 
     const formatDate = (date) => {
-        return new Date(date).toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
+        return new Date(date).toLocaleDateString("vi-VN", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
         });
     };
 
@@ -317,6 +318,16 @@ export default function JobDetail() {
                                                         )}
                                                     </span>
                                                 </div>
+                                                {/* Add deadline info here */}
+                                                <div className="flex items-center gap-2">
+                                                    <Clock className="h-5 w-5 text-red-500" />
+                                                    <span className="font-medium">
+                                                        Deadline:{" "}
+                                                        {formatDate(
+                                                            job.deadline
+                                                        )}
+                                                    </span>
+                                                </div>
                                             </div>
 
                                             {/* Action Buttons */}
@@ -332,29 +343,6 @@ export default function JobDetail() {
                                                 <ChatButton
                                                     company={job.company}
                                                 />
-
-                                                {/* <Button
-                                                    variant="outline"
-                                                    onClick={
-                                                        handleFavoriteClick
-                                                    }
-                                                    className={`border-2 font-semibold py-3 px-6 rounded-full shadow transition-all duration-300 flex items-center gap-2 ${
-                                                        isFavorited
-                                                            ? "bg-red-50 border-red-300 text-red-600 hover:bg-red-100"
-                                                            : "border-gray-300 text-gray-600 hover:bg-gray-50"
-                                                    }`}
-                                                >
-                                                    <Heart
-                                                        className={`h-5 w-5 ${
-                                                            isFavorited
-                                                                ? "fill-current"
-                                                                : ""
-                                                        }`}
-                                                    />
-                                                    {isFavorited
-                                                        ? "Remove from Favorites"
-                                                        : "Add to Favorites"}
-                                                </Button> */}
 
                                                 <Button
                                                     variant="outline"

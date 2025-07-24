@@ -11,7 +11,7 @@ import { SidebarJobseeker } from "@/pages/SideBarJSeeker/DashboardJSeeker";
 import JobseekerDashboardLayout from "@/pages/SideBarJSeeker/JSeekerLayout";
 import DashboardStatistic from "@/pages/SideBarJSeeker/DashboardStatistic";
 import ChatPage from "../pages/Chat/ChatPage";
-import NotificationPage from "../pages/Notification/NotificationPage"; // Thêm import
+import NotificationPage from "../pages/Notification/NotificationPage";
 
 export default function JobseekerRoutes() {
     return (
@@ -33,12 +33,11 @@ export default function JobseekerRoutes() {
                     element={<UpdateCVProfile />}
                 />
                 <Route path="chat" element={<ChatPage />} />
-                <Route
-                    path="notifications"
-                    element={<NotificationPage />}
-                />{" "}
-                {/* Thêm route này */}
+                <Route path="notifications" element={<NotificationPage />} />
+                {/* Thêm route profile vào dashboard */}
+                <Route path="profile" element={<ProfilePage />} />
             </Route>
+            {/* Giữ lại route cũ để tương thích ngược */}
             <Route path="/user/profile" element={<ProfilePage />} />
             <Route
                 path="/cvprofile-follow-apply/:id"

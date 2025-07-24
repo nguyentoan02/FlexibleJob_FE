@@ -151,11 +151,17 @@ export default function JobList() {
                                         <SelectItem value="all">
                                             All Types
                                         </SelectItem>
-                                        <SelectItem value="Full time">
-                                            Full time
+                                        <SelectItem value="Full-time">
+                                            Full-time
                                         </SelectItem>
-                                        <SelectItem value="Part time">
-                                            Part time
+                                        <SelectItem value="Part-time">
+                                            Part-time
+                                        </SelectItem>
+                                        <SelectItem value="Internship">
+                                            Internship
+                                        </SelectItem>
+                                        <SelectItem value="Contract">
+                                            Contract
                                         </SelectItem>
                                         <SelectItem value="Remote">
                                             Remote
