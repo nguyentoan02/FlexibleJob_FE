@@ -16,7 +16,7 @@ import HeaderJobseeker from "@/components/Header/HeaderJobseeker";
 import { MapPin, Clock, Search, DollarSign, Building } from "lucide-react";
 
 export default function JobList() {
-    const [searchParams, setSearchParams] = useState({
+    const defaultValues = {
         title: "",
         location: "",
         level: "all",
@@ -24,7 +24,9 @@ export default function JobList() {
         experienceYears: "",
         page: 1,
         limit: 2,
-    });
+    };
+    const [formValues, setFormValues] = useState(defaultValues);
+    const [searchParams, setSearchParams] = useState(defaultValues);
 
     // Kiểm tra có đang filter/search không
     const isFiltering =
@@ -41,19 +43,28 @@ export default function JobList() {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setSearchParams((prev) => ({
+        setFormValues((prev) => ({
             ...prev,
             [name]: value,
-            page: 1, // Reset về trang 1 khi thay đổi filter
+            page: 1,
         }));
     };
 
     const handleSelectChange = (name, value) => {
-        setSearchParams((prev) => ({
+        setFormValues((prev) => ({
             ...prev,
             [name]: value,
-            page: 1, // Reset về trang 1 khi thay đổi filter
+            page: 1,
         }));
+    };
+
+    const handleSearch = () => {
+        setSearchParams({ ...formValues });
+    };
+
+    const handleClear = () => {
+        setFormValues(defaultValues);
+        setSearchParams(defaultValues);
     };
 
     const formatSalary = (salary) => {
@@ -82,7 +93,7 @@ export default function JobList() {
                                 <Input
                                     name="title"
                                     placeholder="Job title, keywords..."
-                                    value={searchParams.title}
+                                    value={formValues.title}
                                     onChange={handleInputChange}
                                     className="pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-blue-500 shadow-sm"
                                 />
@@ -92,14 +103,14 @@ export default function JobList() {
                                 <Input
                                     name="location"
                                     placeholder="Location..."
-                                    value={searchParams.location}
+                                    value={formValues.location}
                                     onChange={handleInputChange}
                                     className="pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-blue-500 shadow-sm"
                                 />
                             </div>
                             <div className="flex items-center gap-3 flex-1 min-w-[160px]">
                                 <Select
-                                    value={searchParams.level}
+                                    value={formValues.level}
                                     onValueChange={(value) =>
                                         handleSelectChange("level", value)
                                     }
@@ -128,7 +139,7 @@ export default function JobList() {
                             </div>
                             <div className="flex items-center gap-3 flex-1 min-w-[160px]">
                                 <Select
-                                    value={searchParams.jobType}
+                                    value={formValues.jobType}
                                     onValueChange={(value) =>
                                         handleSelectChange("jobType", value)
                                     }
@@ -158,20 +169,26 @@ export default function JobList() {
                                     name="experienceYears"
                                     type="number"
                                     placeholder="Experience years..."
-                                    value={searchParams.experienceYears}
+                                    value={formValues.experienceYears}
                                     onChange={handleInputChange}
                                     className="pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-blue-500 shadow-sm"
                                 />
                             </div>
-                            <div className="flex items-center">
+                            <div className="flex items-center gap-2">
                                 <Button
                                     className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow font-semibold flex gap-2"
-                                    onClick={() =>
-                                        setSearchParams((prev) => ({ ...prev }))
-                                    }
+                                    onClick={handleSearch}
                                 >
                                     <Search className="h-5 w-5" />
                                     Search Jobs
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    className="px-6 py-3 rounded-xl border-gray-300 text-gray-700 hover:bg-gray-100"
+                                    onClick={handleClear}
+                                    type="button"
+                                >
+                                    Clear
                                 </Button>
                             </div>
                         </div>
@@ -188,7 +205,11 @@ export default function JobList() {
                                 <h2 className="text-xl font-semibold">
                                     {data?.payload?.totalJobs} Jobs Found
                                 </h2>
-                            ) : null}
+                            ) : (
+                                <h2 className="text-xl font-semibold text-gray-500">
+                                    No jobs found
+                                </h2>
+                            )}
                         </div>
 
                         {isLoading && !data ? (

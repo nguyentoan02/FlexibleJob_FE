@@ -22,6 +22,7 @@ const TABS = [
 export default function SignUp() {
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Thêm state này
     const [toastMessage, setToastMessage] = useState("");
     const [toastType, setToastType] = useState("success");
     const [isLoading, setIsLoading] = useState(false);
@@ -35,8 +36,23 @@ export default function SignUp() {
         confirmPassword: "",
     });
 
+    const [passwordMatchError, setPasswordMatchError] = useState("");
+    const [emailError, setEmailError] = useState("");
+
+    const [passwordRequirements, setPasswordRequirements] = useState({
+        length: false,
+        uppercase: false,
+    });
+
     const validateEmail = (email) => {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    };
+
+    const checkPasswordRequirements = (password) => {
+        return {
+            length: password.length >= 6 && password.length <= 15,
+            uppercase: /[A-Z]/.test(password),
+        };
     };
 
     const handleSubmit = async (e) => {
@@ -57,8 +73,16 @@ export default function SignUp() {
             return;
         }
 
-        if (form.password.length < 6) {
-            setToastMessage("Password must be at least 6 characters long");
+        if (form.password.length < 6 || form.password.length > 15) {
+            setToastMessage("Password must be 6-15 characters long");
+            setToastType("error");
+            setIsLoading(false);
+            return;
+        }
+        if (!/[A-Z]/.test(form.password)) {
+            setToastMessage(
+                "Password must contain at least 1 uppercase letter"
+            );
             setToastType("error");
             setIsLoading(false);
             return;
@@ -174,11 +198,21 @@ export default function SignUp() {
                                 type="email"
                                 placeholder="john@example.com"
                                 value={form.email}
-                                onChange={(e) =>
-                                    setForm({ ...form, email: e.target.value })
-                                }
+                                onChange={(e) => {
+                                    setForm({ ...form, email: e.target.value });
+                                    if (!validateEmail(e.target.value)) {
+                                        setEmailError("Invalid email format");
+                                    } else {
+                                        setEmailError("");
+                                    }
+                                }}
                                 required
                             />
+                            {emailError && (
+                                <p className="text-red-500 text-xs mt-1">
+                                    {emailError}
+                                </p>
+                            )}
                         </div>
 
                         <div className="space-y-2">
@@ -189,12 +223,26 @@ export default function SignUp() {
                                     type={showPassword ? "text" : "password"}
                                     placeholder="Enter your password"
                                     value={form.password}
-                                    onChange={(e) =>
+                                    onChange={(e) => {
+                                        const value = e.target.value;
                                         setForm({
                                             ...form,
-                                            password: e.target.value,
-                                        })
-                                    }
+                                            password: value,
+                                        });
+                                        const req =
+                                            checkPasswordRequirements(value);
+                                        setPasswordRequirements(req);
+                                        if (
+                                            form.confirmPassword &&
+                                            value !== form.confirmPassword
+                                        ) {
+                                            setPasswordMatchError(
+                                                "Passwords do not match"
+                                            );
+                                        } else {
+                                            setPasswordMatchError("");
+                                        }
+                                    }}
                                     required
                                 />
                                 <button
@@ -211,25 +259,82 @@ export default function SignUp() {
                                     )}
                                 </button>
                             </div>
+                            <div className="mt-2 space-y-1 text-sm">
+                                <div className="flex items-center gap-2">
+                                    {passwordRequirements.length ? (
+                                        <span className="text-green-600">
+                                            ✔
+                                        </span>
+                                    ) : (
+                                        <span className="text-gray-400">✖</span>
+                                    )}
+                                    <span>
+                                        Password must be 6-15 characters
+                                    </span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    {passwordRequirements.uppercase ? (
+                                        <span className="text-green-600">
+                                            ✔
+                                        </span>
+                                    ) : (
+                                        <span className="text-gray-400">✖</span>
+                                    )}
+                                    <span>At least 1 uppercase letter</span>
+                                </div>
+                            </div>
                         </div>
 
                         <div className="space-y-2">
                             <Label htmlFor="confirmPassword">
                                 Confirm Password
                             </Label>
-                            <Input
-                                id="confirmPassword"
-                                type="password"
-                                placeholder="Confirm your password"
-                                value={form.confirmPassword}
-                                onChange={(e) =>
-                                    setForm({
-                                        ...form,
-                                        confirmPassword: e.target.value,
-                                    })
-                                }
-                                required
-                            />
+                            <div className="relative">
+                                <Input
+                                    id="confirmPassword"
+                                    type={
+                                        showConfirmPassword
+                                            ? "text"
+                                            : "password"
+                                    }
+                                    placeholder="Confirm your password"
+                                    value={form.confirmPassword}
+                                    onChange={(e) => {
+                                        setForm({
+                                            ...form,
+                                            confirmPassword: e.target.value,
+                                        });
+                                        if (form.password !== e.target.value) {
+                                            setPasswordMatchError(
+                                                "Passwords do not match"
+                                            );
+                                        } else {
+                                            setPasswordMatchError("");
+                                        }
+                                    }}
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        setShowConfirmPassword(
+                                            !showConfirmPassword
+                                        )
+                                    }
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                                >
+                                    {showConfirmPassword ? (
+                                        <EyeOffIcon className="h-5 w-5" />
+                                    ) : (
+                                        <EyeIcon className="h-5 w-5" />
+                                    )}
+                                </button>
+                            </div>
+                            {passwordMatchError && (
+                                <p className="text-red-500 text-xs mt-1">
+                                    {passwordMatchError}
+                                </p>
+                            )}
                         </div>
 
                         <Button

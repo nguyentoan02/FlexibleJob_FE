@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import axios from "axios";
-import { Plus, Minus, Upload } from "lucide-react";
+import { Plus, Minus } from "lucide-react";
 import Toast from "@/components/Toast/Toast";
 
 export default function CreateCVProfile() {
@@ -14,6 +14,7 @@ export default function CreateCVProfile() {
     const { token } = useAuth();
     const [loading, setLoading] = useState(false);
     const [toast, setToast] = useState({ message: "", type: "" });
+    const [errors, setErrors] = useState({});
 
     const [formData, setFormData] = useState({
         skills: [""],
@@ -38,10 +39,82 @@ export default function CreateCVProfile() {
             },
         ],
         description: "",
-        certifications: "",
+        certifications: [""],
         number: "",
-        cvPdf: null, // For file upload
     });
+
+    // Validate function
+    const validate = () => {
+        const newErrors = {};
+        // Basic info
+        if (!formData.description.trim())
+            newErrors.description = "Professional summary is required";
+        if (!formData.number.trim())
+            newErrors.number = "Contact number is required";
+        else if (!/^\d{10}$/.test(formData.number.trim()))
+            newErrors.number = "Contact number must be 10 digits";
+
+        // Skills
+        if (!formData.skills.length || formData.skills.some((s) => !s.trim()))
+            newErrors.skills =
+                "At least 1 skill is required and cannot be empty";
+
+        // Certifications
+        if (
+            !formData.certifications.length ||
+            formData.certifications.some((c) => !c.trim())
+        )
+            newErrors.certifications =
+                "At least 1 certification is required and cannot be empty";
+
+        // Education
+        if (!formData.education.length)
+            newErrors.education = "At least 1 education is required";
+        formData.education.forEach((edu, idx) => {
+            if (
+                !edu.school.trim() ||
+                !edu.degree.trim() ||
+                !edu.startDate ||
+                !edu.endDate
+            ) {
+                newErrors[`education_${idx}`] = "All fields are required";
+            }
+            if (edu.endDate && new Date(edu.endDate) > new Date()) {
+                newErrors[`education_${idx}_endDate`] =
+                    "End date cannot be in the future";
+            }
+            if (!edu.description.trim()) {
+                newErrors[`education_${idx}_description`] =
+                    "Description is required";
+            }
+        });
+
+        // Experience
+        if (!formData.experience.length)
+            newErrors.experience = "At least 1 experience is required";
+        formData.experience.forEach((exp, idx) => {
+            if (
+                !exp.company.trim() ||
+                !exp.position.trim() ||
+                !exp.startDate ||
+                !exp.endDate ||
+                !exp.location.trim()
+            ) {
+                newErrors[`experience_${idx}`] = "All fields are required";
+            }
+            if (exp.endDate && new Date(exp.endDate) > new Date()) {
+                newErrors[`experience_${idx}_endDate`] =
+                    "End date cannot be in the future";
+            }
+            if (!exp.description.trim()) {
+                newErrors[`experience_${idx}_description`] =
+                    "Description is required";
+            }
+        });
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
 
     const handleSkillChange = (index, value) => {
         const newSkills = [...formData.skills];
@@ -114,48 +187,67 @@ export default function CreateCVProfile() {
         setFormData({ ...formData, experience: newExperience });
     };
 
-    const handleFileChange = (e) => {
-        setFormData({ ...formData, cvPdf: e.target.files[0] });
+    // Certification handlers
+    const handleCertificationChange = (index, value) => {
+        const newCerts = [...formData.certifications];
+        newCerts[index] = value;
+        setFormData({ ...formData, certifications: newCerts });
+    };
+
+    const addCertification = () => {
+        setFormData({
+            ...formData,
+            certifications: [...formData.certifications, ""],
+        });
+    };
+
+    const removeCertification = (index) => {
+        const newCerts = formData.certifications.filter((_, i) => i !== index);
+        setFormData({ ...formData, certifications: newCerts });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!validate()) {
+            setToast({
+                message: "Please fix the errors in the form.",
+                type: "error",
+            });
+            return;
+        }
         setLoading(true);
 
         try {
             const data = new FormData();
-            if (formData.cvPdf) {
-                data.append("cvPdf", formData.cvPdf);
-            }
 
-            // Fix: Append each skill individually to FormData
-            const validSkills = formData.skills.filter(
-                (skill) => skill.trim() !== ""
-            );
-            validSkills.forEach((skill, index) => {
+            // Skills
+            formData.skills.forEach((skill, index) => {
                 data.append(`skills[${index}]`, skill);
             });
 
-            // Add education array directly (do not stringify the whole array)
+            // Education
             formData.education.forEach((edu, index) => {
                 Object.keys(edu).forEach((key) => {
                     data.append(`education[${index}][${key}]`, edu[key]);
                 });
             });
 
-            // Add experience array directly (do not stringify the whole array)
+            // Experience
             formData.experience.forEach((exp, index) => {
                 Object.keys(exp).forEach((key) => {
                     data.append(`experience[${index}][${key}]`, exp[key]);
                 });
             });
 
-            // Add other simple fields
+            // Certifications
+            formData.certifications.forEach((cert, index) => {
+                data.append(`certifications[${index}]`, cert);
+            });
+
             data.append("description", formData.description);
-            data.append("certifications", formData.certifications);
             data.append("number", formData.number);
 
-            const response = await axios.post(
+            await axios.post(
                 `${import.meta.env.VITE_API_URL}/cv-profiles`,
                 data,
                 {
@@ -172,10 +264,9 @@ export default function CreateCVProfile() {
             });
 
             setTimeout(() => {
-                navigate("/cvprofile");
+                navigate("/user/dashboard/cvprofile");
             }, 2000);
         } catch (error) {
-            console.error("API Error:", error.response?.data);
             setToast({
                 message:
                     error.response?.data?.message ||
@@ -188,68 +279,86 @@ export default function CreateCVProfile() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
             {toast.message && (
                 <Toast message={toast.message} type={toast.type} />
             )}
-
-            <div className="container mx-auto max-w-4xl">
-                <Card>
+            <div className="container mx-auto max-w-3xl">
+                <Card className="shadow-2xl border-0 rounded-2xl">
                     <CardHeader>
-                        <CardTitle className="text-2xl font-bold text-center">
+                        <CardTitle className="text-3xl font-bold text-center text-blue-700">
                             Create Your CV Profile
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <form onSubmit={handleSubmit} className="space-y-8">
+                        <form onSubmit={handleSubmit} className="space-y-10">
                             {/* Basic Information */}
                             <div className="space-y-4">
-                                <h3 className="text-lg font-semibold">
-                                    Basic Information
+                                <h3 className="text-xl font-bold text-blue-700">
+                                    Professional Summary
                                 </h3>
-
-                                <div>
-                                    <Label htmlFor="description">
-                                        Professional Summary
-                                    </Label>
-                                    <textarea
-                                        id="description"
-                                        className="w-full h-32 p-2 border rounded-md"
-                                        value={formData.description}
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                description: e.target.value,
-                                            })
-                                        }
-                                    />
-                                </div>
-
-                                <div>
-                                    <Label htmlFor="number">
-                                        Contact Number
-                                    </Label>
-                                    <Input
-                                        id="number"
-                                        type="tel"
-                                        value={formData.number}
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                number: e.target.value,
-                                            })
-                                        }
-                                    />
-                                </div>
+                                <textarea
+                                    id="description"
+                                    className={`w-full h-32 p-3 border rounded-lg focus:ring-2 focus:ring-blue-300 transition resize-y ${
+                                        errors.description
+                                            ? "border-red-500"
+                                            : ""
+                                    }`}
+                                    value={formData.description}
+                                    onChange={(e) =>
+                                        setFormData({
+                                            ...formData,
+                                            description: e.target.value,
+                                        })
+                                    }
+                                    placeholder="Write a summary about yourself..."
+                                />
+                                {errors.description && (
+                                    <p className="text-red-500 text-sm">
+                                        {errors.description}
+                                    </p>
+                                )}
+                                <Label
+                                    htmlFor="number"
+                                    className="font-semibold text-gray-700"
+                                >
+                                    Contact Number
+                                </Label>
+                                <Input
+                                    id="number"
+                                    type="tel"
+                                    maxLength={10}
+                                    value={formData.number}
+                                    onChange={(e) =>
+                                        setFormData({
+                                            ...formData,
+                                            number: e.target.value
+                                                .replace(/\D/g, "")
+                                                .slice(0, 10),
+                                        })
+                                    }
+                                    placeholder="Enter 10-digit phone number"
+                                    className={
+                                        errors.number ? "border-red-500" : ""
+                                    }
+                                />
+                                {errors.number && (
+                                    <p className="text-red-500 text-sm">
+                                        {errors.number}
+                                    </p>
+                                )}
                             </div>
 
-                            {/* Skills Section */}
-                            <div className="space-y-4">
-                                <h3 className="text-lg font-semibold">
+                            {/* Skills */}
+                            <div className="space-y-2">
+                                <h3 className="text-xl font-bold text-green-700">
                                     Skills
                                 </h3>
                                 {formData.skills.map((skill, index) => (
-                                    <div key={index} className="flex gap-2">
+                                    <div
+                                        key={index}
+                                        className="flex gap-2 items-center"
+                                    >
                                         <Input
                                             value={skill}
                                             onChange={(e) =>
@@ -259,17 +368,30 @@ export default function CreateCVProfile() {
                                                 )
                                             }
                                             placeholder="Enter a skill"
+                                            className={
+                                                errors.skills
+                                                    ? "border-red-500"
+                                                    : ""
+                                            }
                                         />
                                         <Button
                                             type="button"
-                                            variant="outline"
+                                            variant="destructive"
                                             size="icon"
                                             onClick={() => removeSkill(index)}
+                                            disabled={
+                                                formData.skills.length === 1
+                                            }
                                         >
                                             <Minus className="h-4 w-4" />
                                         </Button>
                                     </div>
                                 ))}
+                                {errors.skills && (
+                                    <p className="text-red-500 text-sm">
+                                        {errors.skills}
+                                    </p>
+                                )}
                                 <Button
                                     type="button"
                                     variant="outline"
@@ -281,14 +403,17 @@ export default function CreateCVProfile() {
                                 </Button>
                             </div>
 
-                            {/* Education Section */}
-                            <div className="space-y-4">
-                                <h3 className="text-lg font-semibold">
+                            {/* Education */}
+                            <div className="space-y-2">
+                                <h3 className="text-xl font-bold text-purple-700">
                                     Education
                                 </h3>
                                 {formData.education.map((edu, index) => (
-                                    <Card key={index}>
-                                        <CardContent className="space-y-4 pt-6">
+                                    <Card
+                                        key={index}
+                                        className="mb-4 border border-purple-200 shadow-sm"
+                                    >
+                                        <CardContent className="space-y-3 pt-6">
                                             <Input
                                                 placeholder="School"
                                                 value={edu.school}
@@ -299,6 +424,11 @@ export default function CreateCVProfile() {
                                                         e.target.value
                                                     )
                                                 }
+                                                className={
+                                                    errors[`education_${index}`]
+                                                        ? "border-red-500"
+                                                        : ""
+                                                }
                                             />
                                             <Input
                                                 placeholder="Degree"
@@ -307,6 +437,22 @@ export default function CreateCVProfile() {
                                                     handleEducationChange(
                                                         index,
                                                         "degree",
+                                                        e.target.value
+                                                    )
+                                                }
+                                                className={
+                                                    errors[`education_${index}`]
+                                                        ? "border-red-500"
+                                                        : ""
+                                                }
+                                            />
+                                            <Input
+                                                placeholder="Field of Study"
+                                                value={edu.fieldOfStudy}
+                                                onChange={(e) =>
+                                                    handleEducationChange(
+                                                        index,
+                                                        "fieldOfStudy",
                                                         e.target.value
                                                     )
                                                 }
@@ -322,6 +468,13 @@ export default function CreateCVProfile() {
                                                             e.target.value
                                                         )
                                                     }
+                                                    className={
+                                                        errors[
+                                                            `education_${index}`
+                                                        ]
+                                                            ? "border-red-500"
+                                                            : ""
+                                                    }
                                                 />
                                                 <Input
                                                     type="date"
@@ -333,8 +486,69 @@ export default function CreateCVProfile() {
                                                             e.target.value
                                                         )
                                                     }
+                                                    className={
+                                                        errors[
+                                                            `education_${index}_endDate`
+                                                        ]
+                                                            ? "border-red-500"
+                                                            : ""
+                                                    }
+                                                    max={
+                                                        new Date()
+                                                            .toISOString()
+                                                            .split("T")[0]
+                                                    }
                                                 />
                                             </div>
+                                            <textarea
+                                                placeholder="Description"
+                                                className={`w-full h-20 p-2 border rounded-md resize-y ${
+                                                    errors[
+                                                        `education_${index}_description`
+                                                    ]
+                                                        ? "border-red-500"
+                                                        : ""
+                                                }`}
+                                                value={edu.description}
+                                                onChange={(e) =>
+                                                    handleEducationChange(
+                                                        index,
+                                                        "description",
+                                                        e.target.value
+                                                    )
+                                                }
+                                            />
+                                            {errors[`education_${index}`] && (
+                                                <p className="text-red-500 text-sm">
+                                                    {
+                                                        errors[
+                                                            `education_${index}`
+                                                        ]
+                                                    }
+                                                </p>
+                                            )}
+                                            {errors[
+                                                `education_${index}_endDate`
+                                            ] && (
+                                                <p className="text-red-500 text-sm">
+                                                    {
+                                                        errors[
+                                                            `education_${index}_endDate`
+                                                        ]
+                                                    }
+                                                </p>
+                                            )}
+                                            {errors[
+                                                `education_${index}_description`
+                                            ] && (
+                                                <p className="text-red-500 text-sm">
+                                                    {
+                                                        errors[
+                                                            `education_${index}_description`
+                                                        ]
+                                                    }
+                                                </p>
+                                            )}
                                             <Button
                                                 type="button"
                                                 variant="destructive"
@@ -342,12 +556,21 @@ export default function CreateCVProfile() {
                                                     removeEducation(index)
                                                 }
                                                 className="w-full"
+                                                disabled={
+                                                    formData.education
+                                                        .length === 1
+                                                }
                                             >
                                                 Remove Education
                                             </Button>
                                         </CardContent>
                                     </Card>
                                 ))}
+                                {errors.education && (
+                                    <p className="text-red-500 text-sm">
+                                        {errors.education}
+                                    </p>
+                                )}
                                 <Button
                                     type="button"
                                     variant="outline"
@@ -359,14 +582,17 @@ export default function CreateCVProfile() {
                                 </Button>
                             </div>
 
-                            {/* Experience Section */}
-                            <div className="space-y-4">
-                                <h3 className="text-lg font-semibold">
+                            {/* Experience */}
+                            <div className="space-y-2">
+                                <h3 className="text-xl font-bold text-orange-700">
                                     Experience
                                 </h3>
                                 {formData.experience.map((exp, index) => (
-                                    <Card key={index}>
-                                        <CardContent className="space-y-4 pt-6">
+                                    <Card
+                                        key={index}
+                                        className="mb-4 border border-orange-200 shadow-sm"
+                                    >
+                                        <CardContent className="space-y-3 pt-6">
                                             <Input
                                                 placeholder="Company"
                                                 value={exp.company}
@@ -376,6 +602,13 @@ export default function CreateCVProfile() {
                                                         "company",
                                                         e.target.value
                                                     )
+                                                }
+                                                className={
+                                                    errors[
+                                                        `experience_${index}`
+                                                    ]
+                                                        ? "border-red-500"
+                                                        : ""
                                                 }
                                             />
                                             <Input
@@ -388,6 +621,13 @@ export default function CreateCVProfile() {
                                                         e.target.value
                                                     )
                                                 }
+                                                className={
+                                                    errors[
+                                                        `experience_${index}`
+                                                    ]
+                                                        ? "border-red-500"
+                                                        : ""
+                                                }
                                             />
                                             <Input
                                                 placeholder="Location"
@@ -398,6 +638,13 @@ export default function CreateCVProfile() {
                                                         "location",
                                                         e.target.value
                                                     )
+                                                }
+                                                className={
+                                                    errors[
+                                                        `experience_${index}`
+                                                    ]
+                                                        ? "border-red-500"
+                                                        : ""
                                                 }
                                             />
                                             <div className="grid grid-cols-2 gap-4">
@@ -411,6 +658,13 @@ export default function CreateCVProfile() {
                                                             e.target.value
                                                         )
                                                     }
+                                                    className={
+                                                        errors[
+                                                            `experience_${index}`
+                                                        ]
+                                                            ? "border-red-500"
+                                                            : ""
+                                                    }
                                                 />
                                                 <Input
                                                     type="date"
@@ -422,11 +676,29 @@ export default function CreateCVProfile() {
                                                             e.target.value
                                                         )
                                                     }
+                                                    className={
+                                                        errors[
+                                                            `experience_${index}_endDate`
+                                                        ]
+                                                            ? "border-red-500"
+                                                            : ""
+                                                    }
+                                                    max={
+                                                        new Date()
+                                                            .toISOString()
+                                                            .split("T")[0]
+                                                    }
                                                 />
                                             </div>
                                             <textarea
                                                 placeholder="Description"
-                                                className="w-full h-32 p-2 border rounded-md"
+                                                className={`w-full h-24 p-2 border rounded-md resize-y ${
+                                                    errors[
+                                                        `experience_${index}_description`
+                                                    ]
+                                                        ? "border-red-500"
+                                                        : ""
+                                                }`}
                                                 value={exp.description}
                                                 onChange={(e) =>
                                                     handleExperienceChange(
@@ -436,6 +708,37 @@ export default function CreateCVProfile() {
                                                     )
                                                 }
                                             />
+                                            {errors[`experience_${index}`] && (
+                                                <p className="text-red-500 text-sm">
+                                                    {
+                                                        errors[
+                                                            `experience_${index}`
+                                                        ]
+                                                    }
+                                                </p>
+                                            )}
+                                            {errors[
+                                                `experience_${index}_endDate`
+                                            ] && (
+                                                <p className="text-red-500 text-sm">
+                                                    {
+                                                        errors[
+                                                            `experience_${index}_endDate`
+                                                        ]
+                                                    }
+                                                </p>
+                                            )}
+                                            {errors[
+                                                `experience_${index}_description`
+                                            ] && (
+                                                <p className="text-red-500 text-sm">
+                                                    {
+                                                        errors[
+                                                            `experience_${index}_description`
+                                                        ]
+                                                    }
+                                                </p>
+                                            )}
                                             <Button
                                                 type="button"
                                                 variant="destructive"
@@ -443,12 +746,21 @@ export default function CreateCVProfile() {
                                                     removeExperience(index)
                                                 }
                                                 className="w-full"
+                                                disabled={
+                                                    formData.experience
+                                                        .length === 1
+                                                }
                                             >
                                                 Remove Experience
                                             </Button>
                                         </CardContent>
                                     </Card>
                                 ))}
+                                {errors.experience && (
+                                    <p className="text-red-500 text-sm">
+                                        {errors.experience}
+                                    </p>
+                                )}
                                 <Button
                                     type="button"
                                     variant="outline"
@@ -460,40 +772,67 @@ export default function CreateCVProfile() {
                                 </Button>
                             </div>
 
-                            {/* PDF Upload */}
-                            <div className="space-y-4">
-                                <h3 className="text-lg font-semibold">
-                                    Upload CV PDF
+                            {/* Certifications */}
+                            <div className="space-y-2">
+                                <h3 className="text-xl font-bold text-pink-700">
+                                    Certifications
                                 </h3>
-                                <div className="border-2 border-dashed rounded-lg p-6 text-center">
-                                    <input
-                                        type="file"
-                                        id="cvPdf"
-                                        accept=".pdf"
-                                        onChange={handleFileChange}
-                                        className="hidden"
-                                    />
-                                    <Label
-                                        htmlFor="cvPdf"
-                                        className="cursor-pointer flex flex-col items-center"
+                                {formData.certifications.map((cert, index) => (
+                                    <div
+                                        key={index}
+                                        className="flex gap-2 items-center"
                                     >
-                                        <Upload className="h-12 w-12 text-gray-400" />
-                                        <span className="mt-2 text-sm text-gray-500">
-                                            Click to upload PDF
-                                        </span>
-                                    </Label>
-                                    {formData.cvPdf && (
-                                        <p className="mt-2 text-sm text-gray-500">
-                                            Selected: {formData.cvPdf.name}
-                                        </p>
-                                    )}
-                                </div>
+                                        <Input
+                                            value={cert}
+                                            onChange={(e) =>
+                                                handleCertificationChange(
+                                                    index,
+                                                    e.target.value
+                                                )
+                                            }
+                                            placeholder="Enter a certification"
+                                            className={
+                                                errors.certifications
+                                                    ? "border-red-500"
+                                                    : ""
+                                            }
+                                        />
+                                        <Button
+                                            type="button"
+                                            variant="destructive"
+                                            size="icon"
+                                            onClick={() =>
+                                                removeCertification(index)
+                                            }
+                                            disabled={
+                                                formData.certifications
+                                                    .length === 1
+                                            }
+                                        >
+                                            <Minus className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                ))}
+                                {errors.certifications && (
+                                    <p className="text-red-500 text-sm">
+                                        {errors.certifications}
+                                    </p>
+                                )}
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={addCertification}
+                                    className="w-full"
+                                >
+                                    <Plus className="h-4 w-4 mr-2" />
+                                    Add Certification
+                                </Button>
                             </div>
 
                             {/* Submit Button */}
                             <Button
                                 type="submit"
-                                className="w-full"
+                                className="w-full mt-6 py-3 text-lg font-bold bg-gradient-to-r from-green-400 to-blue-500 text-white rounded-xl shadow-lg hover:from-green-500 hover:to-blue-600 transition"
                                 disabled={loading}
                             >
                                 {loading ? "Creating..." : "Create CV Profile"}

@@ -219,7 +219,7 @@ const MyApplicationsPage = () => {
 
                 {/* Modal hiển thị CV snapshot */}
                 <Dialog open={openModal} onOpenChange={setOpenModal}>
-                    <DialogContent className="max-w-3xl p-0 bg-gray-50 rounded-2xl shadow-2xl overflow-hidden">
+                    <DialogContent className="max-w-3xl p-0 bg-gray-50 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
                         <div className="bg-white px-8 py-8 border-b border-gray-100 flex flex-col md:flex-row items-center md:items-start gap-8">
                             {selectedCv?.user?.imageUrl && (
                                 <img

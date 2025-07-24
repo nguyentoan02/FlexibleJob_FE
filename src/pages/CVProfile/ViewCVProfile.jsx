@@ -77,13 +77,13 @@ export default function ViewCVProfile() {
                                     {profile.user?.lastName}
                                 </h1>
                                 <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-center md:justify-start space-y-2 sm:space-y-0 sm:space-x-6">
-                                    <div className="flex items-center text-gray-600">
+                                    {/* <div className="flex items-center text-gray-600">
                                         <MapPin className="w-5 h-5 mr-2" />
                                         <span>
                                             {profile.experience?.[0]
                                                 ?.location || "Not specified"}
                                         </span>
-                                    </div>
+                                    </div> */}
                                     <div className="flex items-center text-gray-600">
                                         <Mail className="w-5 h-5 mr-2" />
                                         <span>{profile.user?.email}</span>
@@ -104,23 +104,6 @@ export default function ViewCVProfile() {
                                     ))}
                                 </div>
                             </div>
-                        </div>
-                        <div className="mt-6 text-center md:text-left">
-                            <Button
-                                className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors"
-                                onClick={() => {
-                                    const a = document.createElement("a");
-                                    a.href = profile.linkUrl;
-                                    a.setAttribute("download", "resume.pdf");
-                                    a.style.display = "none";
-                                    document.body.appendChild(a);
-                                    a.click();
-                                    document.body.removeChild(a);
-                                }}
-                            >
-                                <Download className="w-4 h-4 mr-2" />
-                                Download Resume
-                            </Button>
                         </div>
                     </div>
                     {/* Description Section (Moved Below Header) */}
@@ -149,11 +132,11 @@ export default function ViewCVProfile() {
                                             <span className="text-sm text-gray-500">
                                                 {new Date(
                                                     exp.startDate
-                                                ).getFullYear()}{" "}
+                                                ).toLocaleDateString()}{" "}
                                                 -{" "}
                                                 {new Date(
                                                     exp.endDate
-                                                ).getFullYear()}
+                                                ).toLocaleDateString()}
                                             </span>
                                         </div>
                                         <p className="mt-1 text-green-600 font-medium">
@@ -192,13 +175,13 @@ export default function ViewCVProfile() {
                                             {edu.startDate
                                                 ? new Date(
                                                       edu.startDate
-                                                  ).getFullYear()
+                                                  ).toLocaleDateString()
                                                 : "?"}{" "}
                                             -{" "}
                                             {edu.endDate
                                                 ? new Date(
                                                       edu.endDate
-                                                  ).getFullYear()
+                                                  ).toLocaleDateString()
                                                 : "?"}
                                         </div>
                                         <p className="mt-2 text-gray-700">

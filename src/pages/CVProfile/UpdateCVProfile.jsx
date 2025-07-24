@@ -17,6 +17,7 @@ export default function UpdateCVProfile() {
     const { data: cvData, isLoading } = useCVProfile();
     const [loading, setLoading] = useState(false);
     const [toast, setToast] = useState({ message: "", type: "" });
+    const [errors, setErrors] = useState({});
 
     const [formData, setFormData] = useState({
         skills: [""],
@@ -41,7 +42,7 @@ export default function UpdateCVProfile() {
             },
         ],
         description: "",
-        certification: "", // chỉ 1 chứng chỉ
+        certifications: [""], // sửa thành mảng
         number: "",
         cvPdf: null,
     });
@@ -58,15 +59,17 @@ export default function UpdateCVProfile() {
                 number,
             } = cvData.payload;
             setFormData({
-                ...formData,
                 skills: skills || [""],
                 education: education || [],
                 experience: experience || [],
                 description: description || "",
-                certification: Array.isArray(certifications)
-                    ? certifications[0] || ""
-                    : certifications || "",
+                certifications: Array.isArray(certifications)
+                    ? certifications.length > 0
+                        ? certifications
+                        : [""]
+                    : [""],
                 number: number || "",
+                cvPdf: null,
             });
         }
     }, [cvData]);
@@ -188,9 +191,45 @@ export default function UpdateCVProfile() {
         }
     };
 
+    const validate = () => {
+        const newErrors = {};
+        // Basic info
+        if (!formData.description.trim())
+            newErrors.description = "Professional summary is required";
+        if (!formData.number.trim())
+            newErrors.number = "Contact number is required";
+        else if (!/^\d{10}$/.test(formData.number.trim()))
+            newErrors.number = "Contact number must be 10 digits";
+
+        // Skills
+        if (!formData.skills.length || formData.skills.some((s) => !s.trim()))
+            newErrors.skills =
+                "At least 1 skill is required and cannot be empty";
+
+        // Certifications
+        if (
+            !formData.certifications.length ||
+            formData.certifications.some((c) => !c.trim())
+        )
+            newErrors.certifications =
+                "At least 1 certification is required and cannot be empty";
+
+        // LOẠI BỎ VALIDATE EDUCATION VÀ EXPERIENCE - chúng có API riêng
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     // Main form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!validate()) {
+            setToast({
+                message: "Please fix the errors in the form.",
+                type: "error",
+            });
+            return;
+        }
         setLoading(true);
 
         try {
@@ -207,51 +246,17 @@ export default function UpdateCVProfile() {
                 data.append(`skills[${index}]`, skill);
             });
 
-            // Education (thêm đầy đủ trường degree, school, ...)
-            formData.education.forEach((edu, index) => {
-                data.append(`education[${index}][school]`, edu.school || "");
-                data.append(`education[${index}][degree]`, edu.degree || "");
-                data.append(
-                    `education[${index}][fieldOfStudy]`,
-                    edu.fieldOfStudy || ""
-                );
-                data.append(
-                    `education[${index}][startDate]`,
-                    edu.startDate || ""
-                );
-                data.append(`education[${index}][endDate]`, edu.endDate || "");
-                data.append(
-                    `education[${index}][description]`,
-                    edu.description || ""
-                );
-            });
-
-            // Experience
-            formData.experience.forEach((exp, index) => {
-                data.append(`experience[${index}][company]`, exp.company || "");
-                data.append(
-                    `experience[${index}][position]`,
-                    exp.position || ""
-                );
-                data.append(
-                    `experience[${index}][startDate]`,
-                    exp.startDate || ""
-                );
-                data.append(`experience[${index}][endDate]`, exp.endDate || "");
-                data.append(
-                    `experience[${index}][description]`,
-                    exp.description || ""
-                );
-                data.append(
-                    `experience[${index}][location]`,
-                    exp.location || ""
-                );
-            });
+            // LOẠI BỎ PHẦN GỬI EDUCATION VÀ EXPERIENCE DATA - chúng có API riêng
 
             // Rest of the form data
             data.append("description", formData.description);
             data.append("number", formData.number);
-            data.append("certification", formData.certification);
+            // Certifications (mảng)
+            formData.certifications
+                .filter((cert) => cert.trim() !== "")
+                .forEach((cert, index) => {
+                    data.append(`certifications[${index}]`, cert);
+                });
 
             const response = await axios.put(
                 `${import.meta.env.VITE_API_URL}/cv-profiles/${id}`,
@@ -288,6 +293,8 @@ export default function UpdateCVProfile() {
         return <div>Loading...</div>;
     }
 
+    const today = new Date().toISOString().split("T")[0];
+
     return (
         <div className="min-h-screen bg-gray-50 py-8">
             {toast.message && (
@@ -321,7 +328,11 @@ export default function UpdateCVProfile() {
                                     </Label>
                                     <textarea
                                         id="description"
-                                        className="w-full h-28 p-3 border rounded-lg focus:ring-2 focus:ring-green-300 transition"
+                                        className={`w-full h-28 p-3 border rounded-lg focus:ring-2 focus:ring-green-300 transition ${
+                                            errors.description
+                                                ? "border-red-500"
+                                                : ""
+                                        }`}
                                         value={formData.description}
                                         onChange={(e) =>
                                             setFormData({
@@ -330,6 +341,11 @@ export default function UpdateCVProfile() {
                                             })
                                         }
                                     />
+                                    {errors.description && (
+                                        <p className="text-red-500 text-sm">
+                                            {errors.description}
+                                        </p>
+                                    )}
                                 </div>
                                 <div>
                                     <Label
@@ -341,7 +357,11 @@ export default function UpdateCVProfile() {
                                     <Input
                                         id="number"
                                         type="tel"
-                                        className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-green-300 transition"
+                                        className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-green-300 transition ${
+                                            errors.number
+                                                ? "border-red-500"
+                                                : ""
+                                        }`}
                                         value={formData.number}
                                         onChange={(e) =>
                                             setFormData({
@@ -350,6 +370,11 @@ export default function UpdateCVProfile() {
                                             })
                                         }
                                     />
+                                    {errors.number && (
+                                        <p className="text-red-500 text-sm">
+                                            {errors.number}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
 
@@ -391,6 +416,9 @@ export default function UpdateCVProfile() {
                                                     skills: newSkills,
                                                 });
                                             }}
+                                            disabled={
+                                                formData.skills.length === 1
+                                            }
                                         >
                                             <Trash2 className="h-4 w-4" />
                                         </Button>
@@ -409,9 +437,14 @@ export default function UpdateCVProfile() {
                                     <Plus className="h-4 w-4 mr-2" />
                                     Add Skill
                                 </Button>
+                                {errors.skills && (
+                                    <p className="text-red-500 text-sm">
+                                        {errors.skills}
+                                    </p>
+                                )}
                             </div>
 
-                            {/* Education Section */}
+                            {/* Education Section - Sửa logic xóa */}
                             <div className="space-y-4 border-b pb-6">
                                 <h3 className="text-xl font-bold text-purple-700 flex items-center gap-2">
                                     <span className="inline-block w-2 h-6 bg-purple-500 rounded-full mr-2"></span>
@@ -441,7 +474,6 @@ export default function UpdateCVProfile() {
                                                     });
                                                 }}
                                             />
-                                            {/* Thêm input cho degree */}
                                             <Input
                                                 placeholder="Degree"
                                                 value={edu.degree}
@@ -460,6 +492,25 @@ export default function UpdateCVProfile() {
                                                     });
                                                 }}
                                             />
+                                            <textarea
+                                                placeholder="Description"
+                                                className="w-full h-24 p-3 border rounded-lg focus:ring-2 focus:ring-purple-300 transition"
+                                                value={edu.description}
+                                                onChange={(e) => {
+                                                    const newEducation = [
+                                                        ...formData.education,
+                                                    ];
+                                                    newEducation[index] = {
+                                                        ...newEducation[index],
+                                                        description:
+                                                            e.target.value,
+                                                    };
+                                                    setFormData({
+                                                        ...formData,
+                                                        education: newEducation,
+                                                    });
+                                                }}
+                                            />
                                             <div className="grid grid-cols-2 gap-4">
                                                 <Input
                                                     type="date"
@@ -469,6 +520,7 @@ export default function UpdateCVProfile() {
                                                         )[0]
                                                     }
                                                     className="border rounded-lg"
+                                                    max={today}
                                                     onChange={(e) => {
                                                         const newEducation = [
                                                             ...formData.education,
@@ -495,6 +547,7 @@ export default function UpdateCVProfile() {
                                                         )[0]
                                                     }
                                                     className="border rounded-lg"
+                                                    max={today}
                                                     onChange={(e) => {
                                                         const newEducation = [
                                                             ...formData.education,
@@ -535,6 +588,10 @@ export default function UpdateCVProfile() {
                                                                 edu._id
                                                             )
                                                         }
+                                                        disabled={
+                                                            formData.education
+                                                                .length === 1
+                                                        }
                                                     >
                                                         Delete
                                                     </Button>
@@ -568,7 +625,7 @@ export default function UpdateCVProfile() {
                                 </Button>
                             </div>
 
-                            {/* Experience Section */}
+                            {/* Experience Section - Sửa logic xóa */}
                             <div className="space-y-4">
                                 <h3 className="text-xl font-bold text-orange-700 flex items-center gap-2">
                                     <span className="inline-block w-2 h-6 bg-orange-500 rounded-full mr-2"></span>
@@ -619,6 +676,26 @@ export default function UpdateCVProfile() {
                                                     });
                                                 }}
                                             />
+                                            <Input
+                                                placeholder="Location"
+                                                value={exp.location}
+                                                className="border rounded-lg"
+                                                onChange={(e) => {
+                                                    const newExperience = [
+                                                        ...formData.experience,
+                                                    ];
+                                                    newExperience[index] = {
+                                                        ...newExperience[index],
+                                                        location:
+                                                            e.target.value,
+                                                    };
+                                                    setFormData({
+                                                        ...formData,
+                                                        experience:
+                                                            newExperience,
+                                                    });
+                                                }}
+                                            />
                                             <div className="grid grid-cols-2 gap-4">
                                                 <Input
                                                     type="date"
@@ -628,6 +705,7 @@ export default function UpdateCVProfile() {
                                                         )[0]
                                                     }
                                                     className="border rounded-lg"
+                                                    max={today}
                                                     onChange={(e) => {
                                                         const newExperience = [
                                                             ...formData.experience,
@@ -654,6 +732,7 @@ export default function UpdateCVProfile() {
                                                         )[0]
                                                     }
                                                     className="border rounded-lg"
+                                                    max={today}
                                                     onChange={(e) => {
                                                         const newExperience = [
                                                             ...formData.experience,
@@ -714,6 +793,10 @@ export default function UpdateCVProfile() {
                                                                 exp._id
                                                             )
                                                         }
+                                                        disabled={
+                                                            formData.experience
+                                                                .length === 1
+                                                        }
                                                     >
                                                         Delete
                                                     </Button>
@@ -745,6 +828,79 @@ export default function UpdateCVProfile() {
                                     <Plus className="h-4 w-4 mr-2" />
                                     Add Experience
                                 </Button>
+                            </div>
+
+                            {/* Certifications Section */}
+                            <div className="space-y-4 border-b pb-6">
+                                <h3 className="text-xl font-bold text-pink-700 flex items-center gap-2">
+                                    <span className="inline-block w-2 h-6 bg-pink-500 rounded-full mr-2"></span>
+                                    Certifications
+                                </h3>
+                                {formData.certifications.map((cert, index) => (
+                                    <div key={index} className="flex gap-2">
+                                        <Input
+                                            value={cert}
+                                            onChange={(e) => {
+                                                const newCerts = [
+                                                    ...formData.certifications,
+                                                ];
+                                                newCerts[index] =
+                                                    e.target.value;
+                                                setFormData({
+                                                    ...formData,
+                                                    certifications: newCerts,
+                                                });
+                                            }}
+                                            placeholder="Enter a certification"
+                                        />
+                                        <Button
+                                            type="button"
+                                            variant="destructive"
+                                            size="icon"
+                                            onClick={() => {
+                                                const newCerts =
+                                                    formData.certifications.filter(
+                                                        (_, i) => i !== index
+                                                    );
+                                                setFormData({
+                                                    ...formData,
+                                                    certifications:
+                                                        newCerts.length
+                                                            ? newCerts
+                                                            : [""],
+                                                });
+                                            }}
+                                            disabled={
+                                                formData.certifications
+                                                    .length === 1
+                                            }
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                ))}
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() =>
+                                        setFormData({
+                                            ...formData,
+                                            certifications: [
+                                                ...formData.certifications,
+                                                "",
+                                            ],
+                                        })
+                                    }
+                                    className="w-full"
+                                >
+                                    <Plus className="h-4 w-4 mr-2" />
+                                    Add Certification
+                                </Button>
+                                {errors.certifications && (
+                                    <p className="text-red-500 text-sm">
+                                        {errors.certifications}
+                                    </p>
+                                )}
                             </div>
 
                             {/* Submit Button */}
