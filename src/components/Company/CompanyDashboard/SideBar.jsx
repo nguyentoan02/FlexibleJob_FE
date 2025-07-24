@@ -109,12 +109,7 @@ const SideBar = ({ isCreate }) => {
                                     setActions("MANAGEAPPLICATION");
                                 }}
                             />
-                            <SideBarItem
-                                icon={<BookOutlined />}
-                                label="Bookmark Resumes"
-                                badge={4}
-                                onClick={() => {}}
-                            />
+
                             <SideBarItem
                                 icon={<GiftOutlined />}
                                 label="Packages"
@@ -131,15 +126,6 @@ const SideBar = ({ isCreate }) => {
                                 onClick={() => {
                                     navigate("chat");
                                     setActions("MESSAGES");
-                                }}
-                            />
-                            <SideBarItem
-                                icon={<BellOutlined />}
-                                label="Notifications"
-                                active={action === "NOTIFICATIONS"}
-                                onClick={() => {
-                                    // navigate("notifications"); // You can create this route
-                                    setActions("NOTIFICATIONS");
                                 }}
                             />
                         </>
@@ -159,16 +145,7 @@ const SideBar = ({ isCreate }) => {
                         }}
                         active={action === "PROFILE"}
                     />
-                    <SideBarItem
-                        icon={<LockOutlined />}
-                        label="Change Password"
-                        onClick={() => {}}
-                    />
-                    <SideBarItem
-                        icon={<DeleteOutlined />}
-                        label="Delete Account"
-                        onClick={() => {}}
-                    />
+
                     <SideBarItem
                         icon={<PoweroffOutlined />}
                         label="Log Out"
