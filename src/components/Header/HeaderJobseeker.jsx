@@ -36,6 +36,12 @@ export default function HeaderJobseeker() {
             to: "/company-public", // Thêm đường dẫn tới Company List
             subItems: [],
         },
+        { label: "Pages", subItems: ["About Us", "Contact Us"] },
+        {
+            label: "Blog",
+            subItems: ["Blog Grid", "Blog Grid 2", "Blog Single"],
+        },
+        { label: "Contact", subItems: [] },
     ];
 
     return (

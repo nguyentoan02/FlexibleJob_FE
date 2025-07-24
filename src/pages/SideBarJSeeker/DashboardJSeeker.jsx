@@ -8,7 +8,8 @@ import {
     Heart,
     LogOut,
     MessageCircle,
-    Bell, // Import Bell icon
+    Bell,
+    User, // Import User icon
 } from "lucide-react";
 
 function NavItem({ icon, label, to, active = false, onClick }) {
@@ -58,7 +59,7 @@ export function SidebarJobseeker() {
 
     return (
         <aside className="w-64 bg-white border-r border-gray-200 flex-shrink-0 md:block min-h-screen">
-            <div className="p-4">
+            <div className="p-4 flex flex-col h-full">
                 <div className="mb-6">
                     <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
                         Main Navigation
@@ -107,7 +108,15 @@ export function SidebarJobseeker() {
                                 "/user/dashboard/notifications"
                             }
                         />
-                        {/* CV logic */}
+                    </nav>
+                </div>
+
+                {/* CV Profile Section */}
+                <div className="mb-6">
+                    <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        CV Profile
+                    </h3>
+                    <nav className="mt-2">
                         {!isLoading && !hasCV && (
                             <NavItem
                                 icon={<FileText size={20} />}
@@ -142,11 +151,22 @@ export function SidebarJobseeker() {
                         )}
                     </nav>
                 </div>
-                <div>
+
+                {/* My Account Section */}
+                <div className="mb-6">
                     <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
                         My Account
                     </h3>
                     <nav className="mt-2">
+                        <NavItem
+                            icon={<User size={20} />}
+                            label="User Profile"
+                            to="profile"
+                            active={
+                                location.pathname ===
+                                "/user/dashboard/user/profile"
+                            }
+                        />
                         <NavItem
                             icon={<LayoutDashboard size={20} />}
                             label="Job List"
@@ -155,6 +175,8 @@ export function SidebarJobseeker() {
                         />
                     </nav>
                 </div>
+
+                {/* Logout - đẩy xuống dưới cùng */}
                 <div className="mt-auto pt-6">
                     <NavItem
                         icon={<LogOut size={20} />}

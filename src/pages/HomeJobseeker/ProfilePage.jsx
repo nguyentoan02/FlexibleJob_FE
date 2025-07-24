@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import Toast from "@/components/Toast/Toast";
+import { Camera, User } from "lucide-react"; // Thêm icon nếu có sẵn
 
 export default function ProfilePage() {
     const { profileQuery, profileMutation } = useProfile();
@@ -76,68 +77,152 @@ export default function ProfilePage() {
         profileMutation.mutate(formData);
     };
 
-    if (profileQuery.isLoading) return <p>Loading profile...</p>;
+    if (profileQuery.isLoading)
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+            </div>
+        );
+
     if (profileQuery.isError)
-        return <p>Error loading profile data: {profileQuery.error.message}</p>;
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full text-center">
+                    <div className="text-red-500 text-xl mb-4">⚠️</div>
+                    <h2 className="text-xl font-bold text-red-600 mb-2">
+                        Error
+                    </h2>
+                    <p className="text-gray-600">
+                        {profileQuery.error.message}
+                    </p>
+                </div>
+            </div>
+        );
 
     return (
-        <div className="flex items-center justify-center min-h-screen">
-            {/* NEW: Chỉ hiển thị Toast khi có toastMessage */}
-            {toastMessage && <Toast message={toastMessage} type={toastType} />}
-            <form
-                onSubmit={handleSubmit}
-                className="w-full max-w-md p-6 bg-white shadow rounded space-y-4"
-            >
-                <h2 className="text-2xl font-bold text-center">Edit Profile</h2>
-                <div>
-                    <Label htmlFor="firstName">First Name</Label>
-                    <Input
-                        id="firstName"
-                        value={form.firstName}
-                        onChange={(e) =>
-                            setForm({ ...form, firstName: e.target.value })
-                        }
-                        required
-                    />
+        <div className="min-h-screen py-12 bg-gray-50 px-4">
+            {/* Toast component */}
+            {toastMessage && (
+                <div className="fixed top-4 right-4 z-50">
+                    <Toast message={toastMessage} type={toastType} />
                 </div>
-                <div>
-                    <Label htmlFor="lastName">Last Name</Label>
-                    <Input
-                        id="lastName"
-                        value={form.lastName}
-                        onChange={(e) =>
-                            setForm({ ...form, lastName: e.target.value })
-                        }
-                        required
-                    />
+            )}
+
+            <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+                <div className="bg-gradient-to-r from-blue-500 to-indigo-600 py-6 px-8 text-white">
+                    <h2 className="text-2xl font-bold">Edit Profile</h2>
+                    <p className="text-blue-100 text-sm">
+                        Update your personal information
+                    </p>
                 </div>
-                <div>
-                    <Label htmlFor="profileImage">Profile Image</Label>
-                    <Input
-                        id="profileImage"
-                        type="file"
-                        onChange={(e) => setImageFile(e.target.files[0])}
-                    />
-                    {(imageFile || form.imageUrl) && (
-                        <img
-                            src={
-                                imageFile
-                                    ? URL.createObjectURL(imageFile) // Hiển thị ảnh xem trước nếu có file mới
-                                    : form.imageUrl // Ngược lại, hiển thị ảnh hiện tại
-                            }
-                            alt="Profile"
-                            className="mt-2 w-24 h-24 rounded-full object-cover"
-                        />
-                    )}
-                </div>
-                <Button
-                    type="submit"
-                    className="w-full"
-                    disabled={profileMutation.isLoading}
-                >
-                    {profileMutation.isLoading ? "Saving..." : "Save Changes"}
-                </Button>
-            </form>
+
+                <form onSubmit={handleSubmit} className="p-8 space-y-6">
+                    {/* Profile Image Section */}
+                    <div className="flex flex-col items-center mb-2">
+                        <div className="relative mb-4">
+                            <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-100 border-4 border-white shadow-lg">
+                                {imageFile || form.imageUrl ? (
+                                    <img
+                                        src={
+                                            imageFile
+                                                ? URL.createObjectURL(imageFile)
+                                                : form.imageUrl
+                                        }
+                                        alt="Profile"
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400">
+                                        <User size={48} />
+                                    </div>
+                                )}
+                            </div>
+
+                            <label
+                                htmlFor="profileImage"
+                                className="absolute bottom-0 right-0 bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full cursor-pointer shadow-md transition-colors"
+                            >
+                                <Camera size={16} />
+                            </label>
+
+                            <Input
+                                id="profileImage"
+                                type="file"
+                                className="hidden"
+                                onChange={(e) =>
+                                    setImageFile(e.target.files[0])
+                                }
+                                accept="image/*"
+                            />
+                        </div>
+                        <p className="text-sm text-gray-500">
+                            Click the icon to change your profile picture
+                        </p>
+                    </div>
+
+                    {/* Form Fields */}
+                    <div className="space-y-4">
+                        <div>
+                            <Label
+                                htmlFor="firstName"
+                                className="text-gray-700 font-medium block mb-1"
+                            >
+                                First Name
+                            </Label>
+                            <Input
+                                id="firstName"
+                                value={form.firstName}
+                                onChange={(e) =>
+                                    setForm({
+                                        ...form,
+                                        firstName: e.target.value,
+                                    })
+                                }
+                                required
+                                className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg"
+                                placeholder="Enter your first name"
+                            />
+                        </div>
+
+                        <div>
+                            <Label
+                                htmlFor="lastName"
+                                className="text-gray-700 font-medium block mb-1"
+                            >
+                                Last Name
+                            </Label>
+                            <Input
+                                id="lastName"
+                                value={form.lastName}
+                                onChange={(e) =>
+                                    setForm({
+                                        ...form,
+                                        lastName: e.target.value,
+                                    })
+                                }
+                                required
+                                className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg"
+                                placeholder="Enter your last name"
+                            />
+                        </div>
+                    </div>
+
+                    <Button
+                        type="submit"
+                        className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+                        disabled={profileMutation.isLoading}
+                    >
+                        {profileMutation.isLoading ? (
+                            <div className="flex items-center justify-center">
+                                <div className="animate-spin h-5 w-5 mr-2 border-2 border-white border-t-transparent rounded-full"></div>
+                                <span>Saving...</span>
+                            </div>
+                        ) : (
+                            "Save Changes"
+                        )}
+                    </Button>
+                </form>
+            </div>
         </div>
     );
 }
