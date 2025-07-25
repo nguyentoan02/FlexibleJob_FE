@@ -24,12 +24,10 @@ const HeaderCompany = () => {
         },
         {
             label: "Recruiters",
-            subItems: ["Recruiter List", "Recruiter Details"],
+            to: "/company-public", // Thêm đường dẫn tới Company List
+            subItems: [],
         },
-        {
-            label: "Candidates",
-            subItems: ["Candidate List", "Candidate Details"],
-        },
+
         { label: "Pages", subItems: ["About Us", "Contact Us"] },
         {
             label: "Blog",
@@ -161,14 +159,6 @@ const HeaderCompany = () => {
                         </>
                     ) : (
                         <>
-                            <Link to="/login-em">
-                                <Button
-                                    variant="default"
-                                    className="bg-blue-600 text-white"
-                                >
-                                    Sign in for Employer
-                                </Button>
-                            </Link>
                             <Link to="/login">
                                 <Button
                                     variant="default"

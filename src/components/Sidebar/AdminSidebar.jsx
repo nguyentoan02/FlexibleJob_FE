@@ -100,12 +100,6 @@ export function AdminSidebar() {
                             label="Manage Jobs"
                             to="/admin/jobs"
                         />
-                        <NavItem
-                            icon={<MessageSquare size={20} />}
-                            label="Messages"
-                            to="/admin/messages"
-                            badge={4}
-                        />
                     </nav>
                 </div>
                 <div className="mb-6">
@@ -118,12 +112,6 @@ export function AdminSidebar() {
                             label="Manage Packages"
                             to="/admin/packages"
                             active={location.pathname === "/admin/packages"}
-                        />
-                        <NavItem
-                            icon={<AlertTriangle size={20} />}
-                            label="Reports"
-                            to="/admin/report"
-                            active={location.pathname === "/admin/reportreport"}
                         />
                     </nav>
                 </div>

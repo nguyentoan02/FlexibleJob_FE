@@ -290,12 +290,12 @@ export default function CompanyDetail() {
                                                 Benefits & Perks
                                             </h3>
                                         </div>
-                                        <div className="flex flex-wrap gap-2">
+                                        <div className="flex flex-wrap gap-3">
                                             {company.benefit?.length ? (
                                                 company.benefit.map((b, i) => (
                                                     <Badge
                                                         key={i}
-                                                        className="bg-blue-100 text-blue-800 hover:bg-blue-200 px-3 py-1 text-sm font-medium"
+                                                        className="bg-blue-100 text-blue-800 hover:bg-blue-200 px-3 py-2 text-sm font-medium h-auto whitespace-normal text-left"
                                                     >
                                                         {b}
                                                     </Badge>
