@@ -98,11 +98,20 @@ export const useMyCompany = () => {
                     key !== "albumImage" &&
                     key !== "identityImage" &&
                     key !== "imageUrl" &&
-                    key !== "coverImage"
+                    key !== "coverImage" &&
+                    key !== "benefit" // Exclude benefit here, handle it separately
                 ) {
                     formData.append(key, data[key]);
                 }
             });
+
+            // Handle benefits as an array
+            if (data.benefit && Array.isArray(data.benefit)) {
+                data.benefit.forEach((benefit, index) => {
+                    formData.append(`benefit[${index}]`, benefit);
+                });
+            }
+
             // Ảnh đại diện
             if (data.imageUrl) formData.append("imageUrl", data.imageUrl);
             // Ảnh cover

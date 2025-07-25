@@ -161,14 +161,6 @@ export default function HeaderJobseeker() {
                         </>
                     ) : (
                         <>
-                            <Link to="/login-em">
-                                <Button
-                                    variant="default"
-                                    className="bg-blue-600 text-white"
-                                >
-                                    Sign in for Employer
-                                </Button>
-                            </Link>
                             <Link to="/login">
                                 <Button
                                     variant="default"

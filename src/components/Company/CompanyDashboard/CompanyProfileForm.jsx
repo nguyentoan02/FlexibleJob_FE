@@ -254,7 +254,7 @@ const CreateCompany = () => {
                         value={formData.benefit}
                         onChange={handleChange}
                         className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        placeholder="e.g. Insurance, Travel, Holiday bonus"
+                        placeholder="Enter benefits, separated by commas"
                     />
                 </div>
                 <div>
