@@ -288,7 +288,7 @@ export default function JobDetail() {
                                                 {job.title}
                                             </h1>
                                             <Link
-                                                to={`/company/${job.company._id}`}
+                                                to={`/company-public/${job.company._id}`}
                                                 className="text-2xl font-semibold text-indigo-600 hover:underline mb-4 block"
                                             >
                                                 {job.company.companyName}

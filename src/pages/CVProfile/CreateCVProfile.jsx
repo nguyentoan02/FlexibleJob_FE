@@ -8,10 +8,12 @@ import { useAuth } from "@/hooks/useAuth";
 import axios from "axios";
 import { Plus, Minus } from "lucide-react";
 import Toast from "@/components/Toast/Toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function CreateCVProfile() {
     const navigate = useNavigate();
-    const { token } = useAuth();
+    const { token, user } = useAuth();
+    const queryClient = useQueryClient();
     const [loading, setLoading] = useState(false);
     const [toast, setToast] = useState({ message: "", type: "" });
     const [errors, setErrors] = useState({});
@@ -258,14 +260,15 @@ export default function CreateCVProfile() {
                 }
             );
 
+            // Invalidate the query to refetch the data on the view page
+            await queryClient.invalidateQueries(["cvProfile", user?.id]);
+
             setToast({
                 message: "CV Profile created successfully!",
                 type: "success",
             });
 
-            setTimeout(() => {
-                navigate("/user/dashboard/cvprofile");
-            }, 2000);
+            navigate("/user/dashboard/cvprofile");
         } catch (error) {
             setToast({
                 message:

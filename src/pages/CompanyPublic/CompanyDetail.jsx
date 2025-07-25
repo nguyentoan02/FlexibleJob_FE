@@ -308,6 +308,73 @@ export default function CompanyDetail() {
                                         </div>
                                     </CardContent>
                                 </Card>
+
+                                {/* Company Album - Add this new section */}
+                                {company.albumImage &&
+                                    company.albumImage.length > 0 && (
+                                        <Card className="shadow-sm border border-gray-200 bg-white mt-6">
+                                            <CardContent className="p-8">
+                                                <div className="flex items-center gap-3 mb-6">
+                                                    <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            width="16"
+                                                            height="16"
+                                                            viewBox="0 0 24 24"
+                                                            fill="none"
+                                                            stroke="currentColor"
+                                                            strokeWidth="2"
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            className="text-white"
+                                                        >
+                                                            <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"></path>
+                                                            <circle
+                                                                cx="8.5"
+                                                                cy="8.5"
+                                                                r="1.5"
+                                                            ></circle>
+                                                            <polyline points="21 15 16 10 5 21"></polyline>
+                                                        </svg>
+                                                    </div>
+                                                    <h3 className="text-xl font-semibold text-gray-800">
+                                                        Company Gallery
+                                                    </h3>
+                                                </div>
+                                                <div className="overflow-x-auto pb-2">
+                                                    <div className="flex gap-4 snap-x snap-mandatory">
+                                                        {company.albumImage.map(
+                                                            (image, index) => (
+                                                                <div
+                                                                    key={index}
+                                                                    className="flex-shrink-0 snap-center"
+                                                                >
+                                                                    <img
+                                                                        src={
+                                                                            image
+                                                                        }
+                                                                        alt={`${
+                                                                            company.companyName
+                                                                        } - Image ${
+                                                                            index +
+                                                                            1
+                                                                        }`}
+                                                                        className="h-48 w-64 object-cover rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+                                                                        onClick={() =>
+                                                                            window.open(
+                                                                                image,
+                                                                                "_blank"
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                </div>
+                                                            )
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    )}
                             </div>
 
                             {/* Contact Info */}
