@@ -24,6 +24,8 @@ export default function AuthGoogleSuccess() {
                 // Chuyển hướng ngay lập tức dựa trên vai trò
                 if (userRole === "ADMIN") {
                     navigate("/admin/dashboard", { replace: true });
+                } else if (userRole === "EMPLOYER") {
+                    navigate("/company/dashboard", { replace: true });
                 } else {
                     navigate("/jobs", { replace: true });
                 }
