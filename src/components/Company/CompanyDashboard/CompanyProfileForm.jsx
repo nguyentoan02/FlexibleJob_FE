@@ -4,13 +4,27 @@ import { useMyCompany } from "../../../hooks/myCompany";
 import Toast from "../../Toast/Toast";
 
 const CreateCompany = () => {
+    // Danh sách thành phố - giống như trong JobList và JobForm
+    const cities = [
+        { value: "Hanoi", label: "Hanoi" },
+        { value: "Ho Chi Minh City", label: "Ho Chi Minh City" },
+        { value: "Da Nang", label: "Da Nang" },
+        { value: "Hai Phong", label: "Hai Phong" },
+        { value: "Can Tho", label: "Can Tho" },
+        { value: "Bien Hoa", label: "Bien Hoa" },
+        { value: "Hue", label: "Hue" },
+        { value: "Nha Trang", label: "Nha Trang" },
+        { value: "Vung Tau", label: "Vung Tau" },
+        { value: "Quy Nhon", label: "Quy Nhon" },
+    ];
+
     const [formData, setFormData] = useState({
         companyName: "",
         industry: "",
         aboutUs: "",
         benefit: "",
         address: "",
-        location: "",
+        location: "", // Sẽ chứa giá trị thành phố được chọn
         companySize: "1-9",
         website: "",
         email: "",
@@ -203,14 +217,19 @@ const CreateCompany = () => {
                     <label className="block text-gray-700 font-medium mb-1">
                         Location
                     </label>
-                    <input
-                        type="text"
+                    <select
                         name="location"
                         value={formData.location}
                         onChange={handleChange}
                         className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        placeholder="Enter location"
-                    />
+                    >
+                        <option value="">Select a location</option>
+                        {cities.map((city) => (
+                            <option key={city.value} value={city.value}>
+                                {city.label}
+                            </option>
+                        ))}
+                    </select>
                 </div>
                 <div className="md:col-span-2">
                     <label className="block text-gray-700 font-medium mb-1">

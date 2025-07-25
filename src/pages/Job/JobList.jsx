@@ -18,20 +18,36 @@ import { MapPin, Clock, Search, DollarSign, Building } from "lucide-react";
 export default function JobList() {
     const defaultValues = {
         title: "",
-        location: "",
+        location: "all",
         level: "all",
         jobType: "all",
         experienceYears: "",
         page: 1,
         limit: 2,
     };
+
+    // Danh sách thành phố - cập nhật tên tiếng Anh
+    const cities = [
+        { value: "all", label: "All Locations" },
+        { value: "Hanoi", label: "Hanoi" },
+        { value: "Ho Chi Minh City", label: "Ho Chi Minh City" },
+        { value: "Da Nang", label: "Da Nang" },
+        { value: "Hai Phong", label: "Hai Phong" },
+        { value: "Can Tho", label: "Can Tho" },
+        { value: "Bien Hoa", label: "Bien Hoa" },
+        { value: "Hue", label: "Hue" },
+        { value: "Nha Trang", label: "Nha Trang" },
+        { value: "Vung Tau", label: "Vung Tau" },
+        { value: "Quy Nhon", label: "Quy Nhon" },
+    ];
+
     const [formValues, setFormValues] = useState(defaultValues);
     const [searchParams, setSearchParams] = useState(defaultValues);
 
-    // Kiểm tra có đang filter/search không
+    // Kiểm tra có đang filter/search không - cập nhật logic
     const isFiltering =
         searchParams.title ||
-        searchParams.location ||
+        (searchParams.location && searchParams.location !== "all") || // Thay đổi logic kiểm tra
         (searchParams.level && searchParams.level !== "all") ||
         (searchParams.jobType && searchParams.jobType !== "all") ||
         searchParams.experienceYears;
@@ -98,15 +114,30 @@ export default function JobList() {
                                     className="pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-blue-500 shadow-sm"
                                 />
                             </div>
-                            <div className="relative flex-1 min-w-[180px]">
-                                <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-400 h-5 w-5" />
-                                <Input
-                                    name="location"
-                                    placeholder="Location..."
+                            <div className="flex items-center gap-3 flex-1 min-w-[180px]">
+                                <Select
                                     value={formValues.location}
-                                    onChange={handleInputChange}
-                                    className="pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-blue-500 shadow-sm"
-                                />
+                                    onValueChange={(value) =>
+                                        handleSelectChange("location", value)
+                                    }
+                                >
+                                    <SelectTrigger className="bg-gray-50 border border-gray-200 rounded-xl focus:border-blue-500 py-3 px-4 shadow-sm w-full">
+                                        <div className="flex items-center gap-2">
+                                            <MapPin className="h-5 w-5 text-blue-400" />
+                                            <SelectValue placeholder="Select Location" />
+                                        </div>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {cities.map((city) => (
+                                            <SelectItem
+                                                key={city.value}
+                                                value={city.value}
+                                            >
+                                                {city.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
                             <div className="flex items-center gap-3 flex-1 min-w-[160px]">
                                 <Select
