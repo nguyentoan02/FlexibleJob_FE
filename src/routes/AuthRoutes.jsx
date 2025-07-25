@@ -11,7 +11,7 @@ import CompanyProfile from "../pages/Employer/CompanyProfile";
 import JobList from "../pages/Job/JobList";
 import JobDetail from "../pages/Job/JobDetail";
 import SignUp from "../pages/SignUp";
-import ChangePassword from "../pages/ChangePassword";
+import ChangePassword from "../pages/Admin/ChangePassword";
 import VerifyEmail from "../pages/VerifyEmail";
 import CompanyList from "../pages/CompanyPublic/CompanyList";
 import CompanyDetail from "../pages/CompanyPublic/CompanyDetail";
