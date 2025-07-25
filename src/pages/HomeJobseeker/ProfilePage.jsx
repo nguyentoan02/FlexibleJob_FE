@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useProfile } from "@/hooks/profilepage";
+import { useAuth } from "@/hooks/useAuth"; // Thêm import này
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -8,6 +9,7 @@ import { Camera, User } from "lucide-react"; // Thêm icon nếu có sẵn
 
 export default function ProfilePage() {
     const { profileQuery, profileMutation } = useProfile();
+    const { user } = useAuth(); // Lấy thông tin user từ auth context
     const [form, setForm] = useState({
         firstName: "",
         lastName: "",
@@ -17,17 +19,17 @@ export default function ProfilePage() {
     const [toastMessage, setToastMessage] = useState(null);
     const [toastType, setToastType] = useState("success");
 
-    // NEW: Sử dụng useEffect để cập nhật form state khi dữ liệu profile được fetch thành công.
-    // Điều này ngăn chặn lỗi re-render vô hạn và đảm bảo form được điền đúng dữ liệu.
+    // Sửa lại useEffect để kết hợp dữ liệu từ API và token
     useEffect(() => {
-        if (profileQuery.isSuccess && profileQuery.data) {
-            setForm({
-                firstName: profileQuery.data.firstName || "",
-                lastName: profileQuery.data.lastName || "",
-                imageUrl: profileQuery.data.imageUrl || "",
-            });
-        }
-    }, [profileQuery.isSuccess, profileQuery.data]); // Chạy lại khi query thành công hoặc data thay đổi
+        const profileData = profileQuery.data || {};
+        const userData = user || {};
+
+        setForm({
+            firstName: profileData.firstName || userData.firstName || "",
+            lastName: profileData.lastName || userData.lastName || "",
+            imageUrl: profileData.imageUrl || "",
+        });
+    }, [profileQuery.data, user]);
 
     // NEW: useEffect để lắng nghe trạng thái của profileMutation và hiển thị Toast
     useEffect(() => {
