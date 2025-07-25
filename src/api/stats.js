@@ -45,3 +45,13 @@ export async function fetchRecentActivity(token) {
   const data = await res.json();
   return Array.isArray(data) ? data : [];
 }
+
+export async function fetchReportedJobsStats(token) {
+  const API_URL = import.meta.env.VITE_API_URL || '';
+  const res = await fetch(`${API_URL}/stats/reported-jobs`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {}
+  });
+  if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+  const data = await res.json();
+  return data.payload || data;
+}

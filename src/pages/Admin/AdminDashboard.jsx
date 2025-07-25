@@ -24,7 +24,7 @@ import {
 import { fetchRevenue } from "../../api/payment";
 import { useAuth } from "../../hooks/useAuth";
 import DashboardChart from "@/components/dashboard/DashboardChart";
-import { fetchRecentActivity } from "../../api/stats";
+import { fetchRecentActivity, fetchReportedJobsStats } from "../../api/stats";
 
 export default function AdminDashboard() {
     const { token } = useAuth();
@@ -34,30 +34,40 @@ export default function AdminDashboard() {
         totalJobseekers: 0,
         totalCompanies: 0,
         revenue: 0,
+        reportedJobs: 0,
+        totalJobs: 0,
         loading: true,
         error: null,
     });
     const [activeTab, setActiveTab] = useState("overview");
     const [recentActivity, setRecentActivity] = useState([]);
-    const [showAllActivity, setShowAllActivity] = useState(false);
 
     useEffect(() => {
         async function fetchStats() {
             try {
-                const [users, employers, jobseekers, companies, revenue] =
-                    await Promise.all([
-                        fetchTotalUsers(token),
-                        fetchTotalEmployers(token),
-                        fetchTotalJobseekers(token),
-                        fetchTotalCompanies(token),
-                        fetchRevenue(token),
-                    ]);
+                const [
+                    users,
+                    employers,
+                    jobseekers,
+                    companies,
+                    revenue,
+                    reportedJobsData,
+                ] = await Promise.all([
+                    fetchTotalUsers(token),
+                    fetchTotalEmployers(token),
+                    fetchTotalJobseekers(token),
+                    fetchTotalCompanies(token),
+                    fetchRevenue(token),
+                    fetchReportedJobsStats(token),
+                ]);
                 setStats({
                     totalUsers: users,
                     totalEmployers: employers,
                     totalJobseekers: jobseekers,
                     totalCompanies: companies,
                     revenue: revenue,
+                    reportedJobs: reportedJobsData.reportedJobs || 0,
+                    totalJobs: reportedJobsData.totalJobs || 0,
                     loading: false,
                     error: null,
                 });
@@ -142,7 +152,7 @@ export default function AdminDashboard() {
                                 Total Companies
                             </span>
                         </Card>
-                        {/* Violation Reports */}
+                        {/* Reported Jobs */}
                         <Card className="p-6 flex flex-col bg-white shadow rounded-lg">
                             <div className="flex items-center gap-2 mb-2">
                                 <AlertTriangle className="h-6 w-6 text-red-500 bg-red-100 rounded p-1" />
@@ -151,9 +161,14 @@ export default function AdminDashboard() {
                                     -8%
                                 </span>
                             </div>
-                            <span className="text-3xl font-bold">23</span>
+                            <span className="text-3xl font-bold">
+                                {stats.reportedJobs}
+                            </span>
                             <span className="text-gray-700 font-medium mt-1">
-                                Violation Reports
+                                Reported Jobs
+                            </span>
+                            <span className="text-gray-400 text-sm mt-1">
+                                Total Jobs: {stats.totalJobs}
                             </span>
                         </Card>
                         {/* Revenue */}
@@ -239,108 +254,92 @@ export default function AdminDashboard() {
                         <h2 className="text-lg font-semibold mb-4">
                             Recent Activity
                         </h2>
-                        <ul className="space-y-3">
-                            {recentActivity.length === 0 ? (
-                                <li className="text-gray-400 text-sm">
-                                    No recent activity.
-                                </li>
-                            ) : (
-                                (showAllActivity
-                                    ? recentActivity
-                                    : recentActivity.slice(0, 5)
-                                ).map((item, idx) => {
-                                    let icon = null;
-                                    let color = "text-gray-600";
-                                    if (item.type === "user_register") {
-                                        icon = (
-                                            <UserPlus className="mr-2 h-5 w-5 text-blue-500" />
-                                        );
-                                        color = "text-blue-600";
-                                    } else if (item.type === "user_banned") {
-                                        icon = (
-                                            <Ban className="mr-2 h-5 w-5 text-red-500" />
-                                        );
-                                        color = "text-red-600";
-                                    } else if (item.type === "user_unbanned") {
-                                        icon = (
-                                            <Unlock className="mr-2 h-5 w-5 text-green-500" />
-                                        );
-                                        color = "text-green-600";
-                                    } else if (
-                                        item.type === "company_post_job"
-                                    ) {
-                                        icon = (
-                                            <Briefcase className="mr-2 h-5 w-5 text-yellow-500" />
-                                        );
-                                        color = "text-yellow-600";
-                                    } else if (
-                                        item.type === "package_purchase_success"
-                                    ) {
-                                        icon = (
-                                            <ShoppingCart className="mr-2 h-5 w-5 text-green-500" />
-                                        );
-                                        color = "text-green-600";
-                                    } else if (
-                                        item.type === "job_application"
-                                    ) {
-                                        icon = (
-                                            <FileText className="mr-2 h-5 w-5 text-purple-500" />
-                                        );
-                                        color = "text-purple-600";
-                                    } else if (item.type === "success") {
-                                        icon = (
-                                            <CheckCircle className="mr-2 h-5 w-5 text-green-500" />
-                                        );
-                                        color = "text-green-600";
-                                    }
-                                    return (
-                                        <li
-                                            key={idx}
-                                            className={`text-sm flex items-start ${color}`}
-                                        >
-                                            <div className="flex-shrink-0 pt-0.5">
-                                                {icon}
-                                            </div>
-                                            <div className="flex-1">
-                                                <div className="font-medium text-base">
-                                                    {item.message}
+                        <div className="max-h-[400px] overflow-y-auto">
+                            <ul className="space-y-3">
+                                {recentActivity.length === 0 ? (
+                                    <li className="text-gray-400 text-sm">
+                                        No recent activity.
+                                    </li>
+                                ) : (
+                                    recentActivity.map((item, idx) => {
+                                        let icon = null;
+                                        let color = "text-gray-600";
+                                        if (item.type === "user_register") {
+                                            icon = (
+                                                <UserPlus className="mr-2 h-5 w-5 text-blue-500" />
+                                            );
+                                            color = "text-blue-600";
+                                        } else if (
+                                            item.type === "user_banned"
+                                        ) {
+                                            icon = (
+                                                <Ban className="mr-2 h-5 w-5 text-red-500" />
+                                            );
+                                            color = "text-red-600";
+                                        } else if (
+                                            item.type === "user_unbanned"
+                                        ) {
+                                            icon = (
+                                                <Unlock className="mr-2 h-5 w-5 text-green-500" />
+                                            );
+                                            color = "text-green-600";
+                                        } else if (
+                                            item.type === "company_post_job"
+                                        ) {
+                                            icon = (
+                                                <Briefcase className="mr-2 h-5 w-5 text-yellow-500" />
+                                            );
+                                            color = "text-yellow-600";
+                                        } else if (
+                                            item.type ===
+                                            "package_purchase_success"
+                                        ) {
+                                            icon = (
+                                                <ShoppingCart className="mr-2 h-5 w-5 text-green-500" />
+                                            );
+                                            color = "text-green-600";
+                                        } else if (
+                                            item.type === "job_application"
+                                        ) {
+                                            icon = (
+                                                <FileText className="mr-2 h-5 w-5 text-purple-500" />
+                                            );
+                                            color = "text-purple-600";
+                                        } else if (item.type === "success") {
+                                            icon = (
+                                                <CheckCircle className="mr-2 h-5 w-5 text-green-500" />
+                                            );
+                                            color = "text-green-600";
+                                        }
+                                        return (
+                                            <li
+                                                key={idx}
+                                                className={`text-sm flex items-start ${color}`}
+                                            >
+                                                <div className="flex-shrink-0 pt-0.5">
+                                                    {icon}
                                                 </div>
-                                                <div className="flex gap-2 mt-1 text-xs text-gray-400">
-                                                    <span>{item.type}</span>
-                                                    {item.createdAt && (
-                                                        <span>
-                                                            {new Date(
-                                                                item.createdAt
-                                                            ).toLocaleString()}
-                                                        </span>
-                                                    )}
+                                                <div className="flex-1">
+                                                    <div className="font-medium text-base">
+                                                        {item.message}
+                                                    </div>
+                                                    <div className="flex gap-2 mt-1 text-xs text-gray-400">
+                                                        <span>{item.type}</span>
+                                                        {item.createdAt && (
+                                                            <span>
+                                                                {new Date(
+                                                                    item.createdAt
+                                                                ).toLocaleString()}
+                                                            </span>
+                                                        )}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </li>
-                                    );
-                                })
-                            )}
-                        </ul>
-                        {recentActivity.length > 5 && !showAllActivity && (
-                            <div className="pt-4 text-center">
-                                <button
-                                    className="text-green-600 hover:underline text-sm font-medium"
-                                    onClick={() => setShowAllActivity(true)}
-                                >
-                                    View All
-                                </button>
-                            </div>
-                        )}
-                        {showAllActivity && recentActivity.length > 5 && (
-                            <div className="pt-4 text-center">
-                                <button
-                                    className="text-gray-500 hover:underline text-sm font-medium"
-                                    onClick={() => setShowAllActivity(false)}
-                                >
-                                    Show Less
-                                </button>
-                            </div>
-                        )}
+                                            </li>
+                                        );
+                                    })
+                                )}
+                            </ul>
+                        </div>
                     </Card>
                 </div>
             </div>
