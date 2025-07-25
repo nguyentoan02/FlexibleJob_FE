@@ -6,10 +6,11 @@ import AdminProfilePage from "../pages/Admin/AdminProfilePage";
 import PackageManagement from "../pages/Admin/PackageManagement";
 import CreatePackage from "../pages/Admin/CreatePackage";
 import EditPackage from "../pages/Admin/EditPackage";
-import ChangePassword from "../pages/ChangePassword";
+import ChangePassword from "../pages/Admin/ChangePassword";
 import Report from "../pages/Admin/Report";
-import ManageJob from "../pages/ManageJob";
-import ManageCompany from "../pages/ManageCompany";
+import ManageJob from "../pages/Admin/ManageJob";
+import ManageCompany from "../pages/Admin/ManageCompany";
+import CompanyProfileDetail from "../pages/Admin/CompanyProfileDetail";
 import Message from "../pages/Admin/Message";
 
 export default function AdminRoutes() {
@@ -28,6 +29,7 @@ export default function AdminRoutes() {
             <Route path="/admin/report" element={<Report />} />
             <Route path="/admin/jobs" element={<ManageJob />} />
             <Route path="/admin/companies" element={<ManageCompany />} />
+            <Route path="/admin/company-profile/:companyId" element={<CompanyProfileDetail />} />
             <Route path="/admin/messages" element={<Message />} />
         </Route>
     );

@@ -1,9 +1,11 @@
 import React from "react";
-import { Menu } from "lucide-react";
+import { Menu, Phone } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useAdminProfile } from "@/hooks/profilepage";
 
 export function AdminHeader({ onMenuClick }) {
     const { user } = useAuth();
+    const { profileQuery } = useAdminProfile();
 
     return (
         <header className="bg-white shadow-md fixed top-0 left-0 right-0 z-50">
@@ -33,6 +35,12 @@ export function AdminHeader({ onMenuClick }) {
                     <span className="text-gray-700 hidden md:inline">
                         Welcome, <strong>{user?.username || "Admin"}</strong>
                     </span>
+                    {profileQuery.data?.phoneNumber && (
+                        <div className="flex items-center space-x-2 text-gray-600 hidden lg:flex">
+                            <Phone size={16} className="text-green-500" />
+                            <span className="text-sm">{profileQuery.data.phoneNumber}</span>
+                        </div>
+                    )}
                 </div>
             </div>
         </header>

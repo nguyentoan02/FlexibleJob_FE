@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Eye, EyeOff, Key, CheckCircle, XCircle } from 'lucide-react';
 import AdminLayout from '@/components/Layout/AdminLayout';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '../hooks/useAuth';
-import { changePassword } from '../api/auth';
+import { useAuth } from '../../hooks/useAuth';
+import { changePassword } from '../../api/auth';
 
 export default function ChangePassword() {
   const { token } = useAuth();
