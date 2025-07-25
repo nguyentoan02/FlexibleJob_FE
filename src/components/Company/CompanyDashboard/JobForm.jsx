@@ -6,6 +6,20 @@ import LimitTationJobPost from "./LimitTationJobPost";
 const JobForm = ({ handleSubmit, title, initialData, limitData }) => {
     const { AllCategory } = useCategory();
 
+    // Danh sách thành phố - giống như trong JobList
+    const cities = [
+        { value: "Hanoi", label: "Hanoi" },
+        { value: "Ho Chi Minh City", label: "Ho Chi Minh City" },
+        { value: "Da Nang", label: "Da Nang" },
+        { value: "Hai Phong", label: "Hai Phong" },
+        { value: "Can Tho", label: "Can Tho" },
+        { value: "Bien Hoa", label: "Bien Hoa" },
+        { value: "Hue", label: "Hue" },
+        { value: "Nha Trang", label: "Nha Trang" },
+        { value: "Vung Tau", label: "Vung Tau" },
+        { value: "Quy Nhon", label: "Quy Nhon" },
+    ];
+
     const [formData, setFormData] = useState(
         initialData || {
             title: "",
@@ -15,7 +29,7 @@ const JobForm = ({ handleSubmit, title, initialData, limitData }) => {
             experienceYears: 0,
             level: "Junior",
             jobType: "Full-time",
-            location: "",
+            location: "", // Sẽ chứa giá trị của thành phố được chọn
             isRemote: false,
             salary: {
                 min: "",
@@ -379,18 +393,27 @@ const JobForm = ({ handleSubmit, title, initialData, limitData }) => {
                     ))}
                 </select>
 
-                <input
-                    name="location"
-                    value={formData.location}
-                    onChange={handleChange}
-                    placeholder="Location"
-                    className="w-full border p-2 rounded"
-                />
-                {errors.location && (
-                    <div className="text-red-500 text-sm">
-                        {errors.location}
-                    </div>
-                )}
+                <div>
+                    <label className="block font-medium mb-1">Location</label>
+                    <select
+                        name="location"
+                        value={formData.location}
+                        onChange={handleChange}
+                        className="w-full border p-2 rounded"
+                    >
+                        <option value="">Select a location</option>
+                        {cities.map((city) => (
+                            <option key={city.value} value={city.value}>
+                                {city.label}
+                            </option>
+                        ))}
+                    </select>
+                    {errors.location && (
+                        <div className="text-red-500 text-sm">
+                            {errors.location}
+                        </div>
+                    )}
+                </div>
 
                 {/* <label className="flex items-center space-x-2">
                     <input
