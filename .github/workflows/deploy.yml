@@ -91,14 +91,14 @@ jobs:
                       echo '${{ secrets.ENV_FILE }}' > ${{ env.APP_DIR }}/.env
                       
                       echo '🐳 Pulling latest image...'
-                      docker pull \$FULL_IMAGE_NAME
+                      docker pull $FULL_IMAGE_NAME
                       
                       echo '🧹 Cleaning up old containers...'
                       docker stop ${{ env.DOCKER_IMAGE_NAME }}_new ${{ env.DOCKER_IMAGE_NAME }} 2>/dev/null || true
                       docker rm ${{ env.DOCKER_IMAGE_NAME }}_new ${{ env.DOCKER_IMAGE_NAME }} 2>/dev/null || true
                       
                       echo '🚀 Starting new container...'
-                      docker run -d --name ${{ env.DOCKER_IMAGE_NAME }}_new -p 6000:5000 --env-file ${{ env.APP_DIR }}/.env \$FULL_IMAGE_NAME
+                      docker run -d --name ${{ env.DOCKER_IMAGE_NAME }}_new -p 6000:5000 --env-file ${{ env.APP_DIR }}/.env $FULL_IMAGE_NAME
                       
                       echo '⌛ Waiting for new container to be healthy...'
                       sleep 10
@@ -115,8 +115,8 @@ jobs:
                       echo '🗑️ Pruning old docker images...'
                       docker system prune -af
                       
-                      echo '✅ Done on \$HOST'
-                    " HOST="$HOST" FULL_IMAGE_NAME="$FULL_IMAGE_NAME"
+                      echo '✅ Done on $HOST'
+                    " FULL_IMAGE_NAME="$FULL_IMAGE_NAME" HOST="$HOST"
                     
                     echo "🕒 Waiting before next deploy..."
                     sleep 10
