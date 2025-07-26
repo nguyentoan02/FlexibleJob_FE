@@ -11,7 +11,6 @@ env:
 
     DOCKER_IMAGE_NAME: myapp-fe # Tên image của bạn
 
-
 jobs:
     build-and-push:
         name: Build and Push to Docker Hub
@@ -88,6 +87,10 @@ jobs:
                     # Truyền biến vào script SSH
                     ssh -o StrictHostKeyChecking=no -i key.pem ${{ env.SSH_USER }}@$HOST "
                       set -e
+                      
+                      # Create .env file from GitHub secret
+                      echo "📝 Creating .env file..."
+                      echo "${{ secrets.ENV_FILE }}" > ${{ env.APP_DIR }}/.env
                       
                       # Pull image mới từ Docker Hub
                       echo '🐳 Pulling latest image...'
