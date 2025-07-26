@@ -8,7 +8,7 @@ on:
 env:
     SSH_USER: ec2-user
     APP_DIR: /home/ec2-user/app
-    DOCKER_IMAGE_NAME: myapp-fe1 # Tên image của bạn
+    DOCKER_IMAGE_NAME: myapp-fe1
 
 jobs:
     build-and-push:
@@ -57,7 +57,6 @@ jobs:
                   cache-from: type=local,src=/tmp/.buildx-cache
                   cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
 
-            # Di chuyển cache mới để sử dụng cho lần chạy tiếp theo
             - name: Move cache
               run: |
                   rm -rf /tmp/.buildx-cache
@@ -65,7 +64,7 @@ jobs:
 
     deploy:
         name: Rolling Deploy to EC2
-        needs: build-and-push # Chạy sau khi build-and-push thành công
+        needs: build-and-push
         runs-on: ubuntu-latest
 
         steps:
@@ -74,7 +73,6 @@ jobs:
                   echo "${{ secrets.EC2_KEY }}" > key.pem
                   chmod 400 key.pem
 
-                  # Lấy tag từ job build-and-push
                   IMAGE_TAG=${{ needs.build-and-push.outputs.image_tag }}
                   FULL_IMAGE_NAME="${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:$IMAGE_TAG"
 
@@ -83,39 +81,30 @@ jobs:
                   for HOST in "${HOSTS[@]}"; do
                     echo "👉 Deploying image $FULL_IMAGE_NAME to $HOST"
 
-                    # Truyền biến vào script SSH
                     ssh -o StrictHostKeyChecking=no -i key.pem ${{ env.SSH_USER }}@$HOST "
                       set -e
                       
-                      # Tạo thư mục app nếu chưa tồn tại
                       echo '📁 Creating app directory...'
                       mkdir -p ${{ env.APP_DIR }}
 
-                      # Tạo file .env từ secret
                       echo '🔑 Creating .env file...'
-                      echo "${{ secrets.ENV_FILE }}" > ${{ env.APP_DIR }}/.env
+                      echo '${{ secrets.ENV_FILE }}' > ${{ env.APP_DIR }}/.env
                       
-                      # Pull image mới từ Docker Hub
                       echo '🐳 Pulling latest image...'
-                      docker pull $FULL_IMAGE_NAME
+                      docker pull \$FULL_IMAGE_NAME
                       
-                      # Dọn dẹp container cũ
                       echo '🧹 Cleaning up old containers...'
                       docker stop ${{ env.DOCKER_IMAGE_NAME }}_new ${{ env.DOCKER_IMAGE_NAME }} 2>/dev/null || true
                       docker rm ${{ env.DOCKER_IMAGE_NAME }}_new ${{ env.DOCKER_IMAGE_NAME }} 2>/dev/null || true
                       
-                      # Tạo container mới
                       echo '🚀 Starting new container...'
-                      docker run -d --name ${{ env.DOCKER_IMAGE_NAME }}_new -p 6000:5000 --env-file ${{ env.APP_DIR }}/.env $FULL_IMAGE_NAME
+                      docker run -d --name ${{ env.DOCKER_IMAGE_NAME }}_new -p 6000:5000 --env-file ${{ env.APP_DIR }}/.env \$FULL_IMAGE_NAME
                       
                       echo '⌛ Waiting for new container to be healthy...'
                       sleep 10
                       
-                      # Kiểm tra container mới
                       if [ \$(docker ps -q -f name=${{ env.DOCKER_IMAGE_NAME }}_new) ]; then
                         echo '✅ New container is running successfully'
-                        
-                        # Đổi tên container mới thành tên chính
                         docker rename ${{ env.DOCKER_IMAGE_NAME }}_new ${{ env.DOCKER_IMAGE_NAME }}
                       else
                         echo '❌ New container failed to start'
@@ -123,12 +112,11 @@ jobs:
                         exit 1
                       fi
                       
-                      # Dọn dẹp image cũ
                       echo '🗑️ Pruning old docker images...'
                       docker system prune -af
                       
-                      echo '✅ Done on $HOST'
-                    "
+                      echo '✅ Done on \$HOST'
+                    " HOST="$HOST" FULL_IMAGE_NAME="$FULL_IMAGE_NAME"
                     
                     echo "🕒 Waiting before next deploy..."
                     sleep 10
