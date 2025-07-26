@@ -3,12 +3,12 @@ name: 🚀 Build, Push and Deploy
 on:
     push:
         branches:
-            - Feat/deployfe
+            - Feat/testdeploy
 
 env:
     SSH_USER: ec2-user
     APP_DIR: /home/ec2-user/app
-    DOCKER_IMAGE_NAME: myapp-fe # Tên image của bạn
+    DOCKER_IMAGE_NAME: myapp-fe1 # Tên image của bạn
 
 jobs:
     build-and-push:

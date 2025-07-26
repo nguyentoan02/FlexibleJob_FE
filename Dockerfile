@@ -6,6 +6,7 @@ RUN npm install
 COPY . .
 RUN npm run build
 
+
 # Stage 2: Serve the static files with Nginx
 FROM nginx:stable-alpine
 # Copy the built assets from the build stage
