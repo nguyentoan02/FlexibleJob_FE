@@ -88,6 +88,10 @@ jobs:
                     ssh -o StrictHostKeyChecking=no -i key.pem ${{ env.SSH_USER }}@$HOST "
                       set -e
                       
+                      # Create app directory if it doesn't exist
+                      echo "📁 Creating app directory..."
+                      mkdir -p ${{ env.APP_DIR }}
+                      
                       # Create .env file from GitHub secret
                       echo "📝 Creating .env file..."
                       echo "${{ secrets.ENV_FILE }}" > ${{ env.APP_DIR }}/.env
