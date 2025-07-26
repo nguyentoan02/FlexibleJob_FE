@@ -30,6 +30,9 @@ jobs:
                   username: ${{ secrets.DOCKERHUB_USERNAME }}
                   password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+            - name: 📝 Create .env from secret
+              run: echo "${{ secrets.ENV_FILE }}" > .env
+
             - name: 🏷️ Extract Docker metadata
               id: docker_meta
               uses: docker/metadata-action@v5
