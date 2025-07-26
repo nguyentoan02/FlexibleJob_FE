@@ -3,12 +3,11 @@ name: 🚀 Build, Push and Deploy
 on:
     push:
         branches:
-            - feat/merge
+            - feat/Merge
 
 env:
     SSH_USER: ec2-user
     APP_DIR: /home/ec2-user/app
-
     DOCKER_IMAGE_NAME: myapp-fe # Tên image của bạn
 
 jobs:
@@ -88,14 +87,6 @@ jobs:
                     ssh -o StrictHostKeyChecking=no -i key.pem ${{ env.SSH_USER }}@$HOST "
                       set -e
                       
-                      # Create app directory if it doesn't exist
-                      echo "📁 Creating app directory..."
-                      mkdir -p ${{ env.APP_DIR }}
-                      
-                      # Create .env file from GitHub secret
-                      echo "📝 Creating .env file..."
-                      echo "${{ secrets.ENV_FILE }}" > ${{ env.APP_DIR }}/.env
-                      
                       # Pull image mới từ Docker Hub
                       echo '🐳 Pulling latest image...'
                       docker pull $FULL_IMAGE_NAME
@@ -107,7 +98,7 @@ jobs:
                       
                       # Tạo container mới
                       echo '🚀 Starting new container...'
-                      docker run -d --name ${{ env.DOCKER_IMAGE_NAME }}_new -p 6000:80 --env-file ${{ env.APP_DIR }}/.env $FULL_IMAGE_NAME
+                      docker run -d --name ${{ env.DOCKER_IMAGE_NAME }}_new -p 6000:5000 --env-file ${{ env.APP_DIR }}/.env $FULL_IMAGE_NAME
                       
                       echo '⌛ Waiting for new container to be healthy...'
                       sleep 10
