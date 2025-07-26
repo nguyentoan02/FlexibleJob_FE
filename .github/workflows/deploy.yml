@@ -98,7 +98,7 @@ jobs:
                       docker rm ${{ env.DOCKER_IMAGE_NAME }}_new ${{ env.DOCKER_IMAGE_NAME }} 2>/dev/null || true
                       
                       echo '🚀 Starting new container...'
-                      docker run -d --name ${{ env.DOCKER_IMAGE_NAME }}_new -p 6000:5000 --env-file ${{ env.APP_DIR }}/.env $FULL_IMAGE_NAME
+                      docker run -d --name ${{ env.DOCKER_IMAGE_NAME }}_new -p 6000:80 --env-file ${{ env.APP_DIR }}/.env $FULL_IMAGE_NAME
                       
                       echo '⌛ Waiting for new container to be healthy...'
                       sleep 10
