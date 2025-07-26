@@ -165,6 +165,9 @@ export default function JobList() {
                                         <SelectItem value="Senior">
                                             Senior
                                         </SelectItem>
+                                        <SelectItem value="Mid">
+                                            Middle
+                                        </SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
