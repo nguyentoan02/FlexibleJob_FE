@@ -87,6 +87,14 @@ jobs:
                     ssh -o StrictHostKeyChecking=no -i key.pem ${{ env.SSH_USER }}@$HOST "
                       set -e
                       
+                      # Tạo thư mục app nếu chưa tồn tại
+                      echo '📁 Creating app directory...'
+                      mkdir -p ${{ env.APP_DIR }}
+
+                      # Tạo file .env từ secret
+                      echo '🔑 Creating .env file...'
+                      echo "${{ secrets.ENV_FILE }}" > ${{ env.APP_DIR }}/.env
+                      
                       # Pull image mới từ Docker Hub
                       echo '🐳 Pulling latest image...'
                       docker pull $FULL_IMAGE_NAME
