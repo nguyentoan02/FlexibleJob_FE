@@ -1,0 +1,127 @@
+name: 🚀 Build, Push and Deploy
+
+on:
+    push:
+        branches:
+            - feat/merge
+
+env:
+    SSH_USER: ec2-user
+    APP_DIR: /home/ec2-user/app
+    DOCKER_IMAGE_NAME: myapp # Tên image của bạn
+
+jobs:
+    build-and-push:
+        name: Build and Push to Docker Hub
+        runs-on: ubuntu-latest
+        outputs:
+            image_tag: ${{ steps.docker_meta.outputs.version }}
+
+        steps:
+            - name: 📥 Checkout code
+              uses: actions/checkout@v3
+
+            - name: 🔧 Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
+
+            - name: 🔑 Login to Docker Hub
+              uses: docker/login-action@v3
+              with:
+                  username: ${{ secrets.DOCKERHUB_USERNAME }}
+                  password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+            - name: 🏷️ Extract Docker metadata
+              id: docker_meta
+              uses: docker/metadata-action@v5
+              with:
+                  images: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}
+                  tags: |
+                      type=raw,value=latest,enable=true
+                      type=raw,value=${{ github.run_number }},enable=true
+
+            - name: ⚡ Cache Docker layers
+              uses: actions/cache@v4
+              with:
+                  path: /tmp/.buildx-cache
+                  key: ${{ runner.os }}-buildx-${{ github.sha }}
+                  restore-keys: |
+                      ${{ runner.os }}-buildx-
+
+            - name: 🚀 Build and push Docker image
+              uses: docker/build-push-action@v5
+              with:
+                  context: .
+                  push: true
+                  tags: ${{ steps.docker_meta.outputs.tags }}
+                  labels: ${{ steps.docker_meta.outputs.labels }}
+                  cache-from: type=local,src=/tmp/.buildx-cache
+                  cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+
+            # Di chuyển cache mới để sử dụng cho lần chạy tiếp theo
+            - name: Move cache
+              run: |
+                  rm -rf /tmp/.buildx-cache
+                  mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
+    deploy:
+        name: Rolling Deploy to EC2
+        needs: build-and-push # Chạy sau khi build-and-push thành công
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: 🔐 Setup key and Deploy
+              run: |
+                  echo "${{ secrets.EC2_KEY }}" > key.pem
+                  chmod 400 key.pem
+
+                  # Lấy tag từ job build-and-push
+                  IMAGE_TAG=${{ needs.build-and-push.outputs.image_tag }}
+                  FULL_IMAGE_NAME="${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:$IMAGE_TAG"
+
+                  HOSTS=(${{ secrets.EC2_HOSTS }})
+
+                  for HOST in "${HOSTS[@]}"; do
+                    echo "👉 Deploying image $FULL_IMAGE_NAME to $HOST"
+
+                    # Truyền biến vào script SSH
+                    ssh -o StrictHostKeyChecking=no -i key.pem ${{ env.SSH_USER }}@$HOST "
+                      set -e
+                      
+                      # Pull image mới từ Docker Hub
+                      echo '🐳 Pulling latest image...'
+                      docker pull $FULL_IMAGE_NAME
+                      
+                      # Dọn dẹp container cũ
+                      echo '🧹 Cleaning up old containers...'
+                      docker stop ${{ env.DOCKER_IMAGE_NAME }}_new ${{ env.DOCKER_IMAGE_NAME }} 2>/dev/null || true
+                      docker rm ${{ env.DOCKER_IMAGE_NAME }}_new ${{ env.DOCKER_IMAGE_NAME }} 2>/dev/null || true
+                      
+                      # Tạo container mới
+                      echo '🚀 Starting new container...'
+                      docker run -d --name ${{ env.DOCKER_IMAGE_NAME }}_new -p 6000:80 --env-file ${{ env.APP_DIR }}/.env $FULL_IMAGE_NAME
+                      
+                      echo '⌛ Waiting for new container to be healthy...'
+                      sleep 10
+                      
+                      # Kiểm tra container mới
+                      if [ \$(docker ps -q -f name=${{ env.DOCKER_IMAGE_NAME }}_new) ]; then
+                        echo '✅ New container is running successfully'
+                        
+                        # Đổi tên container mới thành tên chính
+                        docker rename ${{ env.DOCKER_IMAGE_NAME }}_new ${{ env.DOCKER_IMAGE_NAME }}
+                      else
+                        echo '❌ New container failed to start'
+                        docker logs ${{ env.DOCKER_IMAGE_NAME }}_new
+                        exit 1
+                      fi
+                      
+                      # Dọn dẹp image cũ
+                      echo '🗑️ Pruning old docker images...'
+                      docker system prune -af
+                      
+                      echo '✅ Done on $HOST'
+                    "
+                    
+                    echo "🕒 Waiting before next deploy..."
+                    sleep 10
+                  done
