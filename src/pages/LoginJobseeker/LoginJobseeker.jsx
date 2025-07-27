@@ -30,7 +30,7 @@ export default function LoginJobseeker() {
                 } else if (payload.role === "EMPLOYER") {
                     navigate("/company/dashboard");
                 } else {
-                    navigate("/user/dashboard");
+                    navigate("/jobs");
                 }
             }, 1000); // Navigate after showing toast
         },
