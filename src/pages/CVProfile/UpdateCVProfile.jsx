@@ -520,7 +520,7 @@ export default function UpdateCVProfile() {
                                                         )[0]
                                                     }
                                                     className="border rounded-lg"
-                                                    max={today}
+                                                    // Xóa thuộc tính max để cho phép chọn ngày trong tương lai
                                                     onChange={(e) => {
                                                         const newEducation = [
                                                             ...formData.education,
@@ -547,7 +547,7 @@ export default function UpdateCVProfile() {
                                                         )[0]
                                                     }
                                                     className="border rounded-lg"
-                                                    max={today}
+                                                    // Xóa thuộc tính max để cho phép chọn ngày trong tương lai
                                                     onChange={(e) => {
                                                         const newEducation = [
                                                             ...formData.education,
@@ -705,7 +705,7 @@ export default function UpdateCVProfile() {
                                                         )[0]
                                                     }
                                                     className="border rounded-lg"
-                                                    max={today}
+                                                    // Xóa thuộc tính max để cho phép chọn ngày trong tương lai
                                                     onChange={(e) => {
                                                         const newExperience = [
                                                             ...formData.experience,
@@ -732,7 +732,7 @@ export default function UpdateCVProfile() {
                                                         )[0]
                                                     }
                                                     className="border rounded-lg"
-                                                    max={today}
+                                                    // Xóa thuộc tính max để cho phép chọn ngày trong tương lai
                                                     onChange={(e) => {
                                                         const newExperience = [
                                                             ...formData.experience,

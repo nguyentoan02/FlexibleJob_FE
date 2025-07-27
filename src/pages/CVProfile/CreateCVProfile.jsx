@@ -81,10 +81,7 @@ export default function CreateCVProfile() {
             ) {
                 newErrors[`education_${idx}`] = "All fields are required";
             }
-            if (edu.endDate && new Date(edu.endDate) > new Date()) {
-                newErrors[`education_${idx}_endDate`] =
-                    "End date cannot be in the future";
-            }
+            // BỎ kiểm tra ngày endDate > hôm nay
             if (!edu.description.trim()) {
                 newErrors[`education_${idx}_description`] =
                     "Description is required";
@@ -104,10 +101,7 @@ export default function CreateCVProfile() {
             ) {
                 newErrors[`experience_${idx}`] = "All fields are required";
             }
-            if (exp.endDate && new Date(exp.endDate) > new Date()) {
-                newErrors[`experience_${idx}_endDate`] =
-                    "End date cannot be in the future";
-            }
+            // BỎ kiểm tra ngày endDate > hôm nay
             if (!exp.description.trim()) {
                 newErrors[`experience_${idx}_description`] =
                     "Description is required";
@@ -496,11 +490,6 @@ export default function CreateCVProfile() {
                                                             ? "border-red-500"
                                                             : ""
                                                     }
-                                                    max={
-                                                        new Date()
-                                                            .toISOString()
-                                                            .split("T")[0]
-                                                    }
                                                 />
                                             </div>
                                             <textarea
@@ -685,11 +674,6 @@ export default function CreateCVProfile() {
                                                         ]
                                                             ? "border-red-500"
                                                             : ""
-                                                    }
-                                                    max={
-                                                        new Date()
-                                                            .toISOString()
-                                                            .split("T")[0]
                                                     }
                                                 />
                                             </div>

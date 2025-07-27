@@ -34,8 +34,12 @@ export default function LoginJobseeker() {
                 }
             }, 1000); // Navigate after showing toast
         },
-        onError: () => {
-            setToastMessage("Login failed. Please try again."); // Show error toast
+        onError: (error) => {
+            // Lấy message từ response nếu có, nếu không thì fallback
+            const message =
+                error.response?.data?.message ||
+                "Login failed. Please try again."; // Show error toast
+            setToastMessage(message);
             setToastType("error");
         },
     });
